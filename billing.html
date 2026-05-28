@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wallet - Wisemonk</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap" rel="stylesheet">
+<style>
+:root{--p50:#E8F2FF;--p100:#C5DCFF;--p200:#9DC4FF;--p300:#72ABFF;--p400:#4D97FF;--p500:#2684FF;--p600:#1A6FE0;--p700:#1059BD;--p800:#09449A;--p900:#03307A;--n0:#FFFFFF;--n50:#F7F8FA;--n100:#EEF0F4;--n200:#DDE1E9;--n300:#C4CAD6;--n400:#9AA2B2;--n500:#6B7588;--n600:#4E5768;--n700:#363D4D;--n800:#222733;--n900:#121620;--bg:#F1F8FF;--bd:#EEF0F4;--bd-strong:#DDE1E9;--brand:#2684FF;--s50:#E6F9F0;--s500:#12B76A;--s700:#027A48;--w50:#FFFAEB;--w500:#F79009;--w700:#B54708;--d50:#FFF1F0;--d500:#F04438;--d700:#B42318;--font:'Satoshi',sans-serif;--font-tag:'Open Sans',sans-serif;--rmd:8px;--rlg:10px;--rfull:9999px}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--bg);color:var(--n800);-webkit-font-smoothing:antialiased;height:100vh;overflow:hidden}
+.app{display:flex;height:100vh}
+
+/* sidebar — Figma 94:317 */
+.sidebar{width:240px;flex-shrink:0;background:#FFFFFF;border-right:1px solid #FFFFFF;display:flex;flex-direction:column;align-items:flex-start;padding:30px 20px;gap:0;z-index:1}
+.sidebar-inner{flex:1;display:flex;flex-direction:column;align-items:center;gap:32px;width:100%;min-height:0}
+.logo{height:32px;width:160px;display:flex;align-items:center;justify-content:flex-start;gap:8px;font-size:20px;font-weight:700;color:#222224;padding:0;flex-shrink:0}
+.logo svg{width:32px;height:32px;flex-shrink:0}
+.nav-group{flex:1;display:flex;flex-direction:column;gap:8px;width:100%;min-height:0;align-items:flex-start}
+.nav-section{display:flex;flex-direction:column;width:100%}
+.slab{font-family:'Open Sans',sans-serif;font-size:13px;font-weight:300;color:#abadb1;letter-spacing:0;text-transform:uppercase;padding:0 8px;height:36px;display:flex;align-items:center;width:100%;line-height:1}
+.nav-list{display:flex;flex-direction:column;gap:2px;width:100%}
+.nav{display:flex;align-items:center;gap:8px;height:32px;padding:6px 8px;border-radius:8px;font-family:'Satoshi',sans-serif;font-size:16px;font-weight:500;color:#222224;cursor:pointer;transition:background 120ms;text-decoration:none;background:#FFFFFF;overflow:hidden;line-height:1}
+.nav svg{width:20px;height:20px;flex-shrink:0;color:#222224}
+.nav:hover{background:#F7F8FA}
+.nav.active{background:rgba(38,132,255,0.1);color:#2684FF}
+.nav.active svg{color:#2684FF}
+
+/* main shell */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;position:relative;background:#F1F8FF}
+/* topbar — Figma 94:301 */
+.topbar{flex-shrink:0;background:#F1F8FF;border-bottom:none;display:flex;align-items:center;justify-content:space-between;padding:20px 40px 20px 20px;z-index:5;gap:16px}
+.topbar-title{font-size:23px;font-weight:700;color:#222224;line-height:1;letter-spacing:0}
+.topbar-right{display:flex;align-items:center;gap:16px}
+.bell{width:32px;height:32px;border-radius:6px;background:transparent;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;padding:0}
+.bell svg{width:24px;height:24px;color:#222224}
+.bell .dot{position:absolute;top:4px;right:5px;width:6px;height:6px;border-radius:50%;background:var(--d500);border:1px solid #F1F8FF}
+.uchip{display:flex;align-items:center;gap:8px;cursor:pointer}
+.uavatar{width:32px;height:32px;border-radius:9999px;background:var(--brand);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;line-height:20px;font-family:'Inter',var(--font)}
+.uname{font-size:16px;font-weight:500;color:#222224;display:flex;align-items:center;gap:8px;white-space:nowrap}
+.uname svg{width:16px;height:16px;color:#222224}
+
+.body-area{flex:1;display:flex;overflow:hidden;position:relative}
+.page-body{flex:1;overflow-y:auto;padding:48px 64px 64px;display:flex;flex-direction:column;gap:0}
+.page-body::-webkit-scrollbar{width:4px}
+.page-body::-webkit-scrollbar-thumb{background:var(--n200);border-radius:10px}
+.container{max-width:1100px;width:100%;margin:0 auto}
+
+/* balance header */
+.cards-row{display:grid;grid-template-columns:1.6fr 1fr;gap:18px;width:100%}
+.bal-card{background:#FFFFFF;border:none;border-radius:var(--rlg);padding:28px 32px}
+
+/* advance / security deposit card */
+.advance-card{background:#FFFFFF;border:none;border-radius:var(--rlg);padding:24px 26px;display:flex;flex-direction:column;gap:18px}
+.adv-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.adv-left{display:flex;flex-direction:column;gap:4px;min-width:0}
+.adv-titlerow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.adv-lock{display:inline-flex;width:24px;height:24px;align-items:center;justify-content:center;background:var(--n100);border-radius:6px;color:var(--n600)}
+.adv-lock svg{width:14px;height:14px}
+.adv-title{font-size:16px;font-weight:700;color:var(--n900)}
+.adv-pill{display:inline-flex;align-items:center;padding:2px 8px;background:var(--n100);color:var(--n600);font-size:11px;font-weight:600;border-radius:var(--rfull);text-transform:uppercase;letter-spacing:.4px}
+.adv-amt{font-size:32px;font-weight:700;color:var(--n800);letter-spacing:-0.5px;line-height:1.1;margin-top:6px}
+.adv-meta{font-size:12px;color:var(--n500);margin-top:4px}
+.adv-divider{height:1px;background:var(--bd);margin:0 -26px}
+.adv-info{display:flex;flex-direction:column;gap:12px}
+.adv-info-title{font-family:var(--font-tag);font-size:11px;font-weight:300;color:var(--n400);letter-spacing:.6px;text-transform:uppercase}
+.adv-list{display:flex;flex-direction:column;gap:12px}
+.adv-item{display:flex;gap:10px;align-items:flex-start}
+.adv-ico{display:inline-flex;width:24px;height:24px;align-items:center;justify-content:center;border-radius:6px;flex-shrink:0;margin-top:1px}
+.adv-ico svg{width:13px;height:13px}
+.adv-ico.warn{background:var(--w50);color:var(--w500)}
+.adv-ico.clock{background:var(--p50);color:var(--brand)}
+.adv-ico.ok{background:var(--s50);color:var(--s500)}
+.adv-text{flex:1;font-size:13px;color:var(--n600);line-height:1.55}
+.adv-text strong{color:var(--n900);font-weight:700}
+
+@media (max-width:900px){
+  .cards-row{grid-template-columns:1fr}
+}
+.bal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:8px}
+.bal-right{display:flex;flex-direction:row;align-items:center;gap:24px;flex-shrink:0}
+.bank-link{font-family:var(--font);font-size:16px;font-weight:500;color:#222224;cursor:pointer;text-decoration:none;background:none;border:none;padding:0}
+.bank-link:hover{text-decoration:underline}
+.bank-link.primary{color:#222224;font-weight:500}
+.bal-left{flex:1;min-width:0}
+.bal-title-row{display:flex;align-items:center;gap:8px}
+.bal-title{font-size:32px;font-weight:700;color:var(--n900);letter-spacing:-0.5px;line-height:1.1}
+.oa-wrap{position:relative;display:inline-flex}
+.oa-info{width:28px;height:28px;border-radius:9999px;border:none;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--n400);padding:0}
+.oa-info:hover{background:var(--n100);color:var(--n700)}
+.oa-info svg{width:16px;height:16px}
+.oa-pop{position:absolute;top:calc(100% + 8px);left:-12px;width:320px;background:var(--n0);border:1px solid var(--bd);border-radius:var(--rlg);box-shadow:0 8px 28px rgba(0,0,0,0.10);padding:14px 16px;display:none;z-index:50}
+.oa-pop.show{display:block}
+.oa-pop::before{content:'';position:absolute;top:-6px;left:20px;width:10px;height:10px;background:var(--n0);border-top:1px solid var(--bd);border-left:1px solid var(--bd);transform:rotate(45deg)}
+.oa-title{font-family:var(--font-tag);font-size:11px;font-weight:300;color:var(--n400);letter-spacing:.6px;text-transform:uppercase;margin-bottom:6px}
+.oa-text{font-size:13px;color:var(--n600);line-height:1.55}
+.oa-text strong{color:var(--n900);font-weight:700}
+.bal-amt{font-size:64px;font-weight:700;color:var(--brand);letter-spacing:-1.5px;line-height:1.1;margin-top:2px}
+.bal-credit-note{display:inline-flex;align-items:center;gap:8px;margin-top:14px;padding:7px 12px;background:var(--s50);color:var(--s700);border-radius:var(--rfull);font-size:13px;font-weight:500;width:fit-content}
+.bal-credit-note svg{width:13px;height:13px;flex-shrink:0;color:var(--s500)}
+.bal-credit-note strong{color:var(--s700);font-weight:700}
+.bal-credit-note .cn-ref{font-family:'SF Mono','Menlo',monospace;font-size:12px;color:var(--s700);font-weight:600;background:var(--n0);padding:1px 6px;border-radius:4px;margin-left:2px}
+.bal-amt .cur{font-weight:500}
+.bal-amt .dec{opacity:.55}
+.bal-meta{font-size:13px;color:var(--n500);margin-top:10px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.bal-meta .dotsep{width:3px;height:3px;border-radius:50%;background:var(--n300)}
+.bal-meta .pending-tag{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;background:var(--w50);color:var(--w700);border-radius:var(--rfull);font-size:12px;font-weight:600;border:1px solid #F7900925}
+.bal-meta .pending-tag .pulse{width:6px;height:6px;border-radius:50%;background:var(--w500);animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.bal-actions{display:flex;align-items:center;gap:28px;padding-top:18px;flex-shrink:0}
+.bal-action{font-size:16px;font-weight:500;color:var(--n800);cursor:pointer;background:none;border:none;font-family:var(--font);padding:0;display:flex;align-items:center;gap:6px;text-decoration:none}
+.bal-action:hover{color:var(--brand)}
+.bal-action svg{width:14px;height:14px;color:var(--n400)}
+.bal-action:hover svg{color:var(--brand)}
+.bal-action.primary{color:var(--brand);font-weight:700}
+.bal-action.primary svg{color:var(--brand)}
+
+/* divider */
+.divider{height:0;margin:18px 0}
+
+/* upcoming invoice banner — Stripe-style payout banner */
+.invoice-banner{display:flex;align-items:flex-start;gap:14px;padding:18px 24px;background:#E8F2FF;border:none;border-radius:var(--rlg);margin-bottom:24px}
+.ib-text{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.ib-title{font-size:15px;font-weight:700;color:#0A0A0A;line-height:1.4}
+.ib-body{font-size:14px;font-weight:400;color:#6B7280;line-height:1.5}
+.ib-link{font-weight:600;color:#635BFF;cursor:pointer;text-decoration:none;margin-left:2px}
+.ib-link:hover{text-decoration:underline}
+.ib-close{width:24px;height:24px;border-radius:6px;border:none;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;margin-top:2px}
+.ib-close:hover{background:#E4E4E7}
+.ib-close svg{width:12px;height:12px;color:#6B7280}
+
+/* tabs */
+.tab-bar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:0;margin-top:12px}
+.tab-list{display:flex;align-items:center;gap:0;border-bottom:1px solid transparent;flex:1}
+.tab{padding:12px 4px 14px;margin-right:24px;font-family:var(--font);font-size:16px;font-weight:500;color:var(--n500);cursor:pointer;border-bottom:2px solid transparent;user-select:none;display:inline-flex;align-items:center;gap:8px}
+.tab:hover{color:var(--n700)}
+.tab.active{color:var(--n900);border-bottom-color:var(--brand);font-weight:700}
+.tab-count{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:20px;padding:0 7px;border-radius:var(--rfull);background:var(--n100);color:var(--n500);font-size:12px;font-weight:600}
+.tab.active .tab-count{background:var(--p50);color:var(--brand)}
+.search-box{display:flex;align-items:center;gap:6px;height:36px;padding:0 12px;background:var(--n0);border:1px solid var(--bd-strong);border-radius:var(--rmd);min-width:240px;flex-shrink:0}
+.search-box svg{width:13px;height:13px;color:var(--n400);flex-shrink:0}
+.search-box input{border:none;outline:none;font-family:var(--font);font-size:13px;color:var(--n800);background:transparent;width:100%}
+.search-box input::placeholder{color:var(--n400)}
+
+/* simple table — minimal style */
+.table{width:100%;background:#FFFFFF;border-radius:var(--rlg);border:none;padding:8px 20px;overflow:hidden}
+.thead{display:grid;grid-template-columns:140px minmax(280px,1fr) 180px 180px 32px;padding:14px 8px;border-bottom:1px solid var(--n200);gap:24px;align-items:center}
+.th{font-family:var(--font);font-size:13px;font-weight:700;color:var(--n900);text-transform:uppercase;letter-spacing:.4px}
+.th.right{text-align:right}
+.trow{display:grid;grid-template-columns:140px minmax(280px,1fr) 180px 180px 32px;padding:18px 8px;border-bottom:1px solid var(--bd);gap:24px;align-items:center;cursor:pointer}
+.tidx{font-size:13px;color:var(--n400);font-weight:500;text-align:center;font-variant-numeric:tabular-nums}
+.trow:last-child,.trow.last-visible{border-bottom:none}
+.trow:hover{background:var(--n50)}
+.tdate{font-size:14px;color:var(--n800);font-weight:500}
+.tdate .y{color:var(--n400);font-weight:400;margin-left:4px}
+.tact{display:flex;align-items:center;gap:12px;min-width:0}
+.tact-dot{width:32px;height:32px;border-radius:var(--rfull);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tact-dot.in{background:var(--s50);color:var(--s500)}
+.tact-dot.out{background:var(--p50);color:var(--brand)}
+.tact-dot.invoice{background:var(--n100);color:var(--n500)}
+.tact-dot.credit{background:var(--n100);color:var(--n500)}
+.tact-dot.refund{background:var(--n100);color:var(--n600)}
+.tact-dot svg{width:14px;height:14px}
+.tact-text{min-width:0;display:flex;flex-direction:column;gap:1px}
+.tact-title{font-size:15px;font-weight:600;color:var(--n900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tact-meta{font-size:12px;color:var(--n500);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tamt{font-size:16px;font-weight:600;color:var(--n900);text-align:right;letter-spacing:-0.2px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.tamt.in{color:var(--n900)}
+.tamt .cur{font-size:13px;font-weight:500;color:var(--n400);margin-right:2px}
+.tstatus{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;color:var(--n700)}
+.tstatus .stdot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.tstatus.complete .stdot{background:var(--brand)}
+.tstatus.complete{color:var(--p700)}
+.tstatus.pending .stdot{background:var(--w500);box-shadow:0 0 0 3px #F790091a}
+.tstatus.pending{color:var(--w700)}
+.tstatus.refund .stdot{background:var(--n400)}
+.tstatus.refund{color:var(--n600)}
+.tstatus.invoice .stdot{background:var(--brand)}
+.tstatus.invoice{color:var(--p700)}
+.tstatus.due .stdot{background:var(--w500)}
+.tstatus.due{color:var(--w700);font-weight:600}
+.raw{display:flex;justify-content:flex-end}
+.rabtn{width:28px;height:28px;border-radius:var(--rmd);border:1px solid transparent;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.rabtn:hover{background:var(--n100)}
+.rabtn svg{width:14px;height:14px;color:var(--n400)}
+
+.empty{padding:80px 20px;text-align:center}
+.empty-text{font-size:15px;color:var(--n400);font-weight:500}
+
+/* Notify deposit modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(18,22,32,0.45);display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;pointer-events:none;transition:opacity 180ms}
+.modal-overlay.show{opacity:1;pointer-events:auto}
+.modal{background:var(--n0);border-radius:var(--rlg);width:560px;max-width:92vw;max-height:88vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,0.18);transform:translateY(8px);transition:transform 180ms;border:1px solid var(--bd)}
+.modal-overlay.show .modal{transform:translateY(0)}
+.m-header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--bd)}
+.m-title{font-size:18px;font-weight:700;color:var(--n900);letter-spacing:-0.2px}
+.m-close{width:32px;height:32px;border-radius:var(--rmd);border:1px solid var(--bd);background:var(--n0);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.m-close:hover{background:var(--n50)}
+.m-close svg{width:12px;height:12px;color:var(--n500)}
+.m-body{padding:24px;display:flex;flex-direction:column;gap:20px;overflow-y:auto;background:#FFFFFF}
+.fg{display:flex;flex-direction:column;gap:8px}
+.flabel{font-size:14px;font-weight:600;color:var(--n800);letter-spacing:-0.1px}
+.flabel .req{color:var(--d500)}
+.finput{height:44px;padding:0 14px;border:1px solid var(--bd-strong);border-radius:var(--rmd);font-family:var(--font);font-size:14px;color:var(--n800);outline:none;background:var(--n0);transition:border-color 120ms,box-shadow 120ms}
+.finput:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(38,132,255,0.15)}
+.amount-input{position:relative}
+.amount-input .cur{position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:18px;color:var(--n500);font-weight:500;pointer-events:none}
+.amount-input input{padding-left:32px;height:52px;font-size:20px;font-weight:700}
+.preset-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.preset{padding:8px 14px;border:1px solid var(--bd-strong);border-radius:var(--rfull);font-family:var(--font);font-size:13px;font-weight:600;color:var(--n700);cursor:pointer;background:var(--n0);transition:background 120ms,border-color 120ms}
+.preset:hover{background:var(--n50);border-color:var(--n300)}
+.preset.active{background:var(--p50);border-color:var(--brand);color:var(--brand)}
+.bank-card{background:var(--n0);border:none;border-radius:var(--rlg);padding:0;display:flex;flex-direction:column;gap:12px}
+.rail-toggle{display:inline-flex;background:var(--n100);border-radius:var(--rfull);padding:4px;gap:2px;width:fit-content}
+.rail-tab{padding:7px 16px;border:none;background:transparent;font-family:var(--font);font-size:13px;font-weight:600;color:var(--n500);cursor:pointer;border-radius:var(--rfull);transition:background 120ms,color 120ms;display:inline-flex;align-items:center;gap:6px}
+.rail-tab:hover{color:var(--n700)}
+.rail-tab.active{background:var(--n0);color:var(--n900);box-shadow:0 1px 2px rgba(0,0,0,0.06)}
+.rail-tab .meta{font-weight:400;color:var(--n400);font-size:11px}
+.bank-row{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:24px}
+.bank-row + .bank-row{padding-top:12px;border-top:1px solid var(--bd)}
+.bank-label{font-size:13px;color:var(--n500);font-weight:500}
+.bank-val{font-size:14px;color:var(--n900);font-weight:600;font-family:'SF Mono','Menlo',monospace;letter-spacing:.2px}
+.copybtn{width:28px;height:28px;border-radius:6px;border:1px solid var(--bd-strong);background:var(--n0);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:background 120ms,border-color 120ms}
+.copybtn:hover{background:var(--p50);border-color:var(--p100)}
+.copybtn svg{width:12px;height:12px;color:var(--n500)}
+.copybtn.copied svg{color:var(--s500)}
+.note-box{background:var(--p50);border:none;border-radius:var(--rlg);padding:14px 16px;display:flex;gap:12px;align-items:flex-start}
+.note-box svg{width:16px;height:16px;color:var(--brand);flex-shrink:0;margin-top:1px}
+.note-box .nb-text{font-size:13px;color:var(--n700);line-height:1.55}
+.note-box .nb-text strong{color:var(--n900);font-weight:700}
+.step-tabs{display:flex;align-items:center;gap:6px;padding:0 0 4px}
+.step-pill{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--n400)}
+.step-pill .num{width:20px;height:20px;border-radius:50%;background:var(--n100);color:var(--n500);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+.step-pill.active{color:var(--brand)}
+.step-pill.active .num{background:var(--brand);color:#fff}
+.step-pill.done{color:var(--s700)}
+.step-pill.done .num{background:var(--s500);color:#fff}
+.step-conn{width:24px;height:1px;background:var(--bd-strong)}
+.m-footer{padding:18px 24px;border-top:1px solid var(--bd);display:flex;justify-content:flex-end;gap:10px;background:var(--n0)}
+.btn-cancel{height:42px;padding:0 18px;background:var(--n0);border:1px solid var(--bd-strong);border-radius:var(--rmd);font-family:var(--font);font-size:14px;font-weight:600;color:var(--n700);cursor:pointer;transition:background 120ms}
+.btn-cancel:hover{background:var(--n50)}
+.btn-confirm{height:42px;padding:0 20px;background:var(--brand);border:none;border-radius:var(--rmd);font-family:var(--font);font-size:14px;font-weight:700;color:#fff;cursor:pointer;display:flex;align-items:center;gap:8px;transition:background 120ms}
+.btn-confirm:hover{background:var(--p600)}
+.btn-confirm svg{width:14px;height:14px}
+
+/* drawer */
+.drawer{position:fixed;top:0;right:0;bottom:0;width:42%;min-width:380px;background:var(--n0);border-left:1px solid var(--bd);display:flex;flex-direction:column;overflow:hidden;transition:transform 260ms cubic-bezier(0.4,0,0.2,1),opacity 220ms;box-shadow:-4px 0 32px rgba(0,0,0,0.14);z-index:100}
+.drawer.hidden{transform:translateX(100%);opacity:0;pointer-events:none;box-shadow:none}
+.dr-head{padding:16px 20px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;gap:12px}
+.dr-title-wrap{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
+.dr-head-badge{display:inline-flex;align-items:center;padding:3px 10px;background:var(--p50);color:var(--brand);font-size:12px;font-weight:600;border-radius:var(--rfull);letter-spacing:.2px}
+.dr-head-badge.paid{background:var(--s50);color:var(--s700)}
+.dr-head-badge.open{background:var(--p50);color:var(--brand)}
+.dr-title{font-size:15px;font-weight:700;color:var(--n900)}
+.dr-body{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:20px}
+.dr-amount{font-size:32px;font-weight:700;color:var(--n900);letter-spacing:-0.5px;line-height:1}
+.dr-amount.in{color:var(--n900)}
+.dr-amount .cur{font-size:18px;font-weight:500;color:var(--n400);margin-right:3px}
+.dr-status-row{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:12px;color:var(--n500)}
+.dr-sec{display:flex;flex-direction:column;gap:10px}
+.dr-stitle{font-family:var(--font-tag);font-size:13px;font-weight:300;color:var(--n400);text-transform:uppercase;letter-spacing:.6px}
+.dr-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 18px}
+.dr-cell{display:flex;flex-direction:column;gap:3px}
+.dr-clabel{font-size:12px;color:var(--n400)}
+.dr-cval{font-size:13px;color:var(--n800);font-weight:600;word-break:break-word}
+.dr-divider{height:1px;background:var(--bd)}
+.dr-mini-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px dashed var(--bd)}
+.dr-mini-row:last-child{border-bottom:none;border-top:1px solid var(--bd);padding-top:10px;margin-top:4px}
+.dr-mini-label{font-size:13px;color:var(--n600)}
+.dr-mini-val{font-size:13px;font-weight:600;color:var(--n800)}
+.dr-mini-row.total .dr-mini-label{font-weight:700;color:var(--n900)}
+.dr-mini-row.total .dr-mini-val{font-weight:700;color:var(--n900)}
+.dr-foot{padding:14px 20px;border-top:1px solid var(--bd);display:flex;gap:8px;flex-shrink:0}
+.dr-lines{display:flex;flex-direction:column;gap:0}
+.dr-line{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px dashed var(--bd)}
+.dr-line:first-child{padding-top:6px}
+.dr-line:nth-last-child(2){border-bottom:none}
+.dr-line-info{display:flex;flex-direction:column;gap:2px;min-width:0}
+.dr-line-title{font-size:13px;font-weight:600;color:var(--n900)}
+.dr-line-sub{font-size:12px;color:var(--n500)}
+.dr-line-amt{font-size:14px;font-weight:600;color:var(--n900);text-align:right;white-space:nowrap;letter-spacing:-0.1px}
+.dr-line.dr-line-total{border-bottom:none;border-top:1px solid var(--bd);padding-top:12px;margin-top:2px}
+.dr-line.dr-line-total .dr-line-title{font-weight:700}
+.dr-line.dr-line-total .dr-line-amt{font-weight:700;font-size:15px}
+.dr-line.credit .dr-line-title{color:var(--s700)}
+.dr-line.credit .dr-line-sub{color:var(--s500)}
+.dr-line.credit .dr-line-amt{color:var(--s700);font-weight:700}
+.dr-bank-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.dr-rail-toggle{display:inline-flex;background:var(--n100);border-radius:var(--rfull);padding:3px;gap:2px}
+.dr-rail-tab{padding:5px 12px;border:none;background:transparent;font-family:var(--font);font-size:12px;font-weight:600;color:var(--n500);cursor:pointer;border-radius:var(--rfull);transition:background 120ms,color 120ms}
+.dr-rail-tab:hover{color:var(--n700)}
+.dr-rail-tab.active{background:var(--n0);color:var(--n900);box-shadow:0 1px 2px rgba(0,0,0,0.06)}
+.dr-bank-card{display:flex;flex-direction:column;gap:10px;padding:0}
+.dr-bank-row{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:22px}
+.dr-bank-row + .dr-bank-row{padding-top:10px;border-top:1px solid var(--bd)}
+.dr-bank-label{font-size:12px;color:var(--n500);font-weight:500;flex-shrink:0}
+.dr-bank-val{font-size:13px;color:var(--n900);font-weight:600;font-family:'SF Mono','Menlo',monospace;letter-spacing:.2px;text-align:right}
+.dr-bank-val-wrap{display:flex;align-items:center;gap:6px}
+.dr-bank-note{display:flex;gap:8px;align-items:flex-start;background:var(--p50);border-radius:var(--rmd);padding:10px 12px;margin-top:4px}
+.dr-bank-note svg{width:14px;height:14px;color:var(--brand);flex-shrink:0;margin-top:2px}
+.dr-bank-note span{font-size:12px;color:var(--n700);line-height:1.5}
+.dr-bank-note strong{color:var(--n900);font-weight:700}
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:var(--rfull);font-size:12px;font-weight:500;border:1px solid transparent;white-space:nowrap}
+.bs{background:var(--s50);color:var(--s700);border-color:#12B76A33}
+.bw{background:var(--w50);color:var(--w500);border-color:#F7900933}
+.bn{background:var(--n100);color:var(--n600);border-color:var(--bd-strong)}
+
+/* toast */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--n900);color:#fff;padding:12px 18px;border-radius:var(--rmd);font-size:14px;font-weight:500;display:flex;align-items:center;gap:10px;z-index:2000;opacity:0;transition:all 220ms;pointer-events:none;box-shadow:0 10px 30px rgba(0,0,0,0.25)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast-icon{width:22px;height:22px;border-radius:50%;background:var(--s500);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.toast-icon svg{width:11px;height:11px}
+
+@media (max-width:900px){
+  .page-body{padding:32px 24px}
+  .bal-amt{font-size:48px}
+  .bal-actions{gap:18px}
+  .thead,.trow{grid-template-columns:110px 1fr 130px 32px}
+  .thead .th:nth-child(4),.trow > div:nth-child(4){display:none}
+  .upcoming{flex-direction:column;align-items:flex-start;gap:14px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="sidebar-inner">
+  <div class="logo">
+    <svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M3 8L9 24L16 12L23 24L29 8" stroke="#2684FF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span>Wisemonk</span>
+  </div>
+  <div class="nav-group">
+    <div class="nav-section">
+      <div class="slab">WORKSPACE</div>
+      <div class="nav-list">
+        <a class="nav" href="#">
+          <svg viewBox="0 0 20 20" fill="none"><path d="M3 8L10 3L17 8V16C17 16.55 16.55 17 16 17H13V12H7V17H4C3.45 17 3 16.55 3 16V8Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+          Home
+        </a>
+        <a class="nav" href="#">
+          <svg viewBox="0 0 20 20" fill="none"><path d="M10 2.5C14.14 2.5 17.5 5.86 17.5 10H10V2.5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.5"/></svg>
+          Dashboard
+        </a>
+        <a class="nav" href="people.html">
+          <svg viewBox="0 0 20 20" fill="none"><circle cx="7" cy="7" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M2 17C2 14.24 4.24 12 7 12C9.76 12 12 14.24 12 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M14 4C15.66 4 17 5.34 17 7C17 8.66 15.66 10 14 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M15 17C15 14.24 16.5 12.5 18 12.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          People
+        </a>
+        <a class="nav" href="#">
+          <svg viewBox="0 0 20 20" fill="none"><path d="M10 2L17 5V10C17 14 13.87 17.5 10 18.5C6.13 17.5 3 14 3 10V5L10 2Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+          Company policy
+        </a>
+        <a class="nav" href="#">
+          <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="4" width="14" height="13" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M7 2.5V5.5M13 2.5V5.5M3 8.5H17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Time
+        </a>
+      </div>
+    </div>
+    <div class="nav-section">
+      <div class="slab">FINANCE</div>
+      <div class="nav-list">
+        <a class="nav" href="#">
+          <svg viewBox="0 0 20 20" fill="none"><path d="M10 2.5V17.5M6.5 5.5H11.5C12.6 5.5 13.5 6.4 13.5 7.5C13.5 8.6 12.6 9.5 11.5 9.5H8.5C7.4 9.5 6.5 10.4 6.5 11.5C6.5 12.6 7.4 13.5 8.5 13.5H13.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Payroll
+        </a>
+        <a class="nav active" href="#">
+          <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="5" width="14" height="11" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M3 9H17M10 5V16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Billings
+        </a>
+        <a class="nav" href="#">
+          <svg viewBox="0 0 20 20" fill="none"><path d="M10 2.5V17.5M6.5 5.5H11.5C12.6 5.5 13.5 6.4 13.5 7.5C13.5 8.6 12.6 9.5 11.5 9.5H8.5C7.4 9.5 6.5 10.4 6.5 11.5C6.5 12.6 7.4 13.5 8.5 13.5H13.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Direct payments
+        </a>
+      </div>
+    </div>
+  </div>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <span class="topbar-title">Billings</span>
+    <div class="topbar-right">
+      <button class="bell"><svg viewBox="0 0 16 16" fill="none"><path d="M8 2C8 2 4.5 3 4.5 7.5V10.5L3 12H13L11.5 10.5V7.5C11.5 3 8 2 8 2Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M6.5 12C6.5 12.83 7.17 13.5 8 13.5C8.83 13.5 9.5 12.83 9.5 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="dot"></span></button>
+      <div class="uchip"><div class="uavatar">SJ</div><span class="uname">Sarah Johnson<svg viewBox="0 0 12 12" fill="none"><path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+    </div>
+  </div>
+
+  <div class="body-area">
+    <div class="page-body">
+      <div class="container">
+
+        <!-- upcoming invoice banner -->
+        <div class="invoice-banner" id="invoiceBanner">
+          <div class="ib-text">
+            <div class="ib-title">Your invoice for May 2026 payroll is open</div>
+            <div class="ib-body">Invoice INV-2026-0050 of $14,700.00 (after $500 credit) is due on 10 May 2026 (in 4 days).<a class="ib-link" onclick="openInvoiceDetail()"> View invoice</a></div>
+          </div>
+          <button class="ib-close" onclick="document.getElementById('invoiceBanner').style.display='none'"><svg viewBox="0 0 12 12" fill="none"><path d="M1 1L11 11M11 1L1 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+        </div>
+
+        <!-- balance header -->
+        <div class="bal-card">
+          <div class="bal-head">
+            <div class="bal-left">
+              <div class="bal-title-row">
+                <span class="bal-title">Outstanding amount</span>
+                <div class="oa-wrap">
+                  <button class="oa-info" onclick="toggleOaInfo(event)" aria-label="About outstanding amount">
+                    <svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.4"/><path d="M7 6.5V10M7 4V4.1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+                  </button>
+                  <div class="oa-pop" id="oaPop">
+                    <div class="oa-title">About outstanding amount</div>
+                    <div class="oa-text">Total of all <strong>open invoices</strong> currently due from your account. This funds the upcoming payroll cycle and any platform fees.</div>
+                    <div class="oa-text" style="margin-top:8px">The amount clears once you transfer it to the Wisemonk account using the bank details on the open invoice.</div>
+                  </div>
+                </div>
+              </div>
+              <div class="bal-amt"><span class="cur">$</span>14,700<span class="dec">.00</span></div>
+            </div>
+            <div class="bal-right">
+              <a class="bank-link primary" href="deposits.html">Deposit</a>
+            </div>
+          </div>
+        </div>
+
+
+        <div class="divider"></div>
+
+        <!-- tabs -->
+        <div class="tab-bar">
+          <div class="tab-list">
+            <span class="tab active" onclick="setFilter(this,'invoice')">Invoices <span class="tab-count" id="cntInv">0</span></span>
+            <span class="tab" onclick="setFilter(this,'out')">Payments <span class="tab-count" id="cntPay">0</span></span>
+            <span class="tab" onclick="setFilter(this,'credit')">Credit notes <span class="tab-count" id="cntCN">0</span></span>
+          </div>
+          <div class="search-box">
+            <svg viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.5"/><path d="M9.5 9.5L12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <input type="text" placeholder="Search transactions" oninput="applyFilter()"/>
+          </div>
+        </div>
+
+        <div class="table">
+          <div class="thead">
+            <div class="th">Date</div>
+            <div class="th">Activity</div>
+            <div class="th right">Amount</div>
+            <div class="th">Status</div>
+            <div class="th"></div>
+          </div>
+          <div id="txBody"></div>
+          <div class="empty" id="emptyState" style="display:none"><div class="empty-text">No activities</div></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- transaction detail drawer -->
+    <div class="drawer hidden" id="txDrawer">
+      <div class="dr-head">
+        <div class="dr-title-wrap">
+          <div class="dr-title" id="drTitle">Transaction details</div>
+          <span class="dr-head-badge" id="drHeadBadge" style="display:none"></span>
+        </div>
+        <button class="m-close" onclick="closeDrawer()"><svg viewBox="0 0 12 12" fill="none"><path d="M1 1L11 11M11 1L1 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+      </div>
+      <div class="dr-body" id="drBody"></div>
+      <div class="dr-foot" style="justify-content:flex-end">
+        <button class="btn-cancel" onclick="closeDrawer()" style="min-width:110px">Close</button>
+        <button class="btn-confirm" id="drDownload" style="flex:1;justify-content:center"><svg viewBox="0 0 13 13" fill="none"><path d="M6.5 1V8M3.5 5.5L6.5 8.5L9.5 5.5M2 11H11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Download receipt</button>
+      </div>
+    </div>
+
+  </div>
+</main>
+</div>
+
+<!-- Notify deposit modal -->
+<div class="modal-overlay" id="addOverlay" onclick="if(event.target===this)closeAddCredit()">
+  <div class="modal">
+    <div class="m-header">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div><div class="m-title" id="modTitle">Bank transfer details</div></div>
+      </div>
+      <button class="m-close" onclick="closeAddCredit()"><svg viewBox="0 0 12 12" fill="none"><path d="M1 1L11 11M11 1L1 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+    </div>
+
+    <div class="m-body">
+
+      <div id="step1" style="display:flex;flex-direction:column;gap:28px">
+        <div class="fg" style="gap:14px">
+          <div style="display:flex;align-items:center;justify-content:flex-end;gap:12px;flex-wrap:wrap">
+            <div class="rail-toggle" role="tablist">
+              <button class="rail-tab active" id="railLocal" onclick="setRail('local')">Local</button>
+              <button class="rail-tab" id="railSwift" onclick="setRail('swift')">SWIFT</button>
+            </div>
+          </div>
+
+          <div class="bank-card" id="bankLocal">
+            <div class="bank-row"><span class="bank-label">Beneficiary</span><div style="display:flex;align-items:center;gap:8px"><span class="bank-val">Anju</span><button class="copybtn" onclick="copyVal(this,'Anju')"><svg viewBox="0 0 11 11" fill="none"><rect x="2" y="2" width="6" height="7" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M4 2V1H9V8H8" stroke="currentColor" stroke-width="1.2"/></svg></button></div></div>
+            <div class="bank-row"><span class="bank-label">Receiving Currency</span><span class="bank-val">USD</span></div>
+            <div class="bank-row"><span class="bank-label">Account Number</span><div style="display:flex;align-items:center;gap:8px"><span class="bank-val">99968202787266</span><button class="copybtn" onclick="copyVal(this,'99968202787266')"><svg viewBox="0 0 11 11" fill="none"><rect x="2" y="2" width="6" height="7" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M4 2V1H9V8H8" stroke="currentColor" stroke-width="1.2"/></svg></button></div></div>
+            <div class="bank-row"><span class="bank-label">Routing Number</span><div style="display:flex;align-items:center;gap:8px"><span class="bank-val">000000007</span><button class="copybtn" onclick="copyVal(this,'000000007')"><svg viewBox="0 0 11 11" fill="none"><rect x="2" y="2" width="6" height="7" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M4 2V1H9V8H8" stroke="currentColor" stroke-width="1.2"/></svg></button></div></div>
+            <div class="bank-row"><span class="bank-label">Account Type</span><span class="bank-val" style="font-family:var(--font);font-weight:600">Business</span></div>
+            <div class="bank-row"><span class="bank-label">Bank</span><span class="bank-val" style="text-align:right">JPMORGAN CHASE BANK,<br/>N.A</span></div>
+            <div class="bank-row"><span class="bank-label">Bank Address</span><span class="bank-val" style="font-family:var(--font);font-weight:500;text-align:right">383 Madison Ave,<br/>New York, NY 10179, USA</span></div>
+          </div>
+
+          <div class="bank-card" id="bankSwift" style="display:none">
+            <div class="bank-row"><span class="bank-label">Beneficiary</span><div style="display:flex;align-items:center;gap:8px"><span class="bank-val">Anju</span><button class="copybtn" onclick="copyVal(this,'Anju')"><svg viewBox="0 0 11 11" fill="none"><rect x="2" y="2" width="6" height="7" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M4 2V1H9V8H8" stroke="currentColor" stroke-width="1.2"/></svg></button></div></div>
+            <div class="bank-row"><span class="bank-label">Receiving Currency</span><span class="bank-val">USD</span></div>
+            <div class="bank-row"><span class="bank-label">IBAN / Account no.</span><div style="display:flex;align-items:center;gap:8px"><span class="bank-val">99968202787266</span><button class="copybtn" onclick="copyVal(this,'99968202787266')"><svg viewBox="0 0 11 11" fill="none"><rect x="2" y="2" width="6" height="7" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M4 2V1H9V8H8" stroke="currentColor" stroke-width="1.2"/></svg></button></div></div>
+            <div class="bank-row"><span class="bank-label">SWIFT / BIC</span><div style="display:flex;align-items:center;gap:8px"><span class="bank-val">CHASUS33</span><button class="copybtn" onclick="copyVal(this,'CHASUS33')"><svg viewBox="0 0 11 11" fill="none"><rect x="2" y="2" width="6" height="7" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M4 2V1H9V8H8" stroke="currentColor" stroke-width="1.2"/></svg></button></div></div>
+            <div class="bank-row"><span class="bank-label">Bank</span><span class="bank-val" style="text-align:right">JPMORGAN CHASE BANK,<br/>N.A</span></div>
+            <div class="bank-row"><span class="bank-label">Bank Address</span><span class="bank-val" style="font-family:var(--font);font-weight:500;text-align:right">383 Madison Ave,<br/>New York, NY 10179, USA</span></div>
+          </div>
+        </div>
+
+        <div class="note-box">
+          <svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.4"/><path d="M7 4V7M7 9.5V9.6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          <div class="nb-text">Use your <strong>company name</strong> as the transfer reference. Once you've initiated the transfer at your bank, click <strong>Next</strong> to share the UTR so we can reconcile it faster.</div>
+        </div>
+      </div>
+
+      <div id="step2" style="display:none;flex-direction:column;gap:14px">
+        <div class="fg">
+          <div class="flabel">Amount transferred <span class="req">*</span></div>
+          <div class="amount-input">
+            <span class="cur">$</span>
+            <input type="number" id="amtInput" class="finput" placeholder="0.00" oninput="syncPresets()"/>
+          </div>
+          <div class="preset-row">
+            <button class="preset" onclick="setAmt(5000,this)">$5,000</button>
+            <button class="preset" onclick="setAmt(10000,this)">$10,000</button>
+            <button class="preset" onclick="setAmt(15000,this)">$15,000</button>
+            <button class="preset" onclick="setAmt(25000,this)">$25,000</button>
+          </div>
+        </div>
+        <div class="fg">
+          <div class="flabel">UTR / Reference number <span class="req">*</span></div>
+          <input type="text" id="utrInput" class="finput" placeholder="e.g. HDFCN26050683421"/>
+          <span style="font-size:11px;color:var(--n400);margin-top:2px">Find this in your bank's confirmation SMS or net-banking transaction history.</span>
+        </div>
+        <div class="fg">
+          <div class="flabel">Transfer date</div>
+          <input type="date" id="utrDate" class="finput"/>
+        </div>
+        <div class="note-box" style="background:var(--w50);border-color:#F7900930">
+          <svg viewBox="0 0 14 14" fill="none" style="color:var(--w500)"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.4"/><path d="M7 4V7L9 9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          <div class="nb-text">Wisemonk Ops will reconcile your deposit within <strong>4 working hours</strong>. Your wallet will only update after reconciliation.</div>
+        </div>
+      </div>
+
+      <div id="step3" style="display:none;flex-direction:column;gap:14px;align-items:center;padding:8px 0 4px">
+        <div style="width:56px;height:56px;border-radius:50%;background:var(--s50);display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 22 22" fill="none" style="width:24px;height:24px;color:var(--s500)"><path d="M5 11L9.5 15.5L17 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div style="text-align:center"><div style="font-size:16px;font-weight:700;color:var(--n900)">Deposit notification sent</div><div style="font-size:13px;color:var(--n500);margin-top:4px;line-height:1.5">We've added your deposit to the reconciliation queue.<br/>You'll see <strong id="successAmt">$0</strong> in your wallet once Wisemonk Ops confirms the credit.</div></div>
+        <div class="bank-card" style="width:100%;background:var(--n50);border-style:solid"><div class="bank-row"><span class="bank-label">Reference</span><span class="bank-val" id="successRef">DEP-2026-0059</span></div><div class="bank-row"><span class="bank-label">Estimated reconciliation</span><span class="bank-val" style="font-family:var(--font);font-weight:600;color:var(--w500)">Within 4 hours</span></div></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Deposit info modal -->
+<div class="modal-overlay" id="depositOverlay" onclick="if(event.target===this)closeDepositInfo()">
+  <div class="modal">
+    <div class="m-header">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div><div class="m-title">Security deposit</div></div>
+      </div>
+      <button class="m-close" onclick="closeDepositInfo()"><svg viewBox="0 0 12 12" fill="none"><path d="M1 1L11 11M11 1L1 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+    </div>
+    <div class="m-body" style="gap:24px">
+      <div class="adv-head">
+        <div class="adv-left">
+          <div class="adv-titlerow">
+            <span class="adv-lock"><svg viewBox="0 0 16 16" fill="none"><rect x="3" y="7.5" width="10" height="7" rx="1.2" stroke="currentColor" stroke-width="1.4"/><path d="M5.5 7.5V5C5.5 3.62 6.62 2.5 8 2.5C9.38 2.5 10.5 3.62 10.5 5V7.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></span>
+            <span class="adv-pill">Locked</span>
+          </div>
+          <div class="adv-amt">$5,000.00</div>
+          <div class="adv-meta">Held since 12 Jan 2026  ·  Refundable at offboarding</div>
+        </div>
+      </div>
+      <div class="adv-info">
+        <div class="adv-info-title">How this is used</div>
+        <div class="adv-list">
+          <div class="adv-item">
+            <span class="adv-ico warn"><svg viewBox="0 0 14 14" fill="none"><path d="M7 1L13 12.5H1L7 1Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M7 5.5V8.5M7 10.5V10.6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></span>
+            <div class="adv-text"><strong>If wallet runs short.</strong> Auto-drawn to cover a scheduled payroll if your wallet balance is insufficient on the run date. You'll be notified to top up immediately after.</div>
+          </div>
+          <div class="adv-item">
+            <span class="adv-ico clock"><svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.4"/><path d="M7 4V7L9 9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></span>
+            <div class="adv-text"><strong>For overdue invoices.</strong> Applied if an invoice remains unpaid past the 7-day grace period, so payroll never stops. Replenished from your next deposit.</div>
+          </div>
+          <div class="adv-item">
+            <span class="adv-ico ok"><svg viewBox="0 0 14 14" fill="none"><path d="M2 5C2.5 3 4.5 2 6.5 2C9.26 2 11.5 4.24 11.5 7C11.5 9.76 9.26 12 6.5 12C4.5 12 2.5 11 2 9M2 5V2M2 5H5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <div class="adv-text"><strong>Refunded at offboarding.</strong> Full balance returned to your bank within 30 days of account closure, after final reconciliation.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="m-footer">
+      <button class="btn-cancel" onclick="closeDepositInfo()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- toast -->
+<div class="toast" id="toast">
+  <div class="toast-icon"><svg viewBox="0 0 11 11" fill="none"><path d="M2 5.5L4.5 8L9 3" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+  <span id="toastText">Action completed</span>
+</div>
+
+<script>
+// Invoice paid = funds added to wallet (+). Payment processed = funds leaving wallet (−).
+// Advance money is intentionally excluded from displayed balance and not surfaced as a line item.
+const TX = [
+  {id:'INV-2026-0050',date:'07 May 2026',year:'2026',kind:'invoice',title:'Invoice INV-2026-0050 issued',meta:'May 2026 cycle · due 10 May 2026 (in 4 days)',type:'Invoice',ref:'INV-2026-0050',status:'Due',amount:14700,balanceAfter:null,isOpen:true,lineItems:[{label:'Payroll funding · May 2026 cycle',sub:'23 employees · 1 contractor',amount:13950},{label:'EOR service fee',sub:'Monthly platform & compliance',amount:1250},{label:'Credit note CN-2026-0012 applied',sub:'From overpayment on Apr cycle',amount:-500,credit:true}]},
+  {id:'TXN-2026-0511',date:'05 May 2026',year:'2026',kind:'out',title:'Payment processed · April 2026 payroll',meta:'23 employees · 1 contractor',type:'Payment',ref:'PAY-APR26',status:'Paid',amount:13950,balanceAfter:10250},
+  {id:'CN-2026-0012',date:'03 May 2026',year:'2026',kind:'credit',title:'Credit note CN-2026-0012 issued',meta:'Overpayment on April cycle · auto-applies to May invoice',type:'Credit note',ref:'CN-2026-0012',status:'Paid',amount:500,balanceAfter:24700},
+  {id:'INV-2026-0042',date:'01 May 2026',year:'2026',kind:'invoice',title:'Invoice INV-2026-0042 paid',meta:'April cycle · received $15,700 against $15,200 invoice',type:'Invoice',ref:'INV-2026-0042',status:'Paid',amount:15700,balanceAfter:24200},
+  {id:'TXN-2026-0508',date:'15 Apr 2026',year:'2026',kind:'out',title:'Payment processed · joining bonus',meta:'EMP09 · Neha Kapoor',type:'Payment',ref:'PAY-OFF-1188',status:'Paid',amount:900,balanceAfter:9000},
+  {id:'TXN-2026-0507',date:'05 Apr 2026',year:'2026',kind:'out',title:'Payment processed · March 2026 payroll',meta:'21 employees',type:'Payment',ref:'PAY-MAR26',status:'Paid',amount:13400,balanceAfter:9900},
+  {id:'INV-2026-0033',date:'01 Apr 2026',year:'2026',kind:'invoice',title:'Invoice INV-2026-0033 paid',meta:'March cycle',type:'Invoice',ref:'INV-2026-0033',status:'Paid',amount:13800,balanceAfter:23300},
+  {id:'TXN-2026-0505',date:'05 Mar 2026',year:'2026',kind:'out',title:'Payment processed · February 2026 payroll',meta:'21 employees',type:'Payment',ref:'PAY-FEB26',status:'Paid',amount:13200,balanceAfter:9500},
+  {id:'INV-2026-0021',date:'01 Mar 2026',year:'2026',kind:'invoice',title:'Invoice INV-2026-0021 paid',meta:'February cycle',type:'Invoice',ref:'INV-2026-0021',status:'Paid',amount:13500,balanceAfter:22700},
+  {id:'TXN-2026-0504',date:'05 Feb 2026',year:'2026',kind:'out',title:'Payment processed · January 2026 payroll',meta:'20 employees',type:'Payment',ref:'PAY-JAN26',status:'Paid',amount:12800,balanceAfter:9200}
+];
+
+let currentFilter = 'invoice';
+
+function fmtAmt(n){return n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}
+
+function statusClass(t){
+  if(t.pending) return 'pending';
+  if(t.status==='Due') return 'due';
+  if(t.kind==='refund') return 'refund';
+  if(t.kind==='invoice') return 'invoice';
+  return 'complete';
+}
+
+function rowHTML(t, idx){
+  const isPositive = (t.kind==='in'||t.kind==='refund'||t.kind==='invoice'||t.kind==='credit');
+  const sign = isPositive ? '+' : '−';
+  const amtClass = isPositive ? 'in' : '';
+  const icons = {
+    in:'<svg viewBox="0 0 14 14" fill="none"><path d="M7 12V2M3 6L7 2L11 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    out:'<svg viewBox="0 0 14 14" fill="none"><path d="M7 2V12M3 8L7 12L11 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    invoice:'<svg viewBox="0 0 14 14" fill="none"><path d="M3 2H11V12L9 11L7 12L5 11L3 12V2Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M5 5H9M5 7.5H8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>',
+    credit:'<svg viewBox="0 0 14 14" fill="none"><path d="M2 5C2.5 3 4.5 2 6.5 2C9.26 2 11.5 4.24 11.5 7C11.5 9.76 9.26 12 6.5 12C4.5 12 2.5 11 2 9M2 5V2M2 5H5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    refund:'<svg viewBox="0 0 14 14" fill="none"><path d="M2 5C3 3 5 2 7 2C9.76 2 12 4.24 12 7C12 9.76 9.76 12 7 12C5 12 3 11 2 9M2 5V2M2 5H5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+  };
+  const sCls = statusClass(t);
+  return `<div class="trow" data-kind="${t.kind}" data-search="${(t.title+' '+t.meta+' '+t.ref+' '+t.amount).toLowerCase()}" onclick='openDrawer(${JSON.stringify(t).replace(/'/g,"&#39;")})'>
+    <div class="tdate">${t.date.split(' ').slice(0,2).join(' ')}<span class="y">${t.year}</span></div>
+    <div class="tact">
+      <div class="tact-dot ${t.kind}">${icons[t.kind]}</div>
+      <div class="tact-text"><div class="tact-title">${t.title}</div><div class="tact-meta">${t.meta}</div></div>
+    </div>
+    <div class="tamt ${amtClass}">${sign}<span class="cur">$</span>${fmtAmt(t.amount)}</div>
+    <div class="tstatus ${sCls}"><span class="stdot"></span>${t.status}</div>
+    <div class="raw"><button class="rabtn" onclick="event.stopPropagation()"><svg viewBox="0 0 14 14" fill="none"><circle cx="2.5" cy="7" r="1.2" fill="currentColor"/><circle cx="7" cy="7" r="1.2" fill="currentColor"/><circle cx="11.5" cy="7" r="1.2" fill="currentColor"/></svg></button></div>
+  </div>`;
+}
+
+function renderRows(){
+  document.getElementById('txBody').innerHTML = TX.map((t,i)=>rowHTML(t,i)).join('');
+  applyFilter();
+}
+
+function setFilter(el, kind){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  currentFilter = kind;
+  applyFilter();
+}
+
+function applyFilter(){
+  const q = (document.querySelector('.search-box input').value||'').toLowerCase();
+  let visible = 0;
+  let lastVisible = null;
+  document.querySelectorAll('.trow').forEach(r=>{
+    r.classList.remove('last-visible');
+    const kindMatch = currentFilter==='all' || r.dataset.kind===currentFilter;
+    const searchMatch = !q || r.dataset.search.includes(q);
+    const show = kindMatch && searchMatch;
+    r.style.display = show ? 'grid' : 'none';
+    if(show){ visible++; lastVisible = r; }
+  });
+  if(lastVisible) lastVisible.classList.add('last-visible');
+  // tab counts (always reflect totals, ignoring search)
+  let cInv=0, cPay=0, cCN=0;
+  TX.forEach(t=>{ if(t.kind==='invoice')cInv++; if(t.kind==='out')cPay++; if(t.kind==='credit')cCN++; });
+  const cI=document.getElementById('cntInv'); if(cI) cI.textContent = cInv;
+  const cP=document.getElementById('cntPay'); if(cP) cP.textContent = cPay;
+  const cC=document.getElementById('cntCN'); if(cC) cC.textContent = cCN;
+  const empty=document.getElementById('emptyState'); if(empty) empty.style.display = visible===0 ? 'block' : 'none';
+}
+
+// drawer
+function openDrawer(t){
+  document.getElementById('drTitle').textContent = t.title;
+  const isCredit = (t.kind==='in'||t.kind==='refund'||t.kind==='invoice');
+  const sign = isCredit ? '+' : '−';
+  const amtClass = isCredit ? 'in' : '';
+  // Hide Download receipt for unpaid (Due/Pending) invoices
+  const isUnpaid = t.kind==='invoice' && (t.status==='Pending' || t.status==='Open' || t.status==='Due' || t.isOpen);
+  const dl = document.getElementById('drDownload');
+  if(dl) dl.style.display = isUnpaid ? 'none' : 'flex';
+  // Header status badge — shown in the title bar
+  const headBadge = document.getElementById('drHeadBadge');
+  if(headBadge){
+    headBadge.classList.remove('open','paid');
+    if(t.status==='Due' || t.status==='Open' || t.isOpen){
+      headBadge.textContent = 'Due';
+      headBadge.classList.add('open');
+      headBadge.style.display = 'inline-flex';
+    } else if(t.status==='Paid'){
+      headBadge.textContent = 'Paid';
+      headBadge.classList.add('paid');
+      headBadge.style.display = 'inline-flex';
+    } else {
+      headBadge.style.display = 'none';
+    }
+  }
+  const balAfter = t.balanceAfter==null ? 'Pending' : '$'+fmtAmt(t.balanceAfter);
+  const breakdown = t.kind==='out' ? `
+    <div class="dr-sec">
+      <div class="dr-stitle">Breakdown</div>
+      <div>
+        <div class="dr-mini-row"><span class="dr-mini-label">Gross salaries</span><span class="dr-mini-val">$${fmtAmt(Math.round(t.amount*0.92))}</span></div>
+        <div class="dr-mini-row"><span class="dr-mini-label">Statutory contributions</span><span class="dr-mini-val">$${fmtAmt(Math.round(t.amount*0.06))}</span></div>
+        <div class="dr-mini-row"><span class="dr-mini-label">Bank charges</span><span class="dr-mini-val">$${fmtAmt(Math.round(t.amount*0.02))}</span></div>
+        <div class="dr-mini-row total"><span class="dr-mini-label">Total debited</span><span class="dr-mini-val">$${fmtAmt(t.amount)}</span></div>
+      </div>
+    </div>` : '';
+  const badgeCls = (t.pending || t.status==='Open' || t.status==='Pending') ? 'bw' : (t.kind==='refund' ? 'bn' : 'bs');
+  const bankBlock = t.kind==='invoice' ? `
+    <div class="dr-divider"></div>
+    <div class="dr-sec">
+      <div class="dr-bank-head">
+        <div class="dr-stitle">Bank transfer details</div>
+        <div class="dr-rail-toggle">
+          <button class="dr-rail-tab active" data-rail="local" onclick="drSetRail(this,'local')">Local</button>
+          <button class="dr-rail-tab" data-rail="swift" onclick="drSetRail(this,'swift')">SWIFT</button>
+        </div>
+      </div>
+      <div class="dr-bank-card" id="drBankLocal">
+        <div class="dr-bank-row"><span class="dr-bank-label">Beneficiary</span><div class="dr-bank-val-wrap"><span class="dr-bank-val">Anju</span><button class="copybtn" onclick="copyVal(this,'Anju')"><svg viewBox="0 0 11 11" fill="none"><rect x="2" y="2" width="6" height="7" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M4 2V1H9V8H8" stroke="currentColor" stroke-width="1.2"/></svg></button></div></div>
+        <div class="dr-bank-row"><span class="dr-bank-label">Receiving Currency</span><span class="dr-bank-val">USD</span></div>
+        <div class="dr-bank-row"><span class="dr-bank-label">Account Number</span><div class="dr-bank-val-wrap"><span class="dr-bank-val">99968202787266</span><button class="copybtn" onclick="copyVal(this,'99968202787266')"><svg viewBox="0 0 11 11" fill="none"><rect x="2" y="2" width="6" height="7" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M4 2V1H9V8H8" stroke="currentColor" stroke-width="1.2"/></svg></button></div></div>
+        <div class="dr-bank-row"><span class="dr-bank-label">Routing Number</span><div class="dr-bank-val-wrap"><span class="dr-bank-val">000000007</span><button class="copybtn" onclick="copyVal(this,'000000007')"><svg viewBox="0 0 11 11" fill="none"><rect x="2" y="2" width="6" height="7" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M4 2V1H9V8H8" stroke="currentColor" stroke-width="1.2"/></svg></button></div></div>
+        <div class="dr-bank-row"><span class="dr-bank-label">Account Type</span><span class="dr-bank-val" style="font-family:var(--font);font-weight:600">Business</span></div>
+        <div class="dr-bank-row"><span class="dr-bank-label">Bank</span><span class="dr-bank-val" style="text-align:right">JPMORGAN CHASE BANK, N.A</span></div>
+        <div class="dr-bank-row"><span class="dr-bank-label">Bank Address</span><span class="dr-bank-val" style="font-family:var(--font);font-weight:500;text-align:right">383 Madison Ave,<br/>New York, NY 10179, USA</span></div>
+      </div>
+      <div class="dr-bank-card" id="drBankSwift" style="display:none">
+        <div class="dr-bank-row"><span class="dr-bank-label">Beneficiary</span><div class="dr-bank-val-wrap"><span class="dr-bank-val">Anju</span><button class="copybtn" onclick="copyVal(this,'Anju')"><svg viewBox="0 0 11 11" fill="none"><rect x="2" y="2" width="6" height="7" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M4 2V1H9V8H8" stroke="currentColor" stroke-width="1.2"/></svg></button></div></div>
+        <div class="dr-bank-row"><span class="dr-bank-label">Receiving Currency</span><span class="dr-bank-val">USD</span></div>
+        <div class="dr-bank-row"><span class="dr-bank-label">IBAN / Account no.</span><div class="dr-bank-val-wrap"><span class="dr-bank-val">99968202787266</span><button class="copybtn" onclick="copyVal(this,'99968202787266')"><svg viewBox="0 0 11 11" fill="none"><rect x="2" y="2" width="6" height="7" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M4 2V1H9V8H8" stroke="currentColor" stroke-width="1.2"/></svg></button></div></div>
+        <div class="dr-bank-row"><span class="dr-bank-label">SWIFT / BIC</span><div class="dr-bank-val-wrap"><span class="dr-bank-val">CHASUS33</span><button class="copybtn" onclick="copyVal(this,'CHASUS33')"><svg viewBox="0 0 11 11" fill="none"><rect x="2" y="2" width="6" height="7" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M4 2V1H9V8H8" stroke="currentColor" stroke-width="1.2"/></svg></button></div></div>
+        <div class="dr-bank-row"><span class="dr-bank-label">Bank</span><span class="dr-bank-val" style="text-align:right">JPMORGAN CHASE BANK, N.A</span></div>
+        <div class="dr-bank-row"><span class="dr-bank-label">Bank Address</span><span class="dr-bank-val" style="font-family:var(--font);font-weight:500;text-align:right">383 Madison Ave,<br/>New York, NY 10179, USA</span></div>
+      </div>
+      <div class="dr-bank-note"><svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.4"/><path d="M7 4V7M7 9.5V9.6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><span>Use <strong>invoice number</strong> as the transfer reference.</span></div>
+    </div>` : '';
+  document.getElementById('drBody').innerHTML = `
+    <div>
+      <div class="dr-amount ${amtClass}">${sign}<span class="cur">$</span>${fmtAmt(t.amount)}</div>
+      <div class="dr-status-row">${(t.status==='Open' || t.status==='Due' || t.status==='Paid' || t.isOpen) ? '' : `<span class="badge ${badgeCls}">${t.status}</span>`}<span>${t.date}</span></div>
+    </div>
+    <div class="dr-divider"></div>
+    <div class="dr-sec">
+      <div class="dr-stitle">Details</div>
+      <div class="dr-grid">
+        <div class="dr-cell"><span class="dr-clabel">Type</span><span class="dr-cval">${t.type}</span></div>
+        <div class="dr-cell"><span class="dr-clabel">Reference</span><span class="dr-cval">${t.ref}</span></div>
+        <div class="dr-cell"><span class="dr-clabel">Transaction ID</span><span class="dr-cval">${t.id}</span></div>
+        <div class="dr-cell"><span class="dr-clabel">Balance after</span><span class="dr-cval">${balAfter}</span></div>
+      </div>
+    </div>
+    ${breakdown}
+    ${t.kind==='invoice' && t.lineItems ? `
+    <div class="dr-divider"></div>
+    <div class="dr-sec">
+      <div class="dr-stitle">Line items</div>
+      <div class="dr-lines">
+        ${t.lineItems.map(li=>`
+          <div class="dr-line ${li.credit?'credit':''}">
+            <div class="dr-line-info">
+              <div class="dr-line-title">${li.label}</div>
+              ${li.sub ? `<div class="dr-line-sub">${li.sub}</div>` : ''}
+            </div>
+            <div class="dr-line-amt">${li.amount<0?'−':''}$${fmtAmt(Math.abs(li.amount))}</div>
+          </div>`).join('')}
+        <div class="dr-line dr-line-total">
+          <div class="dr-line-info"><div class="dr-line-title">Total</div></div>
+          <div class="dr-line-amt">$${fmtAmt(t.amount)}</div>
+        </div>
+      </div>
+    </div>` : ''}
+    <div class="dr-sec">
+      <div class="dr-stitle">Note</div>
+      <div style="font-size:13px;color:var(--n700);line-height:1.55">${t.meta}</div>
+    </div>
+    ${bankBlock}`;
+  document.getElementById('txDrawer').classList.remove('hidden');
+}
+function closeDrawer(){document.getElementById('txDrawer').classList.add('hidden')}
+
+function openInvoiceDetail(){
+  openDrawer({
+    id:'INV-2026-0050', date:'10 May 2026', year:'2026', kind:'invoice',
+    title:'Invoice · May 2026 cycle', meta:'EOR fee + payroll processing',
+    type:'Invoice', ref:'INV-2026-0050', status:'Due',
+    amount:14700, balanceAfter:null, isOpen:true,
+    lineItems:[
+      {label:'Payroll funding · May 2026 cycle', sub:'23 employees · 1 contractor', amount:13950},
+      {label:'EOR service fee', sub:'Monthly platform & compliance', amount:1250},
+      {label:'Credit note CN-2026-0012 applied', sub:'From overpayment on Apr cycle', amount:-500, credit:true}
+    ]
+  });
+  document.getElementById('drTitle').textContent = 'Invoice INV-2026-0050';
+}
+function drSetRail(btn, rail){
+  document.querySelectorAll('.dr-rail-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  const local = document.getElementById('drBankLocal');
+  const swift = document.getElementById('drBankSwift');
+  if(local) local.style.display = rail==='local' ? 'flex' : 'none';
+  if(swift) swift.style.display = rail==='swift' ? 'flex' : 'none';
+}
+
+// Outstanding amount info popover
+function toggleOaInfo(e){
+  e.stopPropagation();
+  const pop = document.getElementById('oaPop');
+  const isOpen = pop.classList.toggle('show');
+  if(isOpen){
+    setTimeout(()=>document.addEventListener('click', closeOaOnOutside, {once:true}), 0);
+  }
+}
+function closeOaOnOutside(e){
+  const pop = document.getElementById('oaPop');
+  if(pop && !pop.contains(e.target)) pop.classList.remove('show');
+}
+
+// Bank transfer details modal — view-only
+function openAddCredit(){ document.getElementById('addOverlay').classList.add('show'); }
+function closeAddCredit(){ document.getElementById('addOverlay').classList.remove('show'); }
+// Security deposit info modal
+function openDepositInfo(){ document.getElementById('depositOverlay').classList.add('show'); }
+function closeDepositInfo(){ document.getElementById('depositOverlay').classList.remove('show'); }
+function copyVal(btn, text){ navigator.clipboard?.writeText(text).catch(()=>{}); btn.classList.add('copied'); setTimeout(()=>btn.classList.remove('copied'), 1200); }
+function setRail(rail){
+  document.getElementById('railLocal').classList.toggle('active', rail==='local');
+  document.getElementById('railSwift').classList.toggle('active', rail==='swift');
+  document.getElementById('bankLocal').style.display = rail==='local' ? 'flex' : 'none';
+  document.getElementById('bankSwift').style.display = rail==='swift' ? 'flex' : 'none';
+}
+function showStatement(){ showToast('Statement download coming soon'); }
+function showToast(msg){ document.getElementById('toastText').textContent = msg; const t = document.getElementById('toast'); t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 3200); }
+
+renderRows();
+</script>
+</body>
+</html>

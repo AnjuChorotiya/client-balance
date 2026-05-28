@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Security deposits - Wisemonk</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap" rel="stylesheet">
+<style>
+:root{--p50:#E8F2FF;--p100:#C5DCFF;--p200:#9DC4FF;--p300:#72ABFF;--p400:#4D97FF;--p500:#2684FF;--p600:#1A6FE0;--p700:#1059BD;--p800:#09449A;--p900:#03307A;--n0:#FFFFFF;--n50:#F7F8FA;--n100:#EEF0F4;--n200:#DDE1E9;--n300:#C4CAD6;--n400:#9AA2B2;--n500:#6B7588;--n600:#4E5768;--n700:#363D4D;--n800:#222733;--n900:#121620;--bg:#F1F8FF;--bd:#EEF0F4;--bd-strong:#DDE1E9;--brand:#2684FF;--s50:#E6F9F0;--s500:#12B76A;--s700:#027A48;--w50:#FFFAEB;--w500:#F79009;--w700:#B54708;--d50:#FFF1F0;--d500:#F04438;--d700:#B42318;--font:'Satoshi',sans-serif;--font-tag:'Open Sans',sans-serif;--rmd:8px;--rlg:10px;--rfull:9999px}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--bg);color:var(--n800);-webkit-font-smoothing:antialiased;height:100vh;overflow:hidden}
+.app{display:flex;height:100vh}
+
+/* sidebar — Figma 94:317 */
+.sidebar{width:240px;flex-shrink:0;background:#FFFFFF;border-right:1px solid #FFFFFF;display:flex;flex-direction:column;align-items:flex-start;padding:30px 20px;gap:0;z-index:1}
+.sidebar-inner{flex:1;display:flex;flex-direction:column;align-items:center;gap:32px;width:100%;min-height:0}
+.logo{height:32px;width:160px;display:flex;align-items:center;justify-content:flex-start;gap:8px;font-size:20px;font-weight:700;color:#222224;padding:0;flex-shrink:0}
+.logo svg{width:32px;height:32px;flex-shrink:0}
+.nav-group{flex:1;display:flex;flex-direction:column;gap:8px;width:100%;min-height:0;align-items:flex-start}
+.nav-section{display:flex;flex-direction:column;width:100%}
+.slab{font-family:'Open Sans',sans-serif;font-size:13px;font-weight:300;color:#abadb1;letter-spacing:0;text-transform:uppercase;padding:0 8px;height:36px;display:flex;align-items:center;width:100%;line-height:1}
+.nav-list{display:flex;flex-direction:column;gap:2px;width:100%}
+.nav{display:flex;align-items:center;gap:8px;height:32px;padding:6px 8px;border-radius:8px;font-family:'Satoshi',sans-serif;font-size:16px;font-weight:500;color:#222224;cursor:pointer;transition:background 120ms;text-decoration:none;background:#FFFFFF;overflow:hidden;line-height:1}
+.nav svg{width:20px;height:20px;flex-shrink:0;color:#222224}
+.nav:hover{background:#F7F8FA}
+.nav.active{background:rgba(38,132,255,0.1);color:#2684FF}
+.nav.active svg{color:#2684FF}
+
+/* main shell */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;position:relative;background:#F1F8FF}
+.topbar{flex-shrink:0;background:#F1F8FF;border-bottom:none;display:flex;align-items:center;justify-content:space-between;padding:20px 40px 20px 20px;z-index:5;gap:16px}
+.topbar-left{display:flex;align-items:center;gap:14px}
+.back-btn{width:32px;height:32px;border-radius:8px;background:transparent;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#222224;text-decoration:none}
+.back-btn:hover{background:rgba(0,0,0,0.04)}
+.back-btn svg{width:18px;height:18px}
+.topbar-title{font-size:23px;font-weight:700;color:#222224;line-height:1;letter-spacing:0}
+.topbar-right{display:flex;align-items:center;gap:16px}
+.bell{width:32px;height:32px;border-radius:6px;background:transparent;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;padding:0}
+.bell svg{width:24px;height:24px;color:#222224}
+.bell .dot{position:absolute;top:4px;right:5px;width:6px;height:6px;border-radius:50%;background:var(--d500);border:1px solid #F1F8FF}
+.uchip{display:flex;align-items:center;gap:8px;cursor:pointer}
+.uavatar{width:32px;height:32px;border-radius:9999px;background:var(--brand);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;line-height:20px;font-family:'Inter',var(--font)}
+.uname{font-size:16px;font-weight:500;color:#222224;display:flex;align-items:center;gap:8px;white-space:nowrap}
+.uname svg{width:16px;height:16px;color:#222224}
+
+.body-area{flex:1;display:flex;overflow:hidden;position:relative}
+.page-body{flex:1;overflow-y:auto;padding:32px 64px 64px;display:flex;flex-direction:column;gap:0}
+.page-body::-webkit-scrollbar{width:4px}
+.page-body::-webkit-scrollbar-thumb{background:var(--n200);border-radius:10px}
+.container{max-width:1100px;width:100%;margin:0 auto;display:flex;flex-direction:column;gap:24px}
+
+/* page header */
+.ph{display:flex;align-items:flex-end;justify-content:space-between;gap:20px}
+.ph-left{display:flex;flex-direction:column;gap:6px}
+.pt{font-size:32px;font-weight:700;color:var(--n900);letter-spacing:-0.5px;line-height:1.1}
+.ps{font-size:14px;color:var(--n500);max-width:640px;line-height:1.55}
+
+/* summary card */
+.sum-card{background:#FFFFFF;border-radius:var(--rlg);padding:28px 32px;display:flex;align-items:flex-start;justify-content:space-between;gap:24px}
+.sum-left{display:flex;flex-direction:column;gap:6px}
+.sum-toprow{display:flex;align-items:center;gap:10px}
+.sum-lock{display:inline-flex;width:32px;height:32px;align-items:center;justify-content:center;background:var(--n100);border-radius:8px;color:var(--n600);flex-shrink:0}
+.sum-lock svg{width:16px;height:16px}
+.sum-label{font-family:var(--font-tag);font-size:11px;font-weight:300;color:var(--n400);letter-spacing:.6px;text-transform:uppercase}
+.sum-pill{display:inline-flex;align-items:center;padding:3px 10px;background:var(--n100);color:var(--n600);font-size:11px;font-weight:600;border-radius:var(--rfull);text-transform:uppercase;letter-spacing:.4px}
+.sum-amt{font-size:48px;font-weight:700;color:var(--n900);letter-spacing:-1px;line-height:1.1;margin-top:2px}
+.sum-amt .cur{font-weight:500}
+.sum-amt .dec{opacity:.55}
+.sum-meta{font-size:13px;color:var(--n500);margin-top:6px}
+
+/* salary-increase top-up alert */
+.topup-alert{display:flex;align-items:flex-start;gap:14px;padding:14px 18px;background:var(--w50);border-radius:var(--rlg);border:1px solid #F7900930}
+.topup-alert.hidden{display:none}
+.ta-icon{width:32px;height:32px;border-radius:8px;background:var(--n0);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--w500)}
+.ta-icon svg{width:16px;height:16px}
+.ta-text{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.ta-title{font-size:14px;font-weight:700;color:var(--n900)}
+.ta-body{font-size:13px;color:var(--n700);line-height:1.55}
+.ta-body strong{color:var(--n900);font-weight:700}
+.ta-link{color:var(--w700);font-weight:700;text-decoration:none;cursor:pointer;margin-left:4px}
+.ta-link:hover{text-decoration:underline}
+.ta-close{width:24px;height:24px;border-radius:6px;border:none;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;color:var(--n500)}
+.ta-close:hover{background:#F7900920}
+.ta-close svg{width:10px;height:10px}
+
+/* info banner */
+.info-banner{display:flex;gap:14px;padding:16px 20px;background:var(--p50);border-radius:var(--rlg);align-items:flex-start}
+.info-icon{display:inline-flex;width:24px;height:24px;align-items:center;justify-content:center;color:var(--brand);flex-shrink:0;margin-top:1px}
+.info-icon svg{width:18px;height:18px}
+.info-text{font-size:13px;color:var(--n700);line-height:1.6}
+.info-text strong{color:var(--n900);font-weight:700}
+
+/* policy popover (info icon next to summary card) */
+.policy-wrap{position:relative;display:inline-flex}
+.policy-btn{width:24px;height:24px;border-radius:9999px;border:none;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--n400);padding:0}
+.policy-btn:hover{background:var(--n100);color:var(--n700)}
+.policy-btn svg{width:14px;height:14px}
+.policy-pop{position:absolute;top:calc(100% + 8px);left:-12px;width:340px;background:var(--n0);border:1px solid var(--bd);border-radius:var(--rlg);box-shadow:0 8px 28px rgba(0,0,0,0.10);padding:16px;display:none;z-index:50}
+.policy-pop.show{display:flex;flex-direction:column;gap:12px}
+.policy-pop::before{content:'';position:absolute;top:-6px;left:18px;width:10px;height:10px;background:var(--n0);border-top:1px solid var(--bd);border-left:1px solid var(--bd);transform:rotate(45deg)}
+.pp-title{font-family:var(--font-tag);font-size:11px;font-weight:300;color:var(--n400);letter-spacing:.6px;text-transform:uppercase;margin-bottom:2px}
+.pp-item{display:flex;gap:10px;align-items:flex-start}
+.pp-ico{display:inline-flex;width:24px;height:24px;align-items:center;justify-content:center;border-radius:6px;flex-shrink:0;margin-top:1px}
+.pp-ico svg{width:13px;height:13px}
+.pp-ico.green{background:var(--s50);color:var(--s500)}
+.pp-ico.blue{background:var(--p50);color:var(--brand)}
+.pp-ico.amber{background:var(--w50);color:var(--w500)}
+.pp-text{flex:1;font-size:12px;color:var(--n600);line-height:1.6}
+.pp-text strong{color:var(--n900);font-weight:700}
+
+/* section heading */
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
+.section-title{font-size:23px;font-weight:700;color:var(--n900);letter-spacing:-0.3px}
+.section-title .count{font-size:18px;font-weight:500;color:var(--n400);margin-left:6px}
+.section-tools{display:flex;align-items:center;gap:14px}
+.search-box{display:flex;align-items:center;gap:6px;height:36px;padding:0 12px;background:var(--n0);border:1px solid var(--bd-strong);border-radius:var(--rmd);min-width:240px}
+.search-box svg{width:13px;height:13px;color:var(--n400);flex-shrink:0}
+.search-box input{border:none;outline:none;font-family:var(--font);font-size:13px;color:var(--n800);background:transparent;width:100%}
+.search-box input::placeholder{color:var(--n400)}
+
+/* table */
+.table{width:100%;background:#FFFFFF;border-radius:var(--rlg);padding:8px 20px;overflow:hidden}
+.thead{display:grid;grid-template-columns:140px 200px minmax(220px,1fr) 160px 140px 32px;padding:14px 8px;border-bottom:1px solid var(--n200);gap:32px;align-items:center}
+.th{font-family:var(--font);font-size:13px;font-weight:700;color:var(--n900);text-transform:uppercase;letter-spacing:.4px}
+.th.right{text-align:right}
+.trow{display:grid;grid-template-columns:140px 200px minmax(220px,1fr) 160px 140px 32px;padding:18px 8px;border-bottom:1px solid var(--bd);gap:32px;align-items:center;cursor:pointer;transition:background 120ms}
+.trow:last-child{border-bottom:none}
+.trow:hover{background:var(--n50)}
+.tdate{font-size:14px;color:var(--n800);font-weight:500}
+.tdate .y{color:var(--n400);font-weight:400;margin-left:4px}
+.tref{font-size:13px;color:var(--n700);font-weight:600;font-family:'SF Mono','Menlo',monospace;letter-spacing:.2px}
+.treason{display:flex;align-items:center;gap:10px;min-width:0}
+.tava{width:28px;height:28px;border-radius:9999px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.tinfo{min-width:0;display:flex;flex-direction:column;gap:1px}
+.tinfo-title{font-size:14px;font-weight:600;color:var(--n900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tinfo-meta{font-size:12px;color:var(--n500)}
+.tamt{font-size:16px;font-weight:600;color:var(--n900);text-align:right;letter-spacing:-0.2px}
+.tamt .cur{font-size:13px;font-weight:500;color:var(--n400);margin-right:2px}
+.tstatus{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--n600);font-weight:500}
+.tstatus .stdot{width:7px;height:7px;border-radius:50%;background:var(--n400);flex-shrink:0}
+.tstatus.pending{color:var(--w700)}
+.tstatus.pending .stdot{background:var(--w500);box-shadow:0 0 0 3px #F790091a}
+.tstatus.adjusted{color:var(--p700)}
+.tstatus.adjusted .stdot{background:var(--brand)}
+.tstatus.released{color:var(--n900)}
+.tstatus.released .stdot{background:var(--n900)}
+.trow.is-released .tamt,.trow.is-released .tinfo-title{color:var(--n500)}
+.trow.is-released .tamt .cur,.trow.is-released .tinfo-meta{color:var(--n400)}
+/* drawer */
+.drawer{position:absolute;top:0;right:0;bottom:0;width:46%;min-width:440px;background:var(--n0);border-left:1px solid var(--bd);display:flex;flex-direction:column;overflow:hidden;transition:transform 260ms cubic-bezier(0.4,0,0.2,1),opacity 220ms;box-shadow:-4px 0 24px rgba(0,0,0,0.10);z-index:10}
+.drawer.hidden{transform:translateX(100%);opacity:0;pointer-events:none;box-shadow:none}
+.dr-head{padding:18px 24px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.dr-title{font-size:16px;font-weight:700;color:var(--n900)}
+.m-close{width:32px;height:32px;border-radius:8px;border:1px solid var(--bd);background:var(--n0);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.m-close:hover{background:var(--n50)}
+.m-close svg{width:11px;height:11px;color:var(--n500)}
+.dr-body{flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:22px}
+.dr-emp{display:flex;align-items:center;gap:12px}
+.dr-emp-ava{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex-shrink:0}
+.dr-emp-info{display:flex;flex-direction:column;gap:2px}
+.dr-emp-name{font-size:16px;font-weight:700;color:var(--n900)}
+.dr-emp-role{font-size:13px;color:var(--n500)}
+.dr-amount-row{display:flex;flex-direction:column;gap:6px;padding-bottom:18px;border-bottom:1px solid var(--bd)}
+.dr-amt{font-size:36px;font-weight:700;color:var(--n900);letter-spacing:-0.6px;line-height:1.1}
+.dr-amt .cur{font-weight:500;color:var(--n400)}
+.dr-amt-meta{display:flex;align-items:center;gap:8px}
+.dr-status-pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:var(--n100);color:var(--n700);font-size:12px;font-weight:600;border-radius:var(--rfull)}
+.dr-status-pill.amber{background:var(--w50);color:var(--w700)}
+.dr-status-pill.blue{background:var(--p50);color:var(--p700)}
+.dr-status-pill .stdot{width:6px;height:6px;border-radius:50%;background:currentColor}
+.dr-sec{display:flex;flex-direction:column;gap:10px}
+.dr-stitle{font-family:var(--font-tag);font-size:11px;font-weight:300;color:var(--n400);letter-spacing:.6px;text-transform:uppercase}
+.dr-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 20px}
+.dr-cell{display:flex;flex-direction:column;gap:3px}
+.dr-clabel{font-size:12px;color:var(--n400)}
+.dr-cval{font-size:13px;color:var(--n800);font-weight:600;word-break:break-word}
+.dr-scenario{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-radius:var(--rlg)}
+.dr-scenario.amber{background:var(--w50)}
+.dr-scenario.blue{background:var(--p50)}
+.dr-scenario.green{background:var(--n50)}
+.dr-scenario.green .dr-sc-ico{color:var(--n600);background:var(--n0)}
+.dr-sc-ico{display:inline-flex;width:28px;height:28px;align-items:center;justify-content:center;border-radius:8px;background:var(--n0);flex-shrink:0;color:var(--brand)}
+.dr-scenario.amber .dr-sc-ico{color:var(--w500)}
+.dr-sc-ico svg{width:14px;height:14px}
+.dr-sc-text{flex:1;font-size:13px;color:var(--n700);line-height:1.55}
+.dr-sc-text strong{color:var(--n900);font-weight:700}
+.dr-sc-title{font-size:14px;font-weight:700;color:var(--n900);margin-bottom:2px}
+.dr-diff-card{background:var(--n0);border:1px solid var(--bd);border-radius:var(--rlg);padding:14px 16px;display:flex;flex-direction:column;gap:0}
+.dr-diff-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 0;border:none}
+.dr-diff-row:last-child{font-weight:700;padding-top:12px}
+.dr-diff-label{font-size:13px;color:var(--n600);display:inline-flex;align-items:center;gap:6px}
+.dr-diff-label svg{width:13px;height:13px;flex-shrink:0}
+.dr-diff-val{font-size:14px;font-weight:600;color:var(--n900);font-family:var(--font);letter-spacing:-0.1px}
+.dr-diff-row.warn .dr-diff-label{color:var(--w700)}
+.dr-diff-row.warn .dr-diff-val{color:var(--w700);font-weight:700}
+.dr-diff-row.neutral .dr-diff-label{color:var(--n500)}
+.dr-diff-row.neutral .dr-diff-val{color:var(--n500)}
+.dr-foot{padding:14px 20px;border-top:1px solid var(--bd);display:flex;gap:8px;flex-shrink:0;background:var(--n0)}
+.btn-cancel{height:42px;padding:0 18px;background:var(--n0);border:1px solid var(--bd-strong);border-radius:var(--rmd);font-family:var(--font);font-size:14px;font-weight:600;color:var(--n700);cursor:pointer;transition:background 120ms}
+.btn-cancel:hover{background:var(--n50)}
+.btn-confirm{height:42px;padding:0 20px;background:var(--brand);border:none;border-radius:var(--rmd);font-family:var(--font);font-size:14px;font-weight:700;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background 120ms}
+.btn-confirm:hover{background:var(--p600)}
+.btn-confirm.amber{background:var(--w500)}
+.btn-confirm.amber:hover{background:var(--w700)}
+.type-badge{display:inline-flex;align-items:center;padding:1px 7px;font-size:10px;font-weight:700;border-radius:var(--rfull);text-transform:uppercase;letter-spacing:.4px;margin-left:4px;vertical-align:middle;font-family:var(--font)}
+.tb-amber{background:var(--w50);color:var(--w700)}
+.tb-blue{background:var(--p50);color:var(--p700)}
+.tb-green{background:var(--n100);color:var(--n600)}
+.raw{display:flex;justify-content:flex-end}
+.rabtn{width:28px;height:28px;border-radius:var(--rmd);border:none;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.rabtn:hover{background:var(--n100)}
+.rabtn svg{width:14px;height:14px;color:var(--n400)}
+
+@media (max-width:900px){
+  .policy-strip{grid-template-columns:1fr}
+  .thead,.trow{grid-template-columns:110px 1fr 130px 32px;gap:16px}
+  .thead .th:nth-child(2),.trow > div:nth-child(2),
+  .thead .th:nth-child(5),.trow > div:nth-child(5){display:none}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="sidebar-inner">
+    <div class="logo">
+      <svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M3 8L9 24L16 12L23 24L29 8" stroke="#2684FF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Wisemonk</span>
+    </div>
+    <div class="nav-group">
+      <div class="nav-section">
+        <div class="slab">WORKSPACE</div>
+        <div class="nav-list">
+          <a class="nav" href="#"><svg viewBox="0 0 20 20" fill="none"><path d="M3 8L10 3L17 8V16C17 16.55 16.55 17 16 17H13V12H7V17H4C3.45 17 3 16.55 3 16V8Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>Home</a>
+          <a class="nav" href="#"><svg viewBox="0 0 20 20" fill="none"><path d="M10 2.5C14.14 2.5 17.5 5.86 17.5 10H10V2.5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.5"/></svg>Dashboard</a>
+          <a class="nav" href="people.html"><svg viewBox="0 0 20 20" fill="none"><circle cx="7" cy="7" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M2 17C2 14.24 4.24 12 7 12C9.76 12 12 14.24 12 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M14 4C15.66 4 17 5.34 17 7C17 8.66 15.66 10 14 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M15 17C15 14.24 16.5 12.5 18 12.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>People</a>
+          <a class="nav" href="#"><svg viewBox="0 0 20 20" fill="none"><path d="M10 2L17 5V10C17 14 13.87 17.5 10 18.5C6.13 17.5 3 14 3 10V5L10 2Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>Company policy</a>
+          <a class="nav" href="#"><svg viewBox="0 0 20 20" fill="none"><rect x="3" y="4" width="14" height="13" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M7 2.5V5.5M13 2.5V5.5M3 8.5H17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Time</a>
+        </div>
+      </div>
+      <div class="nav-section">
+        <div class="slab">FINANCE</div>
+        <div class="nav-list">
+          <a class="nav" href="#"><svg viewBox="0 0 20 20" fill="none"><path d="M10 2.5V17.5M6.5 5.5H11.5C12.6 5.5 13.5 6.4 13.5 7.5C13.5 8.6 12.6 9.5 11.5 9.5H8.5C7.4 9.5 6.5 10.4 6.5 11.5C6.5 12.6 7.4 13.5 8.5 13.5H13.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Payroll</a>
+          <a class="nav active" href="billing.html"><svg viewBox="0 0 20 20" fill="none"><rect x="3" y="5" width="14" height="11" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M3 9H17M10 5V16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Billings</a>
+          <a class="nav" href="#"><svg viewBox="0 0 20 20" fill="none"><path d="M10 2.5V17.5M6.5 5.5H11.5C12.6 5.5 13.5 6.4 13.5 7.5C13.5 8.6 12.6 9.5 11.5 9.5H8.5C7.4 9.5 6.5 10.4 6.5 11.5C6.5 12.6 7.4 13.5 8.5 13.5H13.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Direct payments</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <a class="back-btn" href="billing.html" title="Back to Wallet"><svg viewBox="0 0 18 18" fill="none"><path d="M11 3L5 9L11 15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      <span class="topbar-title">Security deposits</span>
+    </div>
+    <div class="topbar-right">
+      <button class="bell"><svg viewBox="0 0 16 16" fill="none"><path d="M8 2C8 2 4.5 3 4.5 7.5V10.5L3 12H13L11.5 10.5V7.5C11.5 3 8 2 8 2Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M6.5 12C6.5 12.83 7.17 13.5 8 13.5C8.83 13.5 9.5 12.83 9.5 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="dot"></span></button>
+      <div class="uchip"><div class="uavatar">SJ</div><span class="uname">Sarah Johnson<svg viewBox="0 0 12 12" fill="none"><path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+    </div>
+  </div>
+
+  <div class="body-area">
+    <div class="page-body">
+      <div class="container">
+
+        <!-- page header -->
+        <div class="ph">
+          <div class="ph-left">
+            <div class="pt">Security deposits</div>
+            <div class="ps">Advance invoices held against your active employees.</div>
+          </div>
+        </div>
+
+        <!-- salary-increase top-up alert -->
+        <div class="topup-alert" id="topupAlert">
+          <div class="ta-icon"><svg viewBox="0 0 18 18" fill="none"><path d="M9 2V16M3 8L9 2L15 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="ta-text">
+            <div class="ta-title">1 deposit top-up required</div>
+            <div class="ta-body"><strong>Priya Singh</strong> received a salary revision on 15 May 2026. An additional <strong>₹25,000</strong> is required to match the new compensation. <a class="ta-link" onclick="document.getElementById('topupAlert').classList.add('hidden')">Pay top-up</a></div>
+          </div>
+          <button class="ta-close" onclick="document.getElementById('topupAlert').classList.add('hidden')"><svg viewBox="0 0 12 12" fill="none"><path d="M1 1L11 11M11 1L1 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+        </div>
+
+        <!-- summary card -->
+        <div class="sum-card">
+          <div class="sum-left">
+            <div class="sum-toprow">
+              <span class="sum-lock"><svg viewBox="0 0 16 16" fill="none"><rect x="3" y="7.5" width="10" height="7" rx="1.2" stroke="currentColor" stroke-width="1.4"/><path d="M5.5 7.5V5C5.5 3.62 6.62 2.5 8 2.5C9.38 2.5 10.5 3.62 10.5 5V7.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></span>
+              <span class="sum-label">Total locked deposit</span>
+              <div class="policy-wrap">
+                <button class="policy-btn" onclick="togglePolicy(event)" aria-label="Deposit policy">
+                  <svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.4"/><path d="M7 6.5V10M7 4V4.1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+                </button>
+                <div class="policy-pop" id="policyPop">
+                  <div class="pp-title">Deposit policy</div>
+                  <div class="pp-item">
+                    <span class="pp-ico green"><svg viewBox="0 0 16 16" fill="none"><path d="M2 6C2.5 4 4.5 3 6.5 3C9.26 3 11.5 5.24 11.5 8C11.5 10.76 9.26 13 6.5 13C4.5 13 2.5 12 2 10M2 6V3M2 6H5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                    <div class="pp-text"><strong>Refundable at offboarding.</strong> When an employee exits, their deposit is returned to your bank within 30 days of final settlement.</div>
+                  </div>
+                  <div class="pp-item">
+                    <span class="pp-ico blue"><svg viewBox="0 0 16 16" fill="none"><path d="M2 8H14M9 4L13 8L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                    <div class="pp-text"><strong>Adjustable for new joiners.</strong> Existing deposits can be transferred to cover the advance for a new employee instead of paying again.</div>
+                  </div>
+                  <div class="pp-item">
+                    <span class="pp-ico amber"><svg viewBox="0 0 16 16" fill="none"><path d="M8 2V14M3 7L8 2L13 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                    <div class="pp-text"><strong>Top-up on salary increase.</strong> If an employee's salary is revised upward, an additional deposit is required to match the new compensation level.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="sum-amt"><span class="cur">₹</span>4,85,000<span class="dec">.00</span></div>
+            <div class="sum-meta">Across <strong id="depCount">6</strong> locked deposits · 1 top-up of ₹25,000 due · 1 released this month · oldest held since 12 Jan 2026</div>
+          </div>
+        </div>
+
+        <!-- section heading -->
+        <div class="section-head">
+          <div class="section-title">Advance invoices <span class="count">(<span id="invCount">5</span>)</span></div>
+          <div class="section-tools">
+            <div class="search-box">
+              <svg viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.5"/><path d="M9.5 9.5L12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              <input type="text" placeholder="Search by invoice or employee…" oninput="filterInvoices(this.value)"/>
+            </div>
+          </div>
+        </div>
+
+        <!-- table -->
+        <div class="table">
+          <div class="thead">
+            <div class="th">Date</div>
+            <div class="th">Invoice</div>
+            <div class="th">Held against</div>
+            <div class="th right">Amount</div>
+            <div class="th">Status</div>
+            <div class="th"></div>
+          </div>
+          <div id="invBody"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Deposit detail drawer -->
+    <div class="drawer hidden" id="depDrawer">
+      <div class="dr-head">
+        <div class="dr-title" id="drTitle">Deposit details</div>
+        <button class="m-close" onclick="closeDepDrawer()"><svg viewBox="0 0 12 12" fill="none"><path d="M1 1L11 11M11 1L1 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+      </div>
+      <div class="dr-body" id="drBody"></div>
+      <div class="dr-foot" id="drFoot">
+        <button class="btn-cancel" onclick="closeDepDrawer()" style="flex:1">Close</button>
+      </div>
+    </div>
+
+  </div>
+</main>
+</div>
+
+<script>
+// Advance invoices held against active employees.
+// Locked. Only refundable at offboarding or adjustable for new joiners.
+const ADV = [
+  {id:'ADV-2026-001', date:'12 Jan', year:'2026', empName:'Rahul Kumar', empId:'EMP01', empRole:'Senior Designer', avatarBg:'#E8F2FF', avatarColor:'#2684FF', initials:'RK', amount:85000, status:'Locked', type:'Initial'},
+  {id:'ADV-2026-002', date:'03 Feb', year:'2026', empName:'Priya Singh', empId:'EMP02', empRole:'Product Manager', avatarBg:'#E8F2FF', avatarColor:'#2684FF', initials:'PS', amount:95000, status:'Locked', type:'Initial'},
+  {id:'ADV-2026-003', date:'18 Mar', year:'2026', empName:'Arjun Verma', empId:'EMP03', empRole:'Frontend Engineer', avatarBg:'#E8F2FF', avatarColor:'#2684FF', initials:'AV', amount:75000, status:'Locked', type:'Initial'},
+  {id:'ADV-2026-004', date:'02 Apr', year:'2026', empName:'Neha Kapoor', empId:'EMP04', empRole:'HR Business Partner', avatarBg:'#E8F2FF', avatarColor:'#2684FF', initials:'NK', amount:65000, status:'Locked', type:'Initial'},
+  {id:'ADV-2026-005', date:'21 Apr', year:'2026', empName:'Vikram Iyer', empId:'EMP05', empRole:'Backend Engineer', avatarBg:'#E8F2FF', avatarColor:'#2684FF', initials:'VI', amount:95000, status:'Locked', type:'Initial'},
+  {id:'ADV-2026-006', date:'12 May', year:'2026', empName:'Karthik Reddy', empId:'EMP06', empRole:'QA Engineer', avatarBg:'#E8F2FF', avatarColor:'#2684FF', initials:'KR', amount:70000, status:'Adjusted', type:'Adjusted', sub:'Transferred from Sneha Arora (exit)'},
+  {id:'ADV-2026-007', date:'18 May', year:'2026', empName:'Priya Singh', empId:'EMP02', empRole:'Product Manager', avatarBg:'#E8F2FF', avatarColor:'#2684FF', initials:'PS', amount:25000, status:'Top-up due', type:'Top-up', sub:'Salary revised on 15 May 2026'},
+  {id:'ADV-2026-008', date:'25 May', year:'2026', empName:'Pooja Mehta', empId:'EMP08', empRole:'Backend Engineer', avatarBg:'#E8F2FF', avatarColor:'#2684FF', initials:'PM', amount:80000, status:'Released', type:'Released', exitDate:'22 May 2026', releaseDestination:'wallet'}
+];
+
+function fmtINR(n){ return n.toLocaleString('en-IN') }
+
+function typeBadge(type){
+  if(type==='Top-up') return '<span class="type-badge tb-amber">Top-up</span>';
+  if(type==='Adjusted') return '<span class="type-badge tb-blue">Adjusted</span>';
+  if(type==='Released') return '<span class="type-badge tb-green">Released</span>';
+  return '';
+}
+function rowHTML(t, idx){
+  const stCls = t.status==='Released' ? 'released' : '';
+  const stLabel = t.status==='Released' ? 'Released' : 'Locked';
+  return `<div class="trow ${t.status==='Released'?'is-released':''}" data-search="${(t.id+' '+t.empName+' '+t.empRole+' '+t.amount+' '+(t.sub||'')).toLowerCase()}" onclick="openDepDrawer(${idx})">
+    <div class="tdate">${t.date}<span class="y">${t.year}</span></div>
+    <div class="tref">${t.id} ${typeBadge(t.type)}</div>
+    <div class="treason">
+      <div class="tava" style="background:${t.avatarBg};color:${t.avatarColor}">${t.initials}</div>
+      <div class="tinfo">
+        <div class="tinfo-title">${t.empName}</div>
+        <div class="tinfo-meta">${t.empRole} · ${t.empId}</div>
+      </div>
+    </div>
+    <div class="tamt"><span class="cur">₹</span>${fmtINR(t.amount)}</div>
+    <div class="tstatus ${stCls}"><span class="stdot"></span>${stLabel}</div>
+    <div class="raw" onclick="event.stopPropagation()"><button class="rabtn" title="More" onclick="openDepDrawer(${idx})"><svg viewBox="0 0 14 14" fill="none"><circle cx="2.5" cy="7" r="1.2" fill="currentColor"/><circle cx="7" cy="7" r="1.2" fill="currentColor"/><circle cx="11.5" cy="7" r="1.2" fill="currentColor"/></svg></button></div>
+  </div>`;
+}
+
+function render(){
+  document.getElementById('invBody').innerHTML = ADV.map((t,i)=>rowHTML(t,i)).join('');
+  document.getElementById('invCount').textContent = ADV.length;
+  const lockedCount = ADV.filter(a => a.status !== 'Top-up due' && a.status !== 'Released').length;
+  document.getElementById('depCount').textContent = lockedCount;
+}
+
+function filterInvoices(q){
+  const query = (q||'').toLowerCase();
+  let visible = 0;
+  document.querySelectorAll('.trow').forEach(r=>{
+    const show = !query || r.dataset.search.includes(query);
+    r.style.display = show ? 'grid' : 'none';
+    if(show) visible++;
+  });
+  document.getElementById('invCount').textContent = visible;
+}
+
+render();
+
+function openDepDrawer(idx){
+  const t = ADV[idx];
+  if(!t) return;
+  document.getElementById('drTitle').textContent = t.id;
+  const pillCls = t.status==='Top-up due' ? 'amber' : (t.status==='Adjusted' ? 'blue' : '');
+  const statusLabel = t.status;
+  let scenario = '';
+  if(t.type==='Adjusted'){
+    const originalDeposit = 85000;
+    const newRequired = t.amount;
+    const delta = originalDeposit - newRequired;
+    let diffRow = '';
+    if(delta > 0){
+      diffRow = `<div class="dr-diff-row"><span class="dr-diff-label">Excess credited to wallet</span><span class="dr-diff-val">₹${fmtINR(delta)}</span></div>`;
+    } else if(delta < 0){
+      diffRow = `<div class="dr-diff-row warn"><span class="dr-diff-label">Top-up required</span><span class="dr-diff-val">₹${fmtINR(Math.abs(delta))}</span></div>`;
+    } else {
+      diffRow = `<div class="dr-diff-row neutral"><span class="dr-diff-label">Exact match — no adjustment needed</span><span class="dr-diff-val">₹0</span></div>`;
+    }
+    scenario = `
+      <div class="dr-sec">
+        <div class="dr-stitle">Adjustment context</div>
+        <div class="dr-scenario blue">
+          <div class="dr-sc-ico"><svg viewBox="0 0 16 16" fill="none"><path d="M2 8H14M9 4L13 8L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="dr-sc-text">
+            <div class="dr-sc-title">Adjusted from an exiting employee</div>
+            This deposit was originally held against <strong>Sneha Arora</strong> (EMP07), who exited on <strong>08 May 2026</strong>. Instead of refunding, the locked amount was transferred to cover the advance for the new joiner <strong>${t.empName}</strong>.
+          </div>
+        </div>
+        <div class="dr-diff-card">
+          <div class="dr-diff-row"><span class="dr-diff-label">Original deposit · Sneha Arora</span><span class="dr-diff-val">₹${fmtINR(originalDeposit)}</span></div>
+          <div class="dr-diff-row"><span class="dr-diff-label">New required · ${t.empName}</span><span class="dr-diff-val">₹${fmtINR(newRequired)}</span></div>
+          ${diffRow}
+        </div>
+      </div>`;
+  } else if(t.type==='Released'){
+    const destLabel = t.releaseDestination==='bank' ? 'refunded to your bank account' : 'refunded back to your wallet and is available as credit for future invoices';
+    const destShort = t.releaseDestination==='bank' ? 'Bank refund' : 'Wallet credit';
+    scenario = `
+      <div class="dr-sec">
+        <div class="dr-stitle">Release context</div>
+        <div class="dr-scenario green">
+          <div class="dr-sc-ico"><svg viewBox="0 0 16 16" fill="none"><path d="M2 6C2.5 4 4.5 3 6.5 3C9.26 3 11.5 5.24 11.5 8C11.5 10.76 9.26 13 6.5 13C4.5 13 2.5 12 2 10M2 6V3M2 6H5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="dr-sc-text">
+            <div class="dr-sc-title">Deposit released to wallet</div>
+            <strong>${t.empName}</strong>'s locked deposit of <strong>₹${fmtINR(t.amount)}</strong> was ${destLabel}.
+          </div>
+        </div>
+      </div>
+      <div class="dr-sec">
+        <div class="dr-stitle">Release details</div>
+        <div class="dr-diff-card">
+          <div class="dr-diff-row"><span class="dr-diff-label">Original deposit</span><span class="dr-diff-val">₹${fmtINR(t.amount)}</span></div>
+          <div class="dr-diff-row"><span class="dr-diff-label">Released on</span><span class="dr-diff-val">${t.date} ${t.year}</span></div>
+          <div class="dr-diff-row"><span class="dr-diff-label">Refunded to</span><span class="dr-diff-val">${destShort}</span></div>
+        </div>
+      </div>`;
+  } else if(t.type==='Top-up'){
+    scenario = `
+      <div class="dr-sec">
+        <div class="dr-stitle">Top-up reason</div>
+        <div class="dr-scenario amber">
+          <div class="dr-sc-ico"><svg viewBox="0 0 16 16" fill="none"><path d="M8 2V14M3 7L8 2L13 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="dr-sc-text">
+            <div class="dr-sc-title">Salary revised — additional deposit required</div>
+            <strong>${t.empName}</strong> received a salary increase effective <strong>15 May 2026</strong>. An additional <strong>₹${fmtINR(t.amount)}</strong> is required to match the new compensation level. Existing locked deposit: <strong>₹95,000</strong>.
+          </div>
+        </div>
+      </div>`;
+  } else {
+    scenario = `
+      <div class="dr-sec">
+        <div class="dr-stitle">Held against</div>
+        <div class="dr-scenario blue">
+          <div class="dr-sc-ico"><svg viewBox="0 0 16 16" fill="none"><rect x="3" y="7.5" width="10" height="6" rx="1" stroke="currentColor" stroke-width="1.4"/><path d="M5.5 7.5V5C5.5 3.62 6.62 2.5 8 2.5C9.38 2.5 10.5 3.62 10.5 5V7.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></div>
+          <div class="dr-sc-text">
+            <div class="dr-sc-title">Initial onboarding deposit</div>
+            Locked against <strong>${t.empName}</strong>'s active employment. Refundable at offboarding within 30 days of final settlement, or adjustable for a new joiner.
+          </div>
+        </div>
+      </div>`;
+  }
+  document.getElementById('drBody').innerHTML = `
+    <div class="dr-emp">
+      <div class="dr-emp-ava" style="background:${t.avatarBg};color:${t.avatarColor}">${t.initials}</div>
+      <div class="dr-emp-info">
+        <div class="dr-emp-name">${t.empName}</div>
+        <div class="dr-emp-role">${t.empRole} · ${t.empId}</div>
+      </div>
+    </div>
+    <div class="dr-amount-row">
+      <div class="dr-amt"><span class="cur">₹</span>${fmtINR(t.amount)}</div>
+      <div class="dr-amt-meta">
+        <span class="dr-status-pill ${pillCls}"><span class="stdot"></span>${statusLabel}</span>
+        <span style="font-size:12px;color:var(--n500)">${t.date} ${t.year}</span>
+      </div>
+    </div>
+    <div class="dr-sec">
+      <div class="dr-stitle">Details</div>
+      <div class="dr-grid">
+        <div class="dr-cell"><span class="dr-clabel">Invoice</span><span class="dr-cval">${t.id}</span></div>
+        <div class="dr-cell"><span class="dr-clabel">Type</span><span class="dr-cval">${t.type}</span></div>
+        <div class="dr-cell"><span class="dr-clabel">Held since</span><span class="dr-cval">${t.date} ${t.year}</span></div>
+        <div class="dr-cell"><span class="dr-clabel">Employee</span><span class="dr-cval">${t.empName} (${t.empId})</span></div>
+      </div>
+    </div>
+    ${scenario}`;
+  // footer action
+  document.getElementById('drFoot').innerHTML = `<button class="btn-cancel" onclick="closeDepDrawer()" style="flex:1">Close</button>`;
+  document.getElementById('depDrawer').classList.remove('hidden');
+}
+function closeDepDrawer(){
+  document.getElementById('depDrawer').classList.add('hidden');
+}
+
+function togglePolicy(e){
+  e.stopPropagation();
+  const pop = document.getElementById('policyPop');
+  const isOpen = pop.classList.toggle('show');
+  if(isOpen){
+    setTimeout(()=>{
+      document.addEventListener('click', closePolicyOnOutside, {once:true});
+    },0);
+  }
+}
+function closePolicyOnOutside(e){
+  const pop = document.getElementById('policyPop');
+  if(pop && !pop.contains(e.target)) pop.classList.remove('show');
+}
+</script>
+</body>
+</html>

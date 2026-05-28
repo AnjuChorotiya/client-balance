@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wisemonk Portal — Demo</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Satoshi',sans-serif;background:#F1F8FF;color:#222224;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;-webkit-font-smoothing:antialiased}
+.wrap{max-width:880px;width:100%}
+.brand{display:flex;align-items:center;gap:10px;margin-bottom:32px}
+.brand svg{width:36px;height:36px}
+.brand h1{font-size:22px;font-weight:700;color:#222224}
+.title{font-size:32px;font-weight:700;color:#121620;letter-spacing:-0.5px;line-height:1.1;margin-bottom:8px}
+.sub{font-size:15px;color:#6B7588;margin-bottom:32px;line-height:1.55;max-width:640px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.card{background:#FFFFFF;border:1px solid #EEF0F4;border-radius:12px;padding:22px;text-decoration:none;color:inherit;transition:transform 160ms,box-shadow 160ms,border-color 120ms;display:flex;flex-direction:column;gap:8px}
+.card:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(18,22,32,.08);border-color:#C5DCFF}
+.tag{font-size:11px;font-weight:700;color:#2684FF;background:#E8F2FF;display:inline-flex;width:fit-content;padding:3px 9px;border-radius:9999px;letter-spacing:.4px;text-transform:uppercase}
+.tag.ops{color:#363D4D;background:#EEF0F4}
+.h{font-size:18px;font-weight:700;color:#121620;margin-top:4px}
+.d{font-size:13px;color:#6B7588;line-height:1.55}
+.footer{margin-top:32px;font-size:12px;color:#9AA2B2;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">
+    <svg viewBox="0 0 32 32" fill="none"><path d="M3 8L9 24L16 12L23 24L29 8" stroke="#2684FF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <h1>Wisemonk</h1>
+  </div>
+  <div class="title">Portal demo</div>
+  <p class="sub">Three interconnected screens showing the client billing portal, security deposits page, and the internal Ops admin view. Click a card to open the screen.</p>
+  <div class="cards">
+    <a class="card" href="billing.html">
+      <span class="tag">Client</span>
+      <div class="h">Billings</div>
+      <p class="d">Outstanding amount, upcoming invoice banner, and a transaction ledger with Invoices / Payments / Credit notes tabs.</p>
+    </a>
+    <a class="card" href="deposits.html">
+      <span class="tag">Client</span>
+      <div class="h">Security deposits</div>
+      <p class="d">Locked advance invoices, adjustments for new joiners, top-ups for salary revisions, and released deposits.</p>
+    </a>
+    <a class="card" href="admin.html">
+      <span class="tag ops">Ops admin</span>
+      <div class="h">Admin portal</div>
+      <p class="d">Full client list with risk scoring, drilldown into each client's transaction timeline, and audit-trailed adjustments.</p>
+    </a>
+  </div>
+  <div class="footer">Hosted with GitHub Pages</div>
+</div>
+</body>
+</html>

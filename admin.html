@@ -1,0 +1,1515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin · Clients — Wisemonk Ops</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap" rel="stylesheet">
+<style>
+:root{--p50:#E8F2FF;--p100:#C5DCFF;--p500:#2684FF;--p600:#1A6FE0;--p700:#1059BD;--n0:#FFFFFF;--n50:#F7F8FA;--n100:#EEF0F4;--n200:#DDE1E9;--n300:#C4CAD6;--n400:#9AA2B2;--n500:#6B7588;--n600:#4E5768;--n700:#363D4D;--n800:#222733;--n900:#121620;--bg:#F1F8FF;--bd:#EEF0F4;--bd-strong:#DDE1E9;--brand:#2684FF;--s50:#E6F9F0;--s500:#12B76A;--s700:#027A48;--w50:#FFFAEB;--w500:#F79009;--w700:#B54708;--d50:#FFF1F0;--d500:#F04438;--d700:#B42318;--purple50:#F4F1FF;--purple500:#7C5CFF;--purple700:#5638CC;--font:'Satoshi',sans-serif;--font-tag:'Open Sans',sans-serif;--rmd:8px;--rlg:10px;--rfull:9999px}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smoothing:antialiased;height:100vh;overflow:hidden}
+.app{display:flex;height:100vh}
+
+/* sidebar */
+.sidebar{width:240px;flex-shrink:0;background:#FFFFFF;display:flex;flex-direction:column;align-items:flex-start;padding:30px 20px;gap:0;z-index:1}
+.sidebar-inner{flex:1;display:flex;flex-direction:column;align-items:center;gap:32px;width:100%;min-height:0}
+.logo{height:32px;width:160px;display:flex;align-items:center;justify-content:flex-start;gap:8px;font-size:20px;font-weight:700;color:#222224;flex-shrink:0}
+.logo svg{width:32px;height:32px;flex-shrink:0}
+.ops-tag{font-family:var(--font-tag);font-size:10px;font-weight:300;color:#fff;background:var(--n900);padding:2px 7px;border-radius:var(--rfull);text-transform:uppercase;letter-spacing:.5px;margin-left:4px}
+.nav-group{flex:1;display:flex;flex-direction:column;gap:8px;width:100%;align-items:flex-start}
+.nav-section{display:flex;flex-direction:column;width:100%}
+.slab{font-family:'Open Sans',sans-serif;font-size:13px;font-weight:300;color:#abadb1;text-transform:uppercase;padding:0 8px;height:36px;display:flex;align-items:center;width:100%;line-height:1}
+.nav-list{display:flex;flex-direction:column;gap:2px;width:100%}
+.nav{display:flex;align-items:center;gap:8px;height:32px;padding:6px 8px;border-radius:8px;font-family:'Satoshi',sans-serif;font-size:16px;font-weight:500;color:#222224;cursor:pointer;text-decoration:none;line-height:1}
+.nav svg{width:20px;height:20px;flex-shrink:0;color:#222224}
+.nav:hover{background:#F7F8FA}
+.nav.active{background:rgba(38,132,255,0.1);color:#2684FF}
+.nav.active svg{color:#2684FF}
+
+/* main */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;position:relative;background:#F1F8FF}
+.topbar{flex-shrink:0;background:#F1F8FF;display:flex;align-items:center;justify-content:space-between;padding:20px 40px 20px 20px;z-index:5;gap:16px}
+.topbar-title{font-size:23px;font-weight:700;color:#222224;line-height:1}
+.topbar-right{display:flex;align-items:center;gap:16px}
+.bell{width:32px;height:32px;border-radius:6px;background:transparent;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative}
+.bell svg{width:24px;height:24px;color:#222224}
+.bell .dot{position:absolute;top:4px;right:5px;width:6px;height:6px;border-radius:50%;background:var(--d500);border:1px solid #F1F8FF}
+.uchip{display:flex;align-items:center;gap:8px;cursor:pointer}
+.uavatar{width:32px;height:32px;border-radius:9999px;background:var(--n900);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;line-height:20px}
+.uname{font-size:16px;font-weight:500;color:#222224;display:flex;align-items:center;gap:8px;white-space:nowrap}
+.uname svg{width:16px;height:16px}
+
+.body-area{flex:1;display:flex;overflow:hidden;position:relative}
+.page-body{flex:1;overflow-y:auto;padding:24px 32px 64px;display:flex;flex-direction:column;gap:24px}
+.page-body::-webkit-scrollbar{width:4px}
+.page-body::-webkit-scrollbar-thumb{background:var(--n200);border-radius:10px}
+.container{max-width:none;width:100%;margin:0;display:flex;flex-direction:column;gap:20px}
+
+/* page header */
+.ph{display:flex;align-items:flex-end;justify-content:space-between;gap:20px}
+.pt{font-size:28px;font-weight:700;color:var(--n900);letter-spacing:-0.4px;line-height:1.1}
+.ps{font-size:14px;color:var(--n500);margin-top:6px}
+
+/* stats grid */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.stat-card{background:var(--n0);border-radius:var(--rlg);padding:18px 20px;display:flex;flex-direction:column;gap:6px}
+.stat-label{font-family:var(--font-tag);font-size:11px;font-weight:300;color:var(--n400);letter-spacing:.5px;text-transform:uppercase}
+.stat-val{font-size:22px;font-weight:700;color:var(--n900);letter-spacing:-0.3px;line-height:1.1}
+.stat-val .cur{font-weight:500;color:var(--n400);font-size:14px;margin-right:2px}
+.stat-meta{font-size:12px;color:var(--n500);display:flex;align-items:center;gap:6px}
+.stat-meta .delta{font-weight:700;color:var(--s700)}
+.stat-meta .delta.warn{color:var(--w700)}
+
+/* tabs + search */
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.toolbar-right{display:flex;align-items:center;gap:10px}
+.tabs{display:flex;align-items:center;gap:0}
+.tab{padding:10px 4px 12px;margin-right:24px;font-family:var(--font);font-size:15px;font-weight:500;color:var(--n500);cursor:pointer;border-bottom:2px solid transparent;display:inline-flex;align-items:center;gap:8px}
+.tab:hover{color:var(--n700)}
+.tab.active{color:var(--n900);border-bottom-color:var(--brand);font-weight:700}
+.tab-count{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:20px;padding:0 7px;border-radius:var(--rfull);background:var(--n100);color:var(--n500);font-size:12px;font-weight:600}
+.tab.active .tab-count{background:var(--p50);color:var(--brand)}
+.search-box{display:flex;align-items:center;gap:6px;height:36px;padding:0 12px;background:var(--n0);border:1px solid var(--bd-strong);border-radius:var(--rmd);min-width:280px}
+.search-box svg{width:13px;height:13px;color:var(--n400);flex-shrink:0}
+.search-box input{border:none;outline:none;font-family:var(--font);font-size:13px;color:var(--n800);background:transparent;width:100%}
+.search-box input::placeholder{color:var(--n400)}
+
+/* clients table — Wisemonk wm-table chrome */
+.table{width:100%;background:#FFFFFF;border-radius:8px;overflow:hidden;padding:0}
+.thead{display:grid;grid-template-columns:minmax(200px,1.4fr) 120px 140px 140px 140px 120px 120px 32px;padding:12px 16px;background:#F9FAFB;border-bottom:1px solid #E5E7EB;gap:20px;align-items:center}
+.th{font-family:'Open Sans',sans-serif;font-size:13px;font-weight:600;color:#404145;text-transform:none;letter-spacing:0}
+.th.right{text-align:right}
+.th.sortable{cursor:pointer;user-select:none;display:flex;align-items:center;gap:4px}
+.th.sortable:hover{color:#2684FF}
+.th.right.sortable{justify-content:flex-end}
+.th.right.sortable > span:not(.sort-ind){text-align:right;flex:1;min-width:0}
+.th.sortable > span:not(.sort-ind){line-height:1.35}
+.trow{display:grid;grid-template-columns:minmax(200px,1.4fr) 120px 140px 140px 140px 120px 120px 32px;padding:8px 16px;background:#FFFFFF;border-bottom:1px solid #F0F1F1;gap:20px;align-items:center;cursor:pointer;transition:background 0.2s ease;position:relative}
+.trow:last-child,.trow.last-visible{border-bottom:none}
+.trow:hover{background:#FAFBFC}
+.trow > div{color:#626368;font-size:14px;font-family:'Open Sans',sans-serif;font-weight:400}
+.tclient{display:flex;align-items:center;gap:12px;min-width:0;overflow:hidden}
+.tlogo{width:36px;height:36px;background:#2684FF;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#FFFFFF;font-size:14px;font-family:'Open Sans',sans-serif;font-weight:600}
+.tinfo{min-width:0;display:flex;flex-direction:column;gap:1px;overflow:hidden}
+.tname{color:#222224;font-size:14px;font-family:'Satoshi',sans-serif;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tsub{font-size:12px;color:#85878D;font-family:'Open Sans',sans-serif}
+.tflag{font-size:14px;color:var(--n700);font-weight:500;display:inline-flex;align-items:center;gap:6px}
+.tnum{font-size:14px;color:var(--n800);font-weight:600}
+.tnum.muted{color:var(--n500);font-weight:500}
+.tnum .cur{color:var(--n400);font-size:12px;font-weight:500;margin-right:1px}
+.tamt-out{color:var(--w700)}
+.tamt-out.zero{color:var(--n400)}
+.tstatus{display:inline-flex;align-items:center;padding:4px 12px;border-radius:16px;font-size:12px;font-family:'Satoshi',sans-serif;font-weight:500;text-transform:none}
+.tstatus .stdot{display:none}
+.tstatus.active{background:#E1EDFF;color:#2684FF}
+.tstatus.inactive{background:#FEF9C3;color:#CA8A04}
+.trisk{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--n700)}
+.trisk .stdot{width:7px;height:7px;border-radius:50%;flex-shrink:0;background:var(--n400)}
+.trisk.low{color:var(--s700)}
+.trisk.low .stdot{background:var(--s500)}
+.trisk.medium{color:var(--w700)}
+.trisk.medium .stdot{background:var(--w500)}
+.trisk.high{color:var(--d700)}
+.trisk.high .stdot{background:var(--d500)}
+.trisk.muted{color:var(--n400);font-weight:500}
+.raw{display:flex;justify-content:flex-end}
+.rabtn{width:28px;height:28px;border-radius:var(--rmd);border:none;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.rabtn:hover{background:var(--n100)}
+.rabtn svg{width:14px;height:14px;color:var(--n400)}
+
+/* client detail page (replaces drawer) */
+.hidden{display:none !important}
+.client-page{display:flex;flex-direction:column;gap:20px}
+.cp-crumbs{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--n500);font-weight:500}
+.cp-link{display:inline-flex;align-items:center;gap:6px;cursor:pointer;padding:4px 8px;margin-left:-8px;border-radius:6px;color:var(--n600);transition:background 120ms,color 120ms}
+.cp-link:hover{background:var(--n100);color:var(--n900)}
+.cp-link svg{width:12px;height:12px}
+.cp-sep{color:var(--n300)}
+.cp-here{color:var(--n900);font-weight:600}
+.cp-head{background:var(--n0);border-radius:var(--rlg);padding:18px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.cp-head-left{display:flex;align-items:center;gap:14px;min-width:0;flex:1}
+.cp-head-logo{width:48px;height:48px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff;flex-shrink:0}
+.cp-head-info{display:flex;flex-direction:column;gap:3px;min-width:0}
+.cp-head-name{font-size:22px;font-weight:700;color:var(--n900);letter-spacing:-0.3px;line-height:1.1}
+.cp-head-sub{font-size:13px;color:var(--n500);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.cp-head-sub .sep{color:var(--n300)}
+.cp-head-actions{display:flex;align-items:center;gap:12px;flex-shrink:0}
+.cp-adjust-btn{display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 16px;background:var(--brand);color:#fff;border:none;border-radius:var(--rmd);font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;transition:background 120ms}
+.cp-adjust-btn:hover{background:var(--p600)}
+.cp-adjust-btn svg{width:14px;height:14px}
+
+/* adjustment modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(18,22,32,0.45);display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;pointer-events:none;transition:opacity 180ms}
+.modal-overlay.show{opacity:1;pointer-events:auto}
+.modal{position:relative;background:var(--n0);border-radius:var(--rlg);width:560px;max-width:92vw;max-height:88vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,0.18);transform:translateY(8px);transition:transform 180ms;border:1px solid var(--bd)}
+.modal-overlay.show .modal{transform:translateY(0)}
+.m-header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--bd)}
+.m-title{font-size:18px;font-weight:700;color:var(--n900);letter-spacing:-0.2px}
+.m-sub{font-size:13px;color:var(--n500)}
+.m-close{width:32px;height:32px;border-radius:8px;border:none;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.m-close:hover{background:var(--n50)}
+.m-close svg{width:12px;height:12px;color:var(--n500)}
+.m-body{padding:24px;display:flex;flex-direction:column;gap:18px;overflow-y:auto;background:#FFFFFF}
+.fg{display:flex;flex-direction:column;gap:8px}
+.flabel{font-size:13px;font-weight:600;color:var(--n800)}
+.flabel .req{color:var(--d500)}
+.finput{height:44px;padding:0 14px;border:1px solid var(--bd-strong);border-radius:var(--rmd);font-family:var(--font);font-size:14px;color:var(--n800);outline:none;background:var(--n0);transition:border-color 120ms}
+.finput:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(38,132,255,0.15)}
+.amount-input{position:relative}
+.amount-input .cur{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:16px;color:var(--n500);font-weight:500;pointer-events:none}
+.amount-input input{padding-left:28px;font-size:16px;font-weight:600}
+
+.adj-types{display:flex;flex-direction:column;gap:6px}
+.adj-type{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border:1px solid var(--bd);border-radius:var(--rmd);cursor:pointer;background:var(--n0);transition:border-color 120ms,background 120ms}
+.adj-type:hover{background:var(--n50)}
+.adj-type input[type=radio]{margin-top:3px;accent-color:var(--brand)}
+.adj-type:has(input:checked){border-color:var(--brand);background:var(--p50)}
+.adj-type-content{flex:1}
+.adj-type-title{font-size:13.5px;font-weight:600;color:var(--n900)}
+.adj-type-desc{font-size:11.5px;color:var(--n500);margin-top:2px;line-height:1.4}
+
+.adj-fields{display:flex;flex-direction:column;gap:14px}
+.adj-helper{font-size:11.5px;color:var(--n500);line-height:1.5;margin-top:4px}
+.adj-toggle{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--n700);cursor:pointer;padding:8px 12px;background:var(--p50);border-radius:var(--rmd);width:fit-content}
+.adj-toggle input{accent-color:var(--brand)}
+.adj-radio-row{display:flex;gap:18px}
+.adj-radio{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--n800);cursor:pointer}
+.adj-radio input{accent-color:var(--brand)}
+.adj-warn{display:flex;align-items:flex-start;gap:10px;padding:11px 14px;background:var(--w50);border-radius:var(--rmd);font-size:12px;color:var(--w700);line-height:1.5}
+
+/* in-modal confirmation panel */
+.adj-confirm{display:none;position:absolute;inset:0;background:var(--n0);padding:32px 28px;flex-direction:column;align-items:center;justify-content:flex-start;gap:12px;z-index:5;text-align:center;overflow-y:auto}
+.adj-confirm.show{display:flex;position:relative;height:auto;inset:auto}
+.modal:has(.adj-confirm.show) .m-body,.modal:has(.adj-confirm.show) .m-footer{display:none}
+.adj-confirm-icon{width:44px;height:44px;border-radius:50%;background:var(--w50);display:flex;align-items:center;justify-content:center;color:var(--w500);margin-bottom:2px;flex-shrink:0}
+.adj-confirm-icon svg{width:22px;height:22px}
+.adj-confirm-title{font-size:18px;font-weight:700;color:var(--n900);letter-spacing:-0.2px}
+.adj-confirm-desc{font-size:13px;color:var(--n500);line-height:1.55;max-width:420px;margin-bottom:6px}
+.adj-confirm-summary{font-size:14px;color:var(--n700);line-height:1.5;max-width:420px;padding:14px 18px;background:var(--n50);border-radius:var(--rlg);width:100%;text-align:left;display:flex;flex-direction:column;gap:8px}
+.adj-confirm-summary .row{display:flex;justify-content:space-between;gap:10px;font-size:13px}
+.adj-confirm-summary .row .label{color:var(--n500)}
+.adj-confirm-summary .row .val{color:var(--n900);font-weight:600}
+.adj-confirm-summary .row.reason{flex-direction:column;gap:4px;border-top:1px dashed var(--bd);padding-top:8px;margin-top:2px}
+.adj-confirm-summary .row.reason .val{font-weight:500;line-height:1.5}
+.adj-confirm-actions{display:flex;gap:10px;margin-top:10px}
+.modal-overlay.show .modal.compact{max-height:none;height:auto}
+.modal.compact{transition:max-height 220ms ease}
+.adj-warn svg{width:14px;height:14px;flex-shrink:0;margin-top:1px;color:var(--w500)}
+.adj-warn strong{color:var(--w700)}
+
+.m-footer{padding:16px 24px;border-top:1px solid var(--bd);display:flex;justify-content:flex-end;gap:10px;background:var(--n0)}
+.btn-cancel{height:40px;padding:0 16px;background:var(--n0);border:1px solid var(--bd-strong);border-radius:var(--rmd);font-family:var(--font);font-size:13px;font-weight:600;color:var(--n700);cursor:pointer}
+.btn-cancel:hover{background:var(--n50)}
+.btn-confirm{height:40px;padding:0 18px;background:var(--brand);border:none;border-radius:var(--rmd);font-family:var(--font);font-size:13px;font-weight:700;color:#fff;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.btn-confirm:hover{background:var(--p600)}
+.btn-confirm svg{width:13px;height:13px}
+
+/* toast */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--n900);color:#fff;padding:12px 18px;border-radius:var(--rmd);font-size:14px;font-weight:500;display:flex;align-items:center;gap:10px;z-index:2000;opacity:0;transition:all 220ms;pointer-events:none;box-shadow:0 10px 30px rgba(0,0,0,0.25)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast-icon{width:22px;height:22px;border-radius:50%;background:var(--s500);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.toast-icon svg{width:11px;height:11px}
+.cp-jump-btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--font);font-size:13px;font-weight:600;color:var(--brand);background:var(--p50);border:1px solid transparent;padding:7px 12px;border-radius:var(--rmd);cursor:pointer;transition:background 120ms,border-color 120ms,color 120ms}
+.cp-jump-btn:hover{background:var(--n0);border-color:var(--p100);color:var(--p700)}
+.cp-jump-btn svg{width:13px;height:13px;flex-shrink:0}
+.cp-jump-btn .arr{width:11px;height:11px;opacity:.7}
+.cp-status-pill{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--n700);font-weight:500;padding:6px 12px;border-radius:var(--rfull);background:var(--n50)}
+.cp-status-pill .stdot{width:7px;height:7px;border-radius:50%;flex-shrink:0;background:var(--n300)}
+.cp-status-pill.active{background:var(--s50);color:var(--s700)}
+.cp-status-pill.active .stdot{background:var(--s500)}
+.cp-status-pill.atrisk{background:var(--w50);color:var(--w700)}
+.cp-status-pill.atrisk .stdot{background:var(--w500)}
+.cp-status-pill.inactive{background:var(--n100);color:var(--n500)}
+.cp-status-pill.inactive .stdot{background:var(--n400)}
+
+/* summary panel inside drawer */
+.summ-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:32px}
+.summ-cell{background:transparent;border-radius:0;padding:0;display:flex;flex-direction:column;gap:4px}
+.summ-label{font-size:11px;color:var(--n500);font-weight:500;text-transform:uppercase;letter-spacing:.4px}
+.summ-val{font-size:18px;font-weight:700;color:var(--n900);letter-spacing:-0.2px}
+.summ-val .cur{color:var(--n400);font-weight:500;font-size:12px;margin-right:1px}
+.summ-val.warn{color:var(--w700)}
+.summ-val.muted{color:var(--n400)}
+
+/* timeline */
+.tl-header{display:flex;align-items:center;justify-content:space-between;gap:14px}
+.tl-title{font-size:16px;font-weight:700;color:var(--n900)}
+.tl-filter{display:flex;gap:6px}
+.tl-controls{display:flex;align-items:center;gap:14px}
+.tl-time{height:32px;padding:0 30px 0 12px;font-family:var(--font);font-size:13px;font-weight:600;color:var(--n800);background:var(--n0);border:1px solid var(--bd-strong);border-radius:var(--rfull);cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10' fill='none'%3E%3Cpath d='M2 4L5 7L8 4' stroke='%236B7588' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;background-size:10px}
+.tl-time:hover{border-color:var(--n300)}
+.tl-time:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(38,132,255,0.15)}
+.tl-search{display:flex;align-items:center;gap:8px;height:32px;padding:0 12px;background:var(--n0);border:1px solid var(--bd-strong);border-radius:var(--rfull);width:240px;transition:border-color 120ms,box-shadow 120ms}
+.tl-search:focus-within{border-color:var(--brand);box-shadow:0 0 0 3px rgba(38,132,255,0.15)}
+.tl-search svg{width:13px;height:13px;color:var(--n400);flex-shrink:0}
+.tl-search input{flex:1;border:none;outline:none;font-family:var(--font);font-size:13px;color:var(--n800);background:transparent;min-width:0}
+.tl-search input::placeholder{color:var(--n400)}
+.tlh.sortable{cursor:pointer;user-select:none;display:flex;align-items:center;gap:4px}
+.tlh.sortable:hover{color:var(--brand)}
+.tlh.right.sortable{justify-content:flex-end}
+.sort-ind{display:inline-flex;align-items:center;justify-content:center;width:12px;height:12px;opacity:0.35;transition:opacity 120ms,transform 200ms;flex-shrink:0;color:currentColor}
+.sort-ind.show{opacity:1}
+.th.sortable:hover .sort-ind,.tlh.sortable:hover .sort-ind{opacity:0.7}
+.sort-ind svg{width:10px;height:10px;display:block;transition:transform 200ms}
+.sort-ind.desc svg{transform:rotate(180deg)}
+.tlf{padding:4px 10px;font-size:12px;font-weight:600;color:var(--n500);cursor:pointer;border-radius:var(--rfull);background:var(--n50)}
+.tlf:hover{background:var(--n100);color:var(--n700)}
+.tlf.active{background:var(--p50);color:var(--brand)}
+
+/* ledger-style table */
+.timeline{background:var(--n0);border-radius:var(--rlg);border:1px solid var(--bd);padding:0 16px;overflow:hidden}
+.tlhead{display:grid;grid-template-columns:120px minmax(260px,1fr) 160px 140px 28px;padding:12px 8px;border-bottom:1px solid var(--n200);gap:16px;align-items:center}
+.tlh{font-family:var(--font);font-size:12px;font-weight:700;color:var(--n900);text-transform:uppercase;letter-spacing:.4px}
+.tlh.right{text-align:right}
+.tlh.center{text-align:center}
+.tl-item{display:flex;flex-direction:column;border-bottom:1px solid var(--bd)}
+.tl-item:last-child{border-bottom:none}
+.tl-card{display:grid;grid-template-columns:120px minmax(260px,1fr) 160px 140px 28px;padding:14px 8px;gap:16px;align-items:center;cursor:pointer;transition:background 120ms}
+.tl-card:hover{background:var(--n50)}
+.tl-idx{font-size:13px;color:var(--n400);font-weight:500;text-align:center;font-variant-numeric:tabular-nums}
+.tl-date{font-size:13px;color:var(--n800);font-weight:500;white-space:nowrap}
+.tl-name{display:flex;align-items:center;gap:10px;min-width:0}
+.tl-dot{width:26px;height:26px;border-radius:var(--rfull);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tl-dot svg{width:12px;height:12px}
+.tl-dot.invoice{background:var(--p50);color:var(--brand)}
+.tl-dot.paid{background:var(--s50);color:var(--s500)}
+.tl-dot.payment{background:var(--n100);color:var(--n600)}
+.tl-dot.deposit{background:var(--purple50);color:var(--purple500)}
+.tl-dot.adjust{background:var(--purple50);color:var(--purple500)}
+.tl-dot.topup{background:var(--w50);color:var(--w500)}
+.tl-dot.refund{background:var(--n100);color:var(--n500)}
+.tl-name-text{min-width:0;display:flex;flex-direction:column;gap:1px}
+.tl-name-title{font-size:13.5px;font-weight:600;color:var(--n900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tl-name-meta{font-size:11.5px;color:var(--n500);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tl-amt-wrap{display:flex;justify-content:flex-end}
+.tl-amt{font-size:15px;font-weight:600;color:var(--n900);text-align:right;letter-spacing:-0.1px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.tl-amt.in{color:var(--n900)}
+.tl-amt .cur{font-size:12px;font-weight:500;color:var(--n400);margin-right:2px}
+.tl-pill{display:inline-flex;align-items:center;gap:8px;padding:0;font-size:13px;font-weight:500;background:none;color:var(--n700);text-transform:none;letter-spacing:0}
+.tl-pill::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--n400);flex-shrink:0}
+.tl-pill.paid{color:var(--p700)}
+.tl-pill.paid::before{background:var(--brand)}
+.tl-pill.open{color:var(--w700)}
+.tl-pill.open::before{background:var(--w500);box-shadow:0 0 0 3px #F790091a}
+.tl-pill.locked{color:var(--n600)}
+.tl-pill.locked::before{background:var(--n400)}
+.tl-pill.adjusted{color:var(--purple700)}
+.tl-pill.adjusted::before{background:var(--purple500)}
+.tl-pill.due{color:var(--w700)}
+.tl-pill.due::before{background:var(--w500);box-shadow:0 0 0 3px #F790091a}
+
+/* expandable timeline detail */
+.tl-card .chev{width:14px;height:14px;color:var(--n400);flex-shrink:0;transition:transform 180ms}
+.tl-item.open .tl-card .chev{transform:rotate(180deg)}
+.tl-detail{display:none;background:#FAFBFC;padding:18px 24px;flex-direction:column;gap:14px;border-top:1px solid var(--bd)}
+.tl-item.open .tl-detail{display:flex}
+.detail-section{display:flex;flex-direction:column;gap:8px}
+.detail-stitle{font-family:var(--font-tag);font-size:11px;font-weight:300;color:var(--n400);letter-spacing:.5px;text-transform:uppercase}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 18px}
+.detail-cell{display:flex;flex-direction:column;gap:2px}
+.detail-clabel{font-size:11px;color:var(--n400)}
+.detail-cval{font-size:13px;color:var(--n800);font-weight:600;word-break:break-word}
+.detail-line{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px dashed var(--bd)}
+.detail-line:nth-last-child(2){border-bottom:none}
+.detail-line:last-child{border-bottom:none}
+.detail-line.total{border-top:1px solid var(--bd);padding-top:10px;margin-top:2px;border-bottom:none}
+.detail-line.total .dl-title{font-weight:700}
+.detail-line.total .dl-amt{font-weight:700;font-size:14px}
+.emp-head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:2px}
+.pay-summary{display:flex;gap:8px;flex-wrap:wrap}
+.pay-chip{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:var(--rfull);font-size:11px;font-weight:600;background:var(--n100);color:var(--n700)}
+.pay-chip .stdot{width:6px;height:6px;border-radius:50%;background:currentColor}
+.pay-chip.paid{background:var(--p50);color:var(--brand)}
+.pay-chip.lop{background:var(--w50);color:var(--w700)}
+.pay-chip.skipped{background:var(--n100);color:var(--n600)}
+.emp-list{display:flex;flex-direction:column;background:var(--n0);border-radius:var(--rmd);padding:0}
+.emp-row{display:flex;align-items:center;gap:12px;padding:10px 12px;border-bottom:1px solid var(--bd)}
+.emp-row:last-child{border-bottom:none}
+.emp-ava{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.emp-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.emp-name{font-size:13px;font-weight:600;color:var(--n900)}
+.emp-meta{font-size:11px;color:var(--n500)}
+.emp-amt{font-size:13px;font-weight:600;color:var(--n900);text-align:right;white-space:nowrap;min-width:64px}
+.emp-amt.muted{color:var(--n400);font-weight:500}
+.emp-pill{display:inline-flex;align-items:center;gap:6px;padding:3px 8px;border-radius:var(--rfull);font-size:11px;font-weight:600;min-width:70px;justify-content:center}
+.emp-pill .stdot{width:6px;height:6px;border-radius:50%}
+.emp-pill.paid{background:var(--p50);color:var(--brand)}
+.emp-pill.paid .stdot{background:var(--brand)}
+.emp-pill.lop{background:var(--w50);color:var(--w700)}
+.emp-pill.lop .stdot{background:var(--w500)}
+.emp-pill.skipped{background:var(--n100);color:var(--n600)}
+.emp-pill.skipped .stdot{background:var(--n400)}
+.dl-info{display:flex;flex-direction:column;gap:1px;flex:1;min-width:0}
+.dl-title{font-size:13px;font-weight:600;color:var(--n900)}
+.dl-sub{font-size:11px;color:var(--n500)}
+.dl-amt{font-size:13px;font-weight:600;color:var(--n900);white-space:nowrap}
+
+/* bank toggle inside timeline */
+.bank-toggle-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.rail-toggle{display:inline-flex;background:var(--n100);border-radius:var(--rfull);padding:3px;gap:2px}
+.rail-tab{padding:5px 12px;border:none;background:transparent;font-family:var(--font);font-size:11px;font-weight:600;color:var(--n500);cursor:pointer;border-radius:var(--rfull)}
+.rail-tab.active{background:var(--n0);color:var(--n900);box-shadow:0 1px 2px rgba(0,0,0,0.06)}
+.bank-card-mini{background:var(--n0);border-radius:var(--rmd);padding:0 14px;display:flex;flex-direction:column}
+.bank-row-mini{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--bd);font-size:12px}
+.bank-row-mini:last-child{border-bottom:none}
+.bank-row-mini .lbl{color:var(--n500)}
+.bank-row-mini .val{color:var(--n900);font-weight:600;font-family:'SF Mono','Menlo',monospace}
+
+/* account info card */
+.acct-card{background:var(--n50);border-radius:var(--rlg);padding:16px 18px;display:flex;flex-direction:column;gap:12px}
+.overview-card{background:var(--n0);border-radius:var(--rlg);padding:24px 28px;display:flex;flex-direction:column;gap:24px}
+.overview-divider{height:1px;background:var(--bd);margin:0}
+.acct-section{display:flex;flex-direction:column;gap:14px}
+.acct-head{display:flex;align-items:center;justify-content:space-between}
+.acct-title{font-size:14px;font-weight:700;color:var(--n900)}
+.acct-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px 18px}
+.acct-cell{display:flex;flex-direction:column;gap:2px}
+.acct-label{font-size:11px;color:var(--n500);font-weight:500}
+.acct-val{font-size:13px;color:var(--n900);font-weight:600}
+
+/* employees panel */
+.emp-card{background:var(--n0);border:1px solid var(--bd);border-radius:var(--rlg);overflow:hidden;flex-shrink:0}
+.emp-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--bd);gap:12px}
+.emp-title{font-size:14px;font-weight:700;color:var(--n900);display:flex;align-items:center;gap:8px}
+.emp-count{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:20px;padding:0 7px;border-radius:var(--rfull);background:var(--p50);color:var(--brand);font-size:11px;font-weight:700}
+.emp-filter{display:flex;gap:6px}
+.emp-search{display:flex;align-items:center;gap:6px;height:30px;padding:0 10px;background:var(--n50);border:1px solid var(--bd);border-radius:var(--rmd);min-width:180px}
+.emp-search svg{width:11px;height:11px;color:var(--n400);flex-shrink:0}
+.emp-search input{border:none;outline:none;font-family:var(--font);font-size:12px;color:var(--n800);background:transparent;width:100%}
+.emp-search input::placeholder{color:var(--n400)}
+.emp-row{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--bd);cursor:pointer;transition:background 120ms}
+.emp-row:last-child{border-bottom:none}
+.emp-row:hover{background:var(--n50)}
+.emp-avatar{width:34px;height:34px;border-radius:8px;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;letter-spacing:.2px}
+.emp-info{min-width:0;flex:1;display:flex;flex-direction:column;gap:3px}
+.emp-line1{display:flex;align-items:center;gap:8px;min-width:0}
+.emp-name{font-size:13px;font-weight:600;color:var(--n900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.emp-role{font-size:11px;color:var(--n500)}
+.emp-line2{font-size:11px;color:var(--n500);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.emp-line2 .sep{color:var(--n300)}
+.emp-line2 .ref{font-family:'SF Mono','Menlo',monospace;font-size:10px;color:var(--n600)}
+.emp-amt{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0}
+.emp-amt .val{font-size:13px;font-weight:700;color:var(--n900);letter-spacing:-0.1px}
+.emp-amt .val .cur{color:var(--n400);font-weight:500;font-size:11px;margin-right:1px}
+.emp-amt .sub{font-size:10px;color:var(--n400);font-family:var(--font-tag);font-weight:300;text-transform:uppercase;letter-spacing:.4px}
+.emp-status{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:600;padding:2px 8px;border-radius:var(--rfull);text-transform:uppercase;letter-spacing:.3px;white-space:nowrap}
+.emp-status.active{background:var(--s50);color:var(--s700)}
+.emp-status.exited{background:var(--n100);color:var(--n500)}
+.emp-status.onleave{background:var(--w50);color:var(--w700)}
+.emp-empty{padding:24px;text-align:center;color:var(--n400);font-size:12px}
+
+/* mini roster inside deposit detail */
+.dep-roster{background:var(--n0);border:1px solid var(--bd);border-radius:var(--rmd);overflow:hidden}
+.dep-roster-head{display:grid;grid-template-columns:minmax(120px,1.4fr) 100px 80px;gap:10px;padding:8px 12px;background:var(--n50);font-family:var(--font-tag);font-size:10px;font-weight:300;color:var(--n400);letter-spacing:.5px;text-transform:uppercase;border-bottom:1px solid var(--bd)}
+.dep-roster-row{display:grid;grid-template-columns:minmax(120px,1.4fr) 100px 80px;gap:10px;align-items:center;padding:9px 12px;border-bottom:1px solid var(--bd)}
+.dep-roster-row:last-child{border-bottom:none}
+.dep-roster-row .who{display:flex;align-items:center;gap:8px;min-width:0}
+.dep-roster-row .av{width:22px;height:22px;border-radius:6px;color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.dep-roster-row .nm{font-size:12px;font-weight:600;color:var(--n900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dep-roster-row .ref{font-family:'SF Mono','Menlo',monospace;font-size:11px;color:var(--n600)}
+.dep-roster-row .amt{font-size:12px;font-weight:600;color:var(--n900);text-align:right;white-space:nowrap}
+.dep-roster-row .amt .cur{color:var(--n400);font-weight:500;font-size:10px;margin-right:1px}
+
+@media (max-width:1100px){
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .summ-grid{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<aside class="sidebar">
+  <div class="sidebar-inner">
+    <div class="logo">
+      <svg viewBox="0 0 32 32" fill="none"><path d="M3 8L9 24L16 12L23 24L29 8" stroke="#2684FF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Wisemonk</span>
+      <span class="ops-tag">OPS</span>
+    </div>
+    <div class="nav-group">
+      <div class="nav-section">
+        <div class="slab">OPERATIONS</div>
+        <div class="nav-list">
+          <a class="nav active" href="#"><svg viewBox="0 0 20 20" fill="none"><path d="M6.67 9.5C8.32 9.5 9.67 8.15 9.67 6.5C9.67 4.85 8.32 3.5 6.67 3.5C5.02 3.5 3.67 4.85 3.67 6.5C3.67 8.15 5.02 9.5 6.67 9.5Z" stroke="currentColor" stroke-width="1.5"/><path d="M13.33 9.5C14.71 9.5 15.83 8.38 15.83 7C15.83 5.62 14.71 4.5 13.33 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M2 16.5C2 13.74 4.24 11.5 7 11.5H7.33C9.81 11.5 11.83 13.52 11.83 16V16.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M13.33 11.5C15.36 11.5 17 13.14 17 15.17V16.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Clients</a>
+          <a class="nav" href="#"><svg viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="14" height="14" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M3 7H17M7 3V7M13 3V7" stroke="currentColor" stroke-width="1.5"/></svg>All invoices</a>
+          <a class="nav" href="#"><svg viewBox="0 0 20 20" fill="none"><path d="M10 2.5V17.5M6.5 5.5H11.5C12.6 5.5 13.5 6.4 13.5 7.5C13.5 8.6 12.6 9.5 11.5 9.5H8.5C7.4 9.5 6.5 10.4 6.5 11.5C6.5 12.6 7.4 13.5 8.5 13.5H13.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>All payments</a>
+          <a class="nav" href="#"><svg viewBox="0 0 20 20" fill="none"><rect x="4" y="9" width="12" height="8" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M7 9V6.5C7 4.84 8.34 3.5 10 3.5C11.66 3.5 13 4.84 13 6.5V9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Deposits</a>
+          <a class="nav" href="#"><svg viewBox="0 0 20 20" fill="none"><path d="M3 16V8M8 16V5M13 16V11M3 16H17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Reports</a>
+        </div>
+      </div>
+      <div class="nav-section">
+        <div class="slab">SETTINGS</div>
+        <div class="nav-list">
+          <a class="nav" href="#"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="6" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M3 17.5C3 13.91 6.13 11 10 11C13.87 11 17 13.91 17 17.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Team</a>
+          <a class="nav" href="#"><svg viewBox="0 0 20 20" fill="none"><path d="M3 4H17M3 10H17M3 16H12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Audit log</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <span class="topbar-title">Clients</span>
+    <div class="topbar-right">
+      <div class="search-box" style="background:var(--n0)">
+        <svg viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.5"/><path d="M9.5 9.5L12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <input type="text" placeholder="Search by client, invoice, or reference…" oninput="filterClients(this.value)"/>
+      </div>
+      <button class="bell"><svg viewBox="0 0 16 16" fill="none"><path d="M8 2C8 2 4.5 3 4.5 7.5V10.5L3 12H13L11.5 10.5V7.5C11.5 3 8 2 8 2Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M6.5 12C6.5 12.83 7.17 13.5 8 13.5C8.83 13.5 9.5 12.83 9.5 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="dot"></span></button>
+      <div class="uchip"><div class="uavatar">OP</div><span class="uname">Ops Admin<svg viewBox="0 0 12 12" fill="none"><path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+    </div>
+  </div>
+
+  <div class="body-area">
+    <div class="page-body">
+      <div class="container list-view" id="listView">
+
+        <!-- page header -->
+        <div class="ph">
+          <div>
+            <div class="pt">All clients</div>
+            <div class="ps">Manage client wallets, invoices, payments and security deposits.</div>
+          </div>
+        </div>
+
+        <!-- stats grid -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Active clients</div>
+            <div class="stat-val">24</div>
+            <div class="stat-meta"><span class="delta">+2</span><span>this month</span></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Outstanding invoices</div>
+            <div class="stat-val"><span class="cur">$</span>1,84,500</div>
+            <div class="stat-meta"><span>across 11 clients</span></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Reconciled MTD</div>
+            <div class="stat-val"><span class="cur">$</span>3,12,800</div>
+            <div class="stat-meta"><span class="delta">+18%</span><span>vs last month</span></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Deposits held</div>
+            <div class="stat-val"><span class="cur">$</span>2,46,200</div>
+            <div class="stat-meta"><span>across 89 employees</span></div>
+          </div>
+        </div>
+
+        <!-- tabs + search/filters -->
+        <div class="toolbar">
+          <div class="tabs">
+            <div class="tab active" onclick="setTab(this,'all')">All clients <span class="tab-count" id="cAll">8</span></div>
+            <div class="tab" onclick="setTab(this,'active')">Active <span class="tab-count" id="cActive">7</span></div>
+            <div class="tab" onclick="setTab(this,'inactive')">Inactive <span class="tab-count" id="cInactive">1</span></div>
+          </div>
+          <div class="toolbar-right">
+            <div class="tl-search" style="width:240px">
+              <svg viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.5"/><path d="M9.5 9.5L12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              <input id="clientSearch" type="text" placeholder="Search clients…" oninput="applyClientFilter()"/>
+            </div>
+            <select class="tl-time" id="filterRisk" onchange="applyClientFilter()">
+              <option value="all">All risk</option>
+              <option value="low">Low risk</option>
+              <option value="medium">Medium risk</option>
+              <option value="high">High risk</option>
+            </select>
+            <select class="tl-time" id="filterStatus" onchange="applyClientFilter()">
+              <option value="all">All statuses</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- table -->
+        <div class="table">
+          <div class="thead">
+            <div class="th sortable" onclick="setClientSort('name')"><span>Client</span><span class="sort-ind" id="csort-name"><svg viewBox="0 0 10 10" fill="none"><path d="M3 4L5 6L7 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+            <div class="th right sortable" onclick="setClientSort('employees')"><span>Employees</span><span class="sort-ind" id="csort-employees"><svg viewBox="0 0 10 10" fill="none"><path d="M3 4L5 6L7 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+            <div class="th right sortable" onclick="setClientSort('outstanding')"><span>Outstanding amount</span><span class="sort-ind" id="csort-outstanding"><svg viewBox="0 0 10 10" fill="none"><path d="M3 4L5 6L7 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+            <div class="th right sortable" onclick="setClientSort('monthly')"><span>Monthly exposure</span><span class="sort-ind" id="csort-monthly"><svg viewBox="0 0 10 10" fill="none"><path d="M3 4L5 6L7 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+            <div class="th right sortable" onclick="setClientSort('deposit')"><span>Deposit held</span><span class="sort-ind" id="csort-deposit"><svg viewBox="0 0 10 10" fill="none"><path d="M3 4L5 6L7 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+            <div class="th right sortable" onclick="setClientSort('risk')"><span>Risk</span><span class="sort-ind" id="csort-risk"><svg viewBox="0 0 10 10" fill="none"><path d="M3 4L5 6L7 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+            <div class="th right sortable" onclick="setClientSort('status')"><span>Status</span><span class="sort-ind" id="csort-status"><svg viewBox="0 0 10 10" fill="none"><path d="M3 4L5 6L7 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+            <div class="th"></div>
+          </div>
+          <div id="clientsBody"></div>
+        </div>
+
+      </div>
+
+      <!-- client detail page -->
+      <div class="container client-page hidden" id="clientPage">
+        <!-- breadcrumb + page header -->
+        <div class="cp-crumbs">
+          <span class="cp-link" onclick="backToList()">
+            <svg viewBox="0 0 14 14" fill="none"><path d="M9 3L5 7L9 11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            All clients
+          </span>
+          <span class="cp-sep">/</span>
+          <span class="cp-here" id="cpCrumbName">Client</span>
+        </div>
+
+        <div class="cp-head">
+          <div class="cp-head-left">
+            <div class="cp-head-logo" id="drLogo" style="background:#2684FF">A</div>
+            <div class="cp-head-info">
+              <div class="cp-head-name" id="drName">Acme Inc</div>
+              <div class="cp-head-sub" id="drSub">United States · contact@acme.com</div>
+            </div>
+          </div>
+          <div class="cp-head-actions">
+            <button class="cp-adjust-btn" onclick="openAdjustModal()">Make adjustment</button>
+          </div>
+        </div>
+
+        <!-- combined: financial summary + account details -->
+        <div class="overview-card">
+          <div class="summ-grid" id="drSumm"></div>
+          <div class="overview-divider"></div>
+          <div class="acct-section" id="drAcct"></div>
+        </div>
+
+        <!-- timeline -->
+        <div class="tl-header" id="timelineAnchor">
+          <div class="tl-title">Transaction timeline</div>
+          <div class="tl-controls">
+            <div class="tl-search">
+              <svg viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.5"/><path d="M9.5 9.5L12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              <input id="tlSearch" type="text" placeholder="Search transactions…" oninput="setSearchFilter(this.value)"/>
+            </div>
+            <select class="tl-time" id="tlKind" onchange="setKindFilter(this.value)">
+              <option value="all">All activity</option>
+              <option value="invoice">Invoices</option>
+              <option value="payment">Payments</option>
+              <option value="deposit">Deposits</option>
+            </select>
+            <select class="tl-time" id="tlStatus" onchange="setStatusFilter(this.value)">
+              <option value="all">All statuses</option>
+              <option value="Paid">Paid</option>
+              <option value="Due">Due</option>
+              <option value="Locked">Locked</option>
+              <option value="Adjusted">Adjusted</option>
+            </select>
+            <select class="tl-time" id="tlTime" onchange="setTimeFilter(this.value)">
+              <option value="all">All time</option>
+              <option value="30">Last 30 days</option>
+              <option value="90">Last 90 days</option>
+              <option value="ytd">This year</option>
+              <option value="month">This month</option>
+              <option value="prev">Last month</option>
+            </select>
+          </div>
+        </div>
+        <div class="timeline" id="timeline">
+          <div class="tlhead">
+            <div class="tlh sortable" data-sort="date" onclick="setSort('date')"><span>Date</span><span class="sort-ind" id="sort-date"><svg viewBox="0 0 10 10" fill="none"><path d="M3 4L5 6L7 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+            <div class="tlh sortable" data-sort="title" onclick="setSort('title')"><span>Activity</span><span class="sort-ind" id="sort-title"><svg viewBox="0 0 10 10" fill="none"><path d="M3 4L5 6L7 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+            <div class="tlh right sortable" data-sort="amount" onclick="setSort('amount')"><span>Amount</span><span class="sort-ind" id="sort-amount"><svg viewBox="0 0 10 10" fill="none"><path d="M3 4L5 6L7 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+            <div class="tlh sortable" data-sort="status" onclick="setSort('status')"><span>Status</span><span class="sort-ind" id="sort-status"><svg viewBox="0 0 10 10" fill="none"><path d="M3 4L5 6L7 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+            <div></div>
+          </div>
+          <div id="timelineBody"></div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</main>
+</div>
+
+<!-- ADJUSTMENT MODAL -->
+<div class="modal-overlay" id="adjOverlay" onclick="if(event.target===this)closeAdjustModal()">
+  <div class="modal">
+    <div class="m-header">
+      <div class="m-title">Make adjustment</div>
+      <button class="m-close" onclick="closeAdjustModal()"><svg viewBox="0 0 12 12" fill="none"><path d="M1 1L11 11M11 1L1 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+    </div>
+    <div class="m-body">
+      <div class="fg">
+        <div class="flabel">Adjustment type <span class="req">*</span></div>
+        <div class="adj-types">
+          <label class="adj-type"><input type="radio" name="adjType" value="credit" checked><div class="adj-type-content"><div class="adj-type-title">Add credit to wallet</div><div class="adj-type-desc">Credit a refundable balance — typically issued as a credit note that auto-applies to the next invoice</div></div></label>
+          <label class="adj-type"><input type="radio" name="adjType" value="debit"><div class="adj-type-content"><div class="adj-type-title">Deduct from wallet</div><div class="adj-type-desc">Reverse a credit or correct an over-allocation</div></div></label>
+          <label class="adj-type"><input type="radio" name="adjType" value="mark-paid"><div class="adj-type-content"><div class="adj-type-title">Mark invoice as paid</div><div class="adj-type-desc">Override status on a specific open invoice (offline reconciliation)</div></div></label>
+          <label class="adj-type"><input type="radio" name="adjType" value="release-deposit"><div class="adj-type-content"><div class="adj-type-title">Release / refund deposit</div><div class="adj-type-desc">Unlock a specific employee's security deposit</div></div></label>
+        </div>
+      </div>
+
+      <!-- Add credit -->
+      <div class="adj-fields" data-for="credit">
+        <div class="fg">
+          <div class="flabel">Amount <span class="req">*</span></div>
+          <div class="amount-input"><span class="cur">$</span><input type="number" class="finput adj-amount" placeholder="0.00"/></div>
+          <div class="adj-helper">Increases the client's available credit. A credit note (e.g. CN-2026-00XX) will be issued and auto-applied to their next open invoice.</div>
+        </div>
+        <label class="adj-toggle"><input type="checkbox" id="adjIssueCN" checked><span>Issue as credit note (recommended)</span></label>
+      </div>
+
+      <!-- Deduct -->
+      <div class="adj-fields" data-for="debit" style="display:none">
+        <div class="fg">
+          <div class="flabel">Amount <span class="req">*</span></div>
+          <div class="amount-input"><span class="cur">$</span><input type="number" class="finput adj-amount" placeholder="0.00"/></div>
+          <div class="adj-helper">Decreases the client's wallet balance. Use only for corrections or reversing a previously-credited amount.</div>
+        </div>
+      </div>
+
+      <!-- Mark invoice as paid -->
+      <div class="adj-fields" data-for="mark-paid" style="display:none">
+        <div class="fg">
+          <div class="flabel">Select open invoice <span class="req">*</span></div>
+          <select class="finput" id="adjInvoice" onchange="adjInvoiceChange()">
+            <option value="">Choose invoice…</option>
+            <option value="INV-2026-0050|15200">INV-2026-0050 · May 2026 cycle · $15,200.00</option>
+            <option value="INV-2026-0094|22400">INV-2026-0094 · Apr cycle (overdue 10d) · $22,400.00</option>
+            <option value="INV-2026-0091|48750">INV-2026-0091 · Apr cycle (overdue 14d) · $48,750.00</option>
+          </select>
+          <div class="adj-helper">Invoice will be marked Paid for its full amount. For partial payments, use "Add credit to wallet" instead.</div>
+          <input type="hidden" class="adj-amount" id="adjInvoiceAmt" value=""/>
+        </div>
+      </div>
+
+      <!-- Release deposit -->
+      <div class="adj-fields" data-for="release-deposit" style="display:none">
+        <div class="fg">
+          <div class="flabel">Select locked deposit <span class="req">*</span></div>
+          <select class="finput" id="adjDeposit" onchange="adjDepositChange()">
+            <option value="">Choose deposit…</option>
+            <option value="ADV-2026-001|85000|Rahul Kumar">ADV-2026-001 · Rahul Kumar · $85,000</option>
+            <option value="ADV-2026-002|95000|Priya Singh">ADV-2026-002 · Priya Singh · $95,000</option>
+            <option value="ADV-2026-003|75000|Arjun Verma">ADV-2026-003 · Arjun Verma · $75,000</option>
+            <option value="ADV-2026-004|65000|Neha Kapoor">ADV-2026-004 · Neha Kapoor · $65,000</option>
+            <option value="ADV-2026-005|95000|Vikram Iyer">ADV-2026-005 · Vikram Iyer · $95,000</option>
+          </select>
+        </div>
+        <div class="fg">
+          <div class="flabel">Amount to release</div>
+          <div class="amount-input"><span class="cur">$</span><input type="number" class="finput adj-amount" id="adjDepositAmt" placeholder="0.00"/></div>
+          <div class="adj-helper">Defaults to full locked amount. Edit for partial release.</div>
+        </div>
+        <div class="fg">
+          <div class="flabel">Refund destination</div>
+          <div class="adj-radio-row">
+            <label class="adj-radio"><input type="radio" name="adjDestination" value="wallet" checked><span>Credit to wallet</span></label>
+            <label class="adj-radio"><input type="radio" name="adjDestination" value="bank"><span>Refund to bank</span></label>
+          </div>
+        </div>
+      </div>
+
+      <div class="fg">
+        <div class="flabel">Reason / audit note <span class="req">*</span></div>
+        <textarea id="adjReason" class="finput" rows="3" style="height:auto;padding:10px 14px;resize:vertical;min-height:80px" placeholder="Why is this adjustment being made? This will appear in the audit log."></textarea>
+      </div>
+
+    </div>
+    <div class="m-footer" id="adjFooter">
+      <button class="btn-cancel" onclick="closeAdjustModal()">Cancel</button>
+      <button class="btn-confirm" onclick="showAdjustConfirm()">Apply adjustment</button>
+    </div>
+
+    <!-- Confirmation overlay (in-modal) -->
+    <div class="adj-confirm" id="adjConfirm">
+      <div class="adj-confirm-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2L21 18H3L12 2Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M12 9V13M12 16V16.1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+      <div class="adj-confirm-title">Confirm this adjustment?</div>
+      <div class="adj-confirm-desc">Review the details below. Once applied, this action cannot be undone and will be logged to the audit trail with your Ops ID and timestamp.</div>
+      <div class="adj-confirm-summary" id="adjConfirmSummary"></div>
+      <div class="adj-confirm-actions">
+        <button class="btn-cancel" onclick="cancelConfirm()">Back to edit</button>
+        <button class="btn-confirm" onclick="submitAdjust()">Yes, apply adjustment</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><div class="toast-icon"><svg viewBox="0 0 11 11" fill="none"><path d="M2 5.5L4.5 8L9 3" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span id="toastText">Action completed</span></div>
+
+<script>
+// ====== DATA ======
+const CLIENTS = [
+  {id:'C001', name:'Acme Inc', sub:'acme.com', region:'United States', flag:'🇺🇸', employees:23, wallet:10250, outstanding:15200, deposit:46500, monthly:13950, status:'active', logoBg:'#2684FF', initial:'A', contact:'contact@acme.com'},
+  {id:'C002', name:'TechFlow Labs', sub:'techflow.io', region:'India', flag:'🇮🇳', employees:8, wallet:32400, outstanding:0, deposit:24000, monthly:9400, status:'active', logoBg:'#2684FF', initial:'T', contact:'ops@techflow.io'},
+  {id:'C003', name:'Brightspark GmbH', sub:'brightspark.de', region:'Germany', flag:'🇩🇪', employees:15, wallet:8500, outstanding:22400, deposit:0, monthly:20500, status:'active', logoBg:'#2684FF', initial:'B', contact:'finance@brightspark.de'},
+  {id:'C004', name:'Nordic Health', sub:'nordichealth.se', region:'Sweden', flag:'🇸🇪', employees:6, wallet:14200, outstanding:0, deposit:18500, monthly:6475, status:'active', logoBg:'#2684FF', initial:'N', contact:'ops@nordichealth.se'},
+  {id:'C005', name:'CloudVault', sub:'cloudvault.co.uk', region:'United Kingdom', flag:'🇬🇧', employees:32, wallet:0, outstanding:18000, deposit:30000, monthly:46400, status:'active', logoBg:'#2684FF', initial:'C', contact:'billing@cloudvault.co.uk'},
+  {id:'C006', name:'DataPipe Co', sub:'datapipe.com', region:'United States', flag:'🇺🇸', employees:18, wallet:22500, outstanding:0, deposit:34200, monthly:22800, status:'active', logoBg:'#2684FF', initial:'D', contact:'admin@datapipe.com'},
+  {id:'C007', name:'Pixel Labs', sub:'pixellabs.ca', region:'Canada', flag:'🇨🇦', employees:11, wallet:14000, outstanding:0, deposit:22600, monthly:13200, status:'active', logoBg:'#2684FF', initial:'P', contact:'team@pixellabs.ca'},
+  {id:'C008', name:'RetailGenie', sub:'retailgenie.au', region:'Australia', flag:'🇦🇺', employees:9, wallet:0, outstanding:0, deposit:0, monthly:0, status:'inactive', logoBg:'#9AA2B2', initial:'R', contact:'paused — exited Apr 2026'}
+];
+
+// Per-client employee roster
+const EMPLOYEES = {
+  C001: [
+    {id:'EMP01', name:'Aditya Sharma',  role:'Senior Backend Engineer', doj:'12 Jan 2026', salary:9500,  adv:'ADV-2026-001', deposit:830,  status:'active', initial:'AS', bg:'#2684FF'},
+    {id:'EMP02', name:'Priya Singh',    role:'Product Manager',         doj:'12 Jan 2026', salary:11200, adv:'ADV-2026-002', deposit:1140, status:'active', initial:'PS', bg:'#7C5CFF'},
+    {id:'EMP03', name:'Rohit Verma',    role:'Engineering Lead',        doj:'12 Jan 2026', salary:10800, adv:'ADV-2026-003', deposit:920,  status:'active', initial:'RV', bg:'#12B76A'},
+    {id:'EMP04', name:'Sneha Arora',    role:'Senior Designer',         doj:'12 Jan 2026', salary:8400,  adv:'ADV-2026-004', deposit:720,  status:'exited', initial:'SA', bg:'#9AA2B2'},
+    {id:'EMP05', name:'Vikram Iyer',    role:'Backend Engineer',        doj:'12 Jan 2026', salary:8800,  adv:'ADV-2026-005', deposit:540,  status:'active', initial:'VI', bg:'#F04438'},
+    {id:'EMP06', name:'Karthik Reddy',  role:'Senior Designer',         doj:'15 Mar 2026', salary:8500,  adv:'ADV-2026-006', deposit:900,  status:'active', initial:'KR', bg:'#1059BD'},
+    {id:'EMP07', name:'Arjun Mehta',    role:'DevOps Engineer',         doj:'10 Feb 2026', salary:9700,  adv:'ADV-2026-007', deposit:820,  status:'active', initial:'AM', bg:'#027A48'},
+    {id:'EMP08', name:'Meera Joshi',    role:'QA Engineer',             doj:'10 Feb 2026', salary:7400,  adv:'ADV-2026-008', deposit:620,  status:'active', initial:'MJ', bg:'#F79009'},
+    {id:'EMP09', name:'Neha Kapoor',    role:'Frontend Engineer',       doj:'15 Apr 2026', salary:9100,  adv:'ADV-2026-009', deposit:780,  status:'active', initial:'NK', bg:'#5638CC'},
+    {id:'EMP10', name:'Sanjay Patel',   role:'Data Engineer',           doj:'15 Apr 2026', salary:9300,  adv:'ADV-2026-010', deposit:800,  status:'active', initial:'SP', bg:'#B54708'},
+    {id:'EMP11', name:'Ananya Rao',     role:'Product Designer',        doj:'02 May 2026', salary:8200,  adv:'ADV-2026-011', deposit:700,  status:'onleave', initial:'AR', bg:'#1A6FE0'},
+    {id:'EMP12', name:'Dhruv Malhotra', role:'Engineering Manager',     doj:'02 May 2026', salary:12400, adv:'ADV-2026-012', deposit:1060, status:'active', initial:'DM', bg:'#7C5CFF'}
+  ],
+  C003: [
+    {id:'DE01', name:'Lukas Becker',   role:'Senior Engineer',     doj:'12 Jan 2026', salary:4800, adv:'ADV-2026-DE-001', deposit:2533, status:'active', initial:'LB', bg:'#F79009'},
+    {id:'DE02', name:'Anna Schmidt',   role:'Product Lead',        doj:'12 Jan 2026', salary:5600, adv:'ADV-2026-DE-002', deposit:2533, status:'active', initial:'AS', bg:'#2684FF'},
+    {id:'DE03', name:'Felix Weber',    role:'Backend Engineer',    doj:'12 Jan 2026', salary:4400, adv:'ADV-2026-DE-003', deposit:2533, status:'active', initial:'FW', bg:'#12B76A'},
+    {id:'DE04', name:'Sophie Müller',  role:'Designer',            doj:'12 Jan 2026', salary:4200, adv:'ADV-2026-DE-004', deposit:2533, status:'active', initial:'SM', bg:'#7C5CFF'},
+    {id:'DE05', name:'Maximilian Koch',role:'DevOps Engineer',     doj:'12 Jan 2026', salary:4900, adv:'ADV-2026-DE-005', deposit:2533, status:'active', initial:'MK', bg:'#F04438'},
+    {id:'DE06', name:'Hannah Fischer', role:'Frontend Engineer',   doj:'12 Jan 2026', salary:4300, adv:'ADV-2026-DE-006', deposit:2533, status:'active', initial:'HF', bg:'#027A48'},
+    {id:'DE07', name:'Paul Wagner',    role:'Data Engineer',       doj:'12 Jan 2026', salary:4700, adv:'ADV-2026-DE-007', deposit:2533, status:'active', initial:'PW', bg:'#1059BD'},
+    {id:'DE08', name:'Lena Hoffmann',  role:'QA Engineer',         doj:'12 Jan 2026', salary:4000, adv:'ADV-2026-DE-008', deposit:2533, status:'active', initial:'LH', bg:'#B54708'},
+    {id:'DE09', name:'Jonas Schulz',   role:'Engineering Lead',    doj:'12 Jan 2026', salary:5800, adv:'ADV-2026-DE-009', deposit:2533, status:'active', initial:'JS', bg:'#5638CC'},
+    {id:'DE10', name:'Mia Richter',    role:'Product Manager',     doj:'12 Jan 2026', salary:5400, adv:'ADV-2026-DE-010', deposit:2533, status:'active', initial:'MR', bg:'#2684FF'},
+    {id:'DE11', name:'Tim Klein',      role:'Backend Engineer',    doj:'12 Jan 2026', salary:4500, adv:'ADV-2026-DE-011', deposit:2533, status:'active', initial:'TK', bg:'#12B76A'},
+    {id:'DE12', name:'Laura Neumann',  role:'Designer',            doj:'12 Jan 2026', salary:4200, adv:'ADV-2026-DE-012', deposit:2533, status:'active', initial:'LN', bg:'#F79009'},
+    {id:'DE13', name:'Erik Braun',     role:'Frontend Engineer',   doj:'12 Jan 2026', salary:4400, adv:'ADV-2026-DE-013', deposit:2533, status:'active', initial:'EB', bg:'#F04438'},
+    {id:'DE14', name:'Clara Zimmermann',role:'QA Lead',            doj:'12 Jan 2026', salary:5100, adv:'ADV-2026-DE-014', deposit:2533, status:'active', initial:'CZ', bg:'#7C5CFF'},
+    {id:'DE15', name:'Niklas Krüger',  role:'Solutions Architect', doj:'12 Jan 2026', salary:5900, adv:'ADV-2026-DE-015', deposit:2533, status:'active', initial:'NK', bg:'#1A6FE0'}
+  ],
+  C005: [
+    {id:'UK01', name:'Oliver Hughes',  role:'CTO Office',          doj:'18 Feb 2026', salary:6200, adv:'ADV-2026-UK-001', deposit:1950, status:'active', initial:'OH', bg:'#F04438'},
+    {id:'UK02', name:'Emily Watson',   role:'VP Engineering',      doj:'18 Feb 2026', salary:7100, adv:'ADV-2026-UK-002', deposit:1950, status:'active', initial:'EW', bg:'#2684FF'},
+    {id:'UK03', name:'James Carter',   role:'Engineering Lead',    doj:'18 Feb 2026', salary:5800, adv:'ADV-2026-UK-003', deposit:1950, status:'active', initial:'JC', bg:'#12B76A'},
+    {id:'UK04', name:'Sophie Bennett', role:'Product Lead',        doj:'18 Feb 2026', salary:5600, adv:'ADV-2026-UK-004', deposit:1950, status:'active', initial:'SB', bg:'#7C5CFF'},
+    {id:'UK05', name:'Henry Wright',   role:'Senior Engineer',     doj:'18 Feb 2026', salary:5200, adv:'ADV-2026-UK-005', deposit:1950, status:'active', initial:'HW', bg:'#F79009'},
+    {id:'UK06', name:'Charlotte Lee',  role:'Designer',            doj:'18 Feb 2026', salary:4800, adv:'ADV-2026-UK-006', deposit:1950, status:'active', initial:'CL', bg:'#027A48'},
+    {id:'UK07', name:'Thomas Walker',  role:'Backend Engineer',    doj:'18 Feb 2026', salary:5000, adv:'ADV-2026-UK-007', deposit:1950, status:'active', initial:'TW', bg:'#1059BD'},
+    {id:'UK08', name:'Olivia Green',   role:'Frontend Engineer',   doj:'18 Feb 2026', salary:4900, adv:'ADV-2026-UK-008', deposit:1950, status:'active', initial:'OG', bg:'#B54708'},
+    {id:'UK09', name:'William Hall',   role:'DevOps Engineer',     doj:'18 Feb 2026', salary:5300, adv:'ADV-2026-UK-009', deposit:1950, status:'active', initial:'WH', bg:'#5638CC'},
+    {id:'UK10', name:'Amelia Wood',    role:'QA Engineer',         doj:'18 Feb 2026', salary:4400, adv:'ADV-2026-UK-010', deposit:1950, status:'active', initial:'AW', bg:'#1A6FE0'},
+    {id:'UK11', name:'Jack Turner',    role:'Data Engineer',       doj:'18 Feb 2026', salary:5100, adv:'ADV-2026-UK-011', deposit:1950, status:'active', initial:'JT', bg:'#2684FF'},
+    {id:'UK12', name:'Isla Cooper',    role:'Product Designer',    doj:'18 Feb 2026', salary:5000, adv:'ADV-2026-UK-012', deposit:1950, status:'active', initial:'IC', bg:'#12B76A'},
+    {id:'UK13', name:'George Phillips',role:'Backend Engineer',    doj:'18 Feb 2026', salary:5000, adv:'ADV-2026-UK-013', deposit:1950, status:'active', initial:'GP', bg:'#7C5CFF'},
+    {id:'UK14', name:'Grace Edwards',  role:'Frontend Engineer',   doj:'18 Feb 2026', salary:4800, adv:'ADV-2026-UK-014', deposit:1950, status:'active', initial:'GE', bg:'#F79009'},
+    {id:'UK15', name:'Harry Foster',   role:'Engineering Manager', doj:'18 Feb 2026', salary:6400, adv:'ADV-2026-UK-015', deposit:1950, status:'active', initial:'HF', bg:'#F04438'},
+    {id:'UK16', name:'Ella Roberts',   role:'Product Manager',     doj:'18 Feb 2026', salary:5300, adv:'ADV-2026-UK-016', deposit:1950, status:'active', initial:'ER', bg:'#027A48'}
+    // (16 of 32 shown — rest paginated)
+  ]
+};
+
+const NAME_POOL = [
+  ['Aarav Gupta','Frontend Engineer'],['Ishaan Khanna','Backend Engineer'],['Ria Nair','Product Manager'],
+  ['Saanvi Pillai','Designer'],['Kabir Bose','Data Engineer'],['Tara Menon','QA Engineer'],
+  ['Ved Krishnan','DevOps Engineer'],['Aanya Saxena','Engineering Lead'],['Rohan Bhatt',"Backend Engineer"],
+  ['Diya Chawla','Solutions Architect'],['Aryan Pandey','Senior Engineer'],['Kiara Sen','Designer']
+];
+const AVATAR_BG = ['#2684FF','#12B76A','#F79009','#7C5CFF','#F04438','#027A48','#1059BD','#B54708','#5638CC','#1A6FE0'];
+
+function defaultEmployees(c){
+  const out = [];
+  for(let i=0;i<c.employees;i++){
+    const [name,role] = NAME_POOL[i % NAME_POOL.length];
+    const initial = name.split(' ').map(p=>p[0]).join('').slice(0,2);
+    const salary = 7000 + ((i*317) % 5500);
+    const dep = Math.round((c.deposit||10000)/c.employees);
+    out.push({
+      id:`EMP${String(i+1).padStart(2,'0')}`, name, role,
+      doj:'12 Jan 2026', salary, adv:`ADV-2026-AUTO-${String(i+1).padStart(3,'0')}`,
+      deposit:dep, status: i%9===4 ? 'exited' : (i%11===6 ? 'onleave' : 'active'),
+      initial, bg: AVATAR_BG[i % AVATAR_BG.length]
+    });
+  }
+  return out;
+}
+
+// Per-client timeline events (newest first)
+const TIMELINES = {
+  C001: [
+    {date:'10 May 2026', type:'invoice-open', title:'Invoice INV-2026-0050 issued', meta:'May 2026 cycle · payroll + EOR', ref:'INV-2026-0050', amount:15200, pill:'Due'},
+    {date:'05 May 2026', type:'payment', title:'Payment processed · April 2026 payroll', meta:'23 employees · 1 contractor', ref:'PAY-APR26', amount:13950, pill:'Paid'},
+    {date:'01 May 2026', type:'invoice-paid', title:'Invoice INV-2026-0042 paid', meta:'Bank transfer reconciled · NEFT-883120', ref:'INV-2026-0042', amount:15200, pill:'Paid'},
+    {date:'15 Apr 2026', type:'payment', title:'Off-cycle payment · joining bonus', meta:'EMP09 · Neha Kapoor', ref:'PAY-OFF-1188', amount:900, pill:'Paid'},
+    {date:'05 Apr 2026', type:'payment', title:'Payment processed · March 2026 payroll', meta:'21 employees', ref:'PAY-MAR26', amount:13400, pill:'Paid'},
+    {date:'02 Apr 2026', type:'deposit-topup', title:'Deposit top-up · Priya Singh', meta:'Salary revised · EMP02', ref:'ADV-2026-007', amount:300, pill:'Due'},
+    {date:'01 Apr 2026', type:'invoice-paid', title:'Invoice INV-2026-0033 paid', meta:'Wire transfer reconciled', ref:'INV-2026-0033', amount:13800, pill:'Paid'},
+    {date:'15 Mar 2026', type:'deposit-adjust', title:'Deposit adjusted · Karthik Reddy onboarding', meta:'Transferred from Sneha Arora (exit) · excess credited', ref:'ADV-2026-006', amount:900, pill:'Adjusted'},
+    {date:'05 Mar 2026', type:'payment', title:'Payment processed · February 2026 payroll', meta:'21 employees', ref:'PAY-FEB26', amount:13200, pill:'Paid'},
+    {date:'01 Mar 2026', type:'invoice-paid', title:'Invoice INV-2026-0021 paid', meta:'Bank transfer reconciled', ref:'INV-2026-0021', amount:13500, pill:'Paid'},
+    {date:'12 Jan 2026', type:'deposit-locked', title:'Security deposit collected', meta:'5 active employees · onboarding', ref:'ADV-2026-001…005', amount:4150, pill:'Locked', empRange:[0,4]}
+  ],
+  C003: [
+    {date:'22 May 2026', type:'invoice-open', title:'Invoice INV-2026-0094 issued', meta:'May 2026 cycle · overdue by 10 days', ref:'INV-2026-0094', amount:22400, pill:'Due'},
+    {date:'10 May 2026', type:'payment', title:'Payment processed · April payroll (partial)', meta:'Funded via security deposit · 15 employees', ref:'PAY-APR26-B', amount:8500, pill:'Paid'},
+    {date:'04 Apr 2026', type:'invoice-paid', title:'Invoice INV-2026-0067 paid', meta:'SEPA transfer reconciled', ref:'INV-2026-0067', amount:21800, pill:'Paid'},
+    {date:'05 Mar 2026', type:'payment', title:'Payment processed · February payroll', meta:'15 employees', ref:'PAY-FEB26', amount:20500, pill:'Paid'},
+    {date:'12 Jan 2026', type:'deposit-locked', title:'Security deposit collected', meta:'15 active employees · onboarding', ref:'ADV-2026-DE-001…015', amount:38000, pill:'Locked', empRange:[0,14]}
+  ],
+  C005: [
+    {date:'19 May 2026', type:'invoice-open', title:'Invoice INV-2026-0091 issued', meta:'May 2026 cycle · overdue by 14 days', ref:'INV-2026-0091', amount:48750, pill:'Due'},
+    {date:'07 May 2026', type:'payment', title:'Payment processed · April payroll', meta:'Funded via security deposit · 32 employees', ref:'PAY-APR26', amount:46400, pill:'Paid'},
+    {date:'02 Apr 2026', type:'invoice-paid', title:'Invoice INV-2026-0061 paid', meta:'Faster Payments reconciled', ref:'INV-2026-0061', amount:47500, pill:'Paid'},
+    {date:'18 Feb 2026', type:'deposit-locked', title:'Security deposit collected', meta:'32 active employees · onboarding', ref:'ADV-2026-UK-001…032', amount:62400, pill:'Locked', empRange:[0,15]}
+  ]
+};
+
+// default timeline for clients not above
+function defaultTimeline(c){
+  return [
+    {date:'10 May 2026', type:'invoice-paid', title:'Invoice paid · May cycle', meta:'Bank transfer reconciled', ref:'INV-2026-AUTO', amount: Math.round(c.deposit*0.4||5000), pill:'Paid'},
+    {date:'05 May 2026', type:'payment', title:'Payment processed · April payroll', meta:`${c.employees} employees`, ref:'PAY-APR26', amount: Math.round(c.deposit*0.35||4500), pill:'Paid'},
+    {date:'12 Jan 2026', type:'deposit-locked', title:'Security deposit collected', meta:`${c.employees} employees · onboarding`, ref:'ADV-2026-INIT', amount: c.deposit, pill:'Locked'}
+  ];
+}
+
+let currentTab='all', currentTl='all', currentClient=null, currentTimeFilter='all';
+const NOW = new Date('2026-05-28');
+
+function setTimeFilter(value){
+  currentTimeFilter = value;
+  renderTimeline();
+}
+function setKindFilter(value){
+  currentTl = value;
+  renderTimeline();
+}
+let currentSearch = '', currentSortKey = 'date', currentSortDir = 'desc', currentStatus = 'all';
+function setStatusFilter(value){ currentStatus = value; renderTimeline(); }
+function setSearchFilter(v){ currentSearch = (v||'').toLowerCase(); renderTimeline(); }
+function setSort(key){
+  if(currentSortKey===key){ currentSortDir = currentSortDir==='asc' ? 'desc' : 'asc'; }
+  else { currentSortKey = key; currentSortDir = key==='amount' || key==='date' ? 'desc' : 'asc'; }
+  // update indicators
+  ['date','title','amount','status'].forEach(k=>{
+    const el = document.getElementById('sort-'+k);
+    if(!el) return;
+    el.classList.toggle('show', k===currentSortKey);
+    el.classList.toggle('desc', k===currentSortKey && currentSortDir==='desc');
+  });
+  renderTimeline();
+}
+
+function isInTimeRange(dateStr){
+  if(currentTimeFilter==='all') return true;
+  const d = new Date(dateStr);
+  if(isNaN(d)) return true;
+  if(currentTimeFilter==='30'){ return (NOW - d)/(1000*60*60*24) <= 30 && d <= NOW; }
+  if(currentTimeFilter==='90'){ return (NOW - d)/(1000*60*60*24) <= 90 && d <= NOW; }
+  if(currentTimeFilter==='ytd'){ return d.getFullYear() === NOW.getFullYear(); }
+  if(currentTimeFilter==='month'){ return d.getFullYear()===NOW.getFullYear() && d.getMonth()===NOW.getMonth(); }
+  if(currentTimeFilter==='prev'){
+    const prevMonth = (NOW.getMonth()-1+12)%12;
+    const prevYear = NOW.getMonth()===0 ? NOW.getFullYear()-1 : NOW.getFullYear();
+    return d.getFullYear()===prevYear && d.getMonth()===prevMonth;
+  }
+  return true;
+}
+
+function fmt(n){ return n.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0}) }
+
+function computeRisk(c){
+  // Risk model: (deposit − outstanding) ÷ monthly salary = net months of cover.
+  // Red <= 0 (deposit can't cover what's already owed)
+  // Amber > 0 & < 1 (less than 1 net month of coverage)
+  // Green >= 1 (1+ months covered after settling outstanding; best ≥ 2)
+  if(c.status==='inactive' || !c.monthly) return {pct:null, level:'na', label:'—'};
+  const netCover = (c.deposit||0) - (c.outstanding||0);
+  const ratio = netCover / c.monthly;
+  // Map net ratio onto a 0–100 risk scale (0% safest, 100% most at-risk).
+  const pct = Math.max(0, Math.min(100, Math.round((2 - ratio) / 3 * 100)));
+  // Colour bands keyed off the displayed risk %: 🟢 0–33 · 🟡 34–66 · 🔴 67–100
+  let level;
+  if(pct >= 67) level = 'high';
+  else if(pct >= 34) level = 'medium';
+  else level = 'low';
+  return {pct, level, label: pct+'%'};
+}
+function clientRow(c){
+  // Wallet displays the open invoice amount (or 0 if nothing due)
+  const wal = c.outstanding || 0;
+  const risk = computeRisk(c);
+  const riskCell = risk.pct===null
+    ? `<span class="trisk muted">—</span>`
+    : `<span class="trisk ${risk.level}"><span class="stdot"></span><span>${risk.label}</span></span>`;
+  return `<div class="trow" data-status="${c.status}" data-region="${c.region}" data-risk="${risk.level}" data-search="${(c.name+' '+c.region+' '+c.contact+' '+c.sub).toLowerCase()}" onclick="openClient('${c.id}')">
+    <div class="tclient">
+      <div class="tlogo" style="background:${c.logoBg}">${c.initial}</div>
+      <div class="tinfo"><div class="tname">${c.name}</div><div class="tsub">${c.sub}</div></div>
+    </div>
+    <div class="tnum muted" style="text-align:right">${c.employees}</div>
+    <div class="tnum tamt-out ${wal?'':'zero'}" style="text-align:right">${wal?`<span class="cur">$</span>${fmt(wal)}`:'<span class="cur" style="color:var(--n400)">$</span><span style="color:var(--n400)">0</span>'}</div>
+    <div class="tnum" style="text-align:right;color:var(--n800)">${c.monthly?`<span class="cur">$</span>${fmt(c.monthly)}`:'—'}</div>
+    <div class="tnum muted" style="text-align:right">${c.deposit?`<span class="cur">$</span>${fmt(c.deposit)}`:'—'}</div>
+    <div style="text-align:right">${riskCell}</div>
+    <div style="text-align:right"><span class="tstatus ${c.status}"><span class="stdot"></span>${c.status[0].toUpperCase()+c.status.slice(1)}</span></div>
+    <div class="raw"><button class="rabtn" onclick="event.stopPropagation();openClient('${c.id}')"><svg viewBox="0 0 14 14" fill="none"><circle cx="2.5" cy="7" r="1.2" fill="currentColor"/><circle cx="7" cy="7" r="1.2" fill="currentColor"/><circle cx="11.5" cy="7" r="1.2" fill="currentColor"/></svg></button></div>
+  </div>`;
+}
+
+let clientSortKey = 'name', clientSortDir = 'asc';
+function setClientSort(key){
+  if(clientSortKey===key) clientSortDir = clientSortDir==='asc' ? 'desc' : 'asc';
+  else { clientSortKey = key; clientSortDir = ['outstanding','monthly','deposit','risk','employees'].includes(key) ? 'desc' : 'asc'; }
+  ['name','employees','outstanding','monthly','deposit','risk','status'].forEach(k=>{
+    const el = document.getElementById('csort-'+k);
+    if(el){
+      el.classList.toggle('show', k===clientSortKey);
+      el.classList.toggle('desc', k===clientSortKey && clientSortDir==='desc');
+    }
+  });
+  renderClients();
+}
+
+function renderClients(){
+  const dir = clientSortDir==='asc' ? 1 : -1;
+  const sorted = [...CLIENTS].sort((a,b)=>{
+    if(clientSortKey==='name') return a.name.localeCompare(b.name)*dir;
+    if(clientSortKey==='employees') return (a.employees-b.employees)*dir;
+    if(clientSortKey==='outstanding') return ((a.outstanding||0)-(b.outstanding||0))*dir;
+    if(clientSortKey==='monthly') return ((a.monthly||0)-(b.monthly||0))*dir;
+    if(clientSortKey==='deposit') return ((a.deposit||0)-(b.deposit||0))*dir;
+    if(clientSortKey==='risk'){
+      const ra = computeRisk(a).pct; const rb = computeRisk(b).pct;
+      return ((ra==null?-1:ra) - (rb==null?-1:rb))*dir;
+    }
+    if(clientSortKey==='status') return a.status.localeCompare(b.status)*dir;
+    return 0;
+  });
+  document.getElementById('clientsBody').innerHTML = sorted.map(clientRow).join('');
+  document.getElementById('cAll').textContent = CLIENTS.length;
+  document.getElementById('cActive').textContent = CLIENTS.filter(c=>c.status==='active').length;
+  const cAt = document.getElementById('cAtRisk'); if(cAt) cAt.textContent = CLIENTS.filter(c=>c.status==='atrisk').length;
+  document.getElementById('cInactive').textContent = CLIENTS.filter(c=>c.status==='inactive').length;
+  applyClientFilter();
+}
+
+function setTab(el,kind){
+  document.querySelectorAll('.tabs .tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  currentTab = kind;
+  applyClientFilter();
+}
+
+function filterClients(){ applyClientFilter() }
+
+function applyClientFilter(){
+  const globalSearch = (document.querySelector('.topbar .search-box input').value||'').toLowerCase();
+  const tableSearchEl = document.getElementById('clientSearch');
+  const tableSearch = (tableSearchEl ? tableSearchEl.value : '').toLowerCase();
+  const q = tableSearch || globalSearch;
+  const regionEl = document.getElementById('filterRegion');
+  const riskEl = document.getElementById('filterRisk');
+  const region = regionEl ? regionEl.value : 'all';
+  const risk = riskEl ? riskEl.value : 'all';
+  const statusEl = document.getElementById('filterStatus');
+  const statusDrop = statusEl ? statusEl.value : 'all';
+  let last=null;
+  document.querySelectorAll('.trow').forEach(r=>{
+    r.classList.remove('last-visible');
+    const tabStatusMatch = currentTab==='all' || r.dataset.status===currentTab;
+    const dropStatusMatch = statusDrop==='all' || r.dataset.status===statusDrop;
+    const regionMatch = region==='all' || r.dataset.region===region;
+    const riskMatch = risk==='all' || r.dataset.risk===risk;
+    const searchMatch = !q || r.dataset.search.includes(q);
+    const show = tabStatusMatch && dropStatusMatch && regionMatch && riskMatch && searchMatch;
+    r.style.display = show ? 'grid' : 'none';
+    if(show) last=r;
+  });
+  if(last) last.classList.add('last-visible');
+}
+
+// client page
+function openClient(id){
+  const c = CLIENTS.find(x=>x.id===id);
+  if(!c) return;
+  currentClient = c;
+  document.getElementById('drLogo').style.background = c.logoBg;
+  document.getElementById('drLogo').textContent = c.initial;
+  document.getElementById('drName').textContent = c.name;
+  document.getElementById('drSub').innerHTML = `${c.region} <span class="sep">·</span> ${c.contact}`;
+  document.getElementById('cpCrumbName').textContent = c.name;
+  const pill = document.getElementById('cpStatusPill');
+  if(pill){
+    const statusLabel = c.status[0].toUpperCase()+c.status.slice(1);
+    pill.className = 'cp-status-pill ' + c.status;
+    pill.innerHTML = `<span class="stdot"></span>${statusLabel}`;
+  }
+  document.querySelector('.topbar-title').textContent = c.name;
+
+  // financial summary
+  const wal = c.outstanding || 0;
+  document.getElementById('drSumm').innerHTML = `
+    <div class="summ-cell"><div class="summ-label">Wallet</div><div class="summ-val ${wal?'warn':'muted'}">${wal?`<span class="cur">$</span>${fmt(wal)}`:'$0'}</div></div>
+    <div class="summ-cell"><div class="summ-label">Deposit held</div><div class="summ-val">${c.deposit?`<span class="cur">$</span>${fmt(c.deposit)}`:'<span class="muted">$0</span>'}</div></div>
+    <div class="summ-cell"><div class="summ-label">Employees</div><div class="summ-val">${c.employees}</div></div>
+  `;
+
+  // account info — region & primary contact already shown in header
+  document.getElementById('drAcct').innerHTML = `
+    <div class="acct-head"><div class="acct-title">Account details</div></div>
+    <div class="acct-grid">
+      <div class="acct-cell"><div class="acct-label">Client ID</div><div class="acct-val">${c.id}</div></div>
+      <div class="acct-cell"><div class="acct-label">EOR plan</div><div class="acct-val">Standard · ${c.employees>15?'Annual':'Monthly'}</div></div>
+      <div class="acct-cell"><div class="acct-label">Onboarded</div><div class="acct-val">12 Jan 2026</div></div>
+      <div class="acct-cell"><div class="acct-label">Billing cycle</div><div class="acct-val">5th of each month</div></div>
+      <div class="acct-cell"><div class="acct-label">Payment terms</div><div class="acct-val">Net 5 days</div></div>
+      <div class="acct-cell"><div class="acct-label">Account manager</div><div class="acct-val">Anju Verma</div></div>
+    </div>
+  `;
+
+  currentTl = 'all';
+  currentTimeFilter = 'all';
+  currentStatus = 'all';
+  currentSearch = '';
+  currentSortKey = 'date';
+  currentSortDir = 'desc';
+  const tlTime = document.getElementById('tlTime'); if(tlTime) tlTime.value = 'all';
+  const tlKind = document.getElementById('tlKind'); if(tlKind) tlKind.value = 'all';
+  const tlStatus = document.getElementById('tlStatus'); if(tlStatus) tlStatus.value = 'all';
+  const tlSearch = document.getElementById('tlSearch'); if(tlSearch) tlSearch.value = '';
+  document.querySelectorAll('.sort-ind').forEach(el => el.classList.remove('show','desc'));
+  const sortDate = document.getElementById('sort-date'); if(sortDate){ sortDate.classList.add('show','desc'); }
+  renderTimeline();
+  document.getElementById('listView').classList.add('hidden');
+  document.getElementById('clientPage').classList.remove('hidden');
+  document.querySelector('.page-body').scrollTop = 0;
+}
+
+function clientEmployees(c){
+  return EMPLOYEES[c.id] || defaultEmployees(c);
+}
+
+function paymentRoster(e){
+  // Mock per-employee payroll roster for a payment event
+  const sampleSize = Math.min(6, parseInt(e.meta) || 6);
+  const all = [
+    {name:'Aarav Gupta', role:'Frontend Engineer', empId:'EMP01', initial:'AG', baseSalary:2100},
+    {name:'Ishaan Khanna', role:'Backend Engineer', empId:'EMP02', initial:'IK', baseSalary:2350},
+    {name:'Ria Nair', role:'Product Manager', empId:'EMP03', initial:'RN', baseSalary:2680},
+    {name:'Saanvi Pillai', role:'Designer', empId:'EMP04', initial:'SP', baseSalary:1980},
+    {name:'Kabir Bose', role:'Data Engineer', empId:'EMP05', initial:'KB', baseSalary:2240},
+    {name:'Tara Menon', role:'QA Engineer', empId:'EMP06', initial:'TM', baseSalary:1860}
+  ];
+  // Assign statuses: most paid, one LOP, one skipped (for the April payroll demo)
+  return all.slice(0, sampleSize).map((em, idx)=>{
+    if(idx===2) return {...em, status:'lop', amount: Math.round(em.baseSalary*0.78), note:'5 days LOP'};
+    if(idx===4) return {...em, status:'skipped', amount: 0, note:'On unpaid leave'};
+    return {...em, status:'paid', amount: em.baseSalary};
+  });
+}
+
+function depositRoster(e){
+  const list = clientEmployees(currentClient);
+  // 1) Explicit range tagged on the event
+  if(Array.isArray(e.empRange)){
+    const [a,b] = e.empRange;
+    return list.slice(a, b+1);
+  }
+  // 2) Direct ADV-ref match
+  const matchRef = list.filter(emp => emp.adv && e.ref && e.ref.includes(emp.adv));
+  if(matchRef.length) return matchRef;
+  // 3) Try to parse a range like "ADV-2026-001…005" or "ADV-2026-DE-001…015"
+  if(e.ref && e.ref.includes('…')){
+    const [lo,hi] = e.ref.split('…');
+    const prefix = lo.replace(/\d+$/, '');
+    const loN = parseInt(lo.match(/\d+$/)||['1'],10);
+    const hiN = parseInt(hi.match(/\d+$/)||[String(loN)],10);
+    const inRange = list.filter(emp=>{
+      if(!emp.adv || !emp.adv.startsWith(prefix)) return false;
+      const n = parseInt(emp.adv.slice(prefix.length),10);
+      return n>=loN && n<=Math.min(hiN, loN + list.length - 1);
+    });
+    if(inRange.length) return inRange;
+  }
+  // 4) Fall back to first N inferred from meta ("5 active employees …")
+  const m = (e.meta||'').match(/(\d+)\s+/);
+  const n = m ? Math.min(parseInt(m[1],10), list.length) : 0;
+  return n ? list.slice(0, n) : [];
+}
+
+function empRow(e){
+  const statusLabel = e.status==='onleave' ? 'On leave' : (e.status[0].toUpperCase()+e.status.slice(1));
+  const searchKey = (e.name+' '+e.role+' '+e.adv+' '+e.id+' '+e.status).toLowerCase();
+  return `<div class="emp-row" data-search="${searchKey}">
+    <div class="emp-avatar" style="background:${e.bg}">${e.initial}</div>
+    <div class="emp-info">
+      <div class="emp-line1">
+        <span class="emp-name">${e.name}</span>
+        <span class="emp-status ${e.status}">${statusLabel}</span>
+      </div>
+      <div class="emp-line2">
+        <span>${e.role}</span><span class="sep">·</span>
+        <span>Joined ${e.doj}</span><span class="sep">·</span>
+        <span class="ref">${e.adv}</span>
+      </div>
+    </div>
+    <div class="emp-amt">
+      <div class="val"><span class="cur">$</span>${fmt(e.salary)}</div>
+      <div class="sub">Deposit $${fmt(e.deposit)}</div>
+    </div>
+  </div>`;
+}
+
+function renderEmployees(){
+  const list = clientEmployees(currentClient);
+  document.getElementById('drEmpCount').textContent = list.length;
+  const host = document.getElementById('drEmployees');
+  host.innerHTML = list.length ? list.map(empRow).join('') : '<div class="emp-empty">No employees on record for this client</div>';
+  document.getElementById('drEmpSearch').value = '';
+}
+
+function filterEmployees(){
+  const q = (document.getElementById('drEmpSearch').value||'').toLowerCase();
+  document.querySelectorAll('#drEmployees .emp-row').forEach(r=>{
+    r.style.display = (!q || r.dataset.search.includes(q)) ? 'flex' : 'none';
+  });
+}
+
+function jumpToTimeline(){
+  const scroller = document.querySelector('.page-body');
+  const anchor = document.getElementById('timelineAnchor');
+  if(!scroller || !anchor) return;
+  const top = anchor.getBoundingClientRect().top - scroller.getBoundingClientRect().top + scroller.scrollTop - 12;
+  scroller.scrollTo({top, behavior:'smooth'});
+}
+
+function backToList(){
+  document.getElementById('clientPage').classList.add('hidden');
+  document.getElementById('listView').classList.remove('hidden');
+  document.querySelector('.topbar-title').textContent = 'Clients';
+  document.querySelector('.page-body').scrollTop = 0;
+}
+function closeDrawer(){ backToList(); } // back-compat alias
+
+function setTlFilter(el, kind){
+  document.querySelectorAll('.tlf').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  currentTl = kind;
+  renderTimeline();
+}
+
+function eventIcon(type){
+  const icons = {
+    'invoice-open':'<svg viewBox="0 0 14 14" fill="none"><rect x="3" y="2" width="8" height="10" rx="0.8" stroke="currentColor" stroke-width="1.3"/><path d="M5 5H9M5 7.5H8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>',
+    'invoice-paid':'<svg viewBox="0 0 14 14" fill="none"><path d="M3 7L6 10L11 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    'payment':'<svg viewBox="0 0 14 14" fill="none"><path d="M7 2V12M3 8L7 12L11 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    'deposit-locked':'<svg viewBox="0 0 14 14" fill="none"><rect x="3" y="6" width="8" height="6" rx="0.8" stroke="currentColor" stroke-width="1.3"/><path d="M5 6V4.5C5 3.4 5.9 2.5 7 2.5C8.1 2.5 9 3.4 9 4.5V6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>',
+    'deposit-adjust':'<svg viewBox="0 0 14 14" fill="none"><path d="M2 7H12M8 4L12 7L8 10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    'deposit-topup':'<svg viewBox="0 0 14 14" fill="none"><path d="M7 2V12M2 7H12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>'
+  };
+  return icons[type] || '<svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="2" fill="currentColor"/></svg>';
+}
+
+function eventDotClass(type){
+  if(type==='invoice-open') return 'invoice';
+  if(type==='invoice-paid') return 'paid';
+  if(type==='payment') return 'payment';
+  if(type==='deposit-locked') return 'deposit';
+  if(type==='deposit-adjust') return 'adjust';
+  if(type==='deposit-topup') return 'topup';
+  return '';
+}
+
+function eventCategory(type){
+  if(type.startsWith('invoice')) return 'invoice';
+  if(type==='payment') return 'payment';
+  if(type.startsWith('deposit')) return 'deposit';
+  return 'other';
+}
+
+function pillClass(pill){
+  const m = {Paid:'paid', Open:'open', Locked:'locked', Adjusted:'adjusted', Due:'due'};
+  return m[pill] || 'paid';
+}
+
+function eventDetail(e){
+  // Invoice (open or paid)
+  if(e.type==='invoice-open' || e.type==='invoice-paid'){
+    const isOpen = e.type==='invoice-open';
+    const payrollAmt = Math.round(e.amount*0.92);
+    const feeAmt = e.amount - payrollAmt;
+    return `
+      <div class="detail-section">
+        <div class="detail-stitle">Invoice details</div>
+        <div class="detail-grid">
+          <div class="detail-cell"><div class="detail-clabel">Invoice no.</div><div class="detail-cval">${e.ref}</div></div>
+          <div class="detail-cell"><div class="detail-clabel">Status</div><div class="detail-cval">${e.pill}</div></div>
+          <div class="detail-cell"><div class="detail-clabel">Issued</div><div class="detail-cval">${e.date}</div></div>
+          <div class="detail-cell"><div class="detail-clabel">${isOpen?'Due date':'Paid on'}</div><div class="detail-cval">${e.date}</div></div>
+        </div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-stitle">Line items</div>
+        <div>
+          <div class="detail-line"><div class="dl-info"><div class="dl-title">Payroll funding · ${e.date.split(' ').slice(1).join(' ')} cycle</div><div class="dl-sub">${e.meta}</div></div><div class="dl-amt">$${fmt(payrollAmt)}</div></div>
+          <div class="detail-line"><div class="dl-info"><div class="dl-title">EOR service fee</div><div class="dl-sub">Monthly platform & compliance</div></div><div class="dl-amt">$${fmt(feeAmt)}</div></div>
+          <div class="detail-line total"><div class="dl-info"><div class="dl-title">Total</div></div><div class="dl-amt">$${fmt(e.amount)}</div></div>
+        </div>
+      </div>`;
+  }
+  // Payment processed (money out to employees)
+  if(e.type==='payment'){
+    const gross = Math.round(e.amount*0.92);
+    const stat = Math.round(e.amount*0.06);
+    const fees = e.amount - gross - stat;
+    const employees = paymentRoster(e);
+    const counts = employees.reduce((a,em)=>{ a[em.status] = (a[em.status]||0)+1; return a; }, {});
+    const cPaid = counts.paid||0, cLop = counts.lop||0, cSkip = counts.skipped||0;
+    return `
+      <div class="detail-section">
+        <div class="detail-stitle">Payment details</div>
+        <div class="detail-grid">
+          <div class="detail-cell"><div class="detail-clabel">Reference</div><div class="detail-cval">${e.ref}</div></div>
+          <div class="detail-cell"><div class="detail-clabel">Status</div><div class="detail-cval">${e.pill}</div></div>
+          <div class="detail-cell"><div class="detail-clabel">Run date</div><div class="detail-cval">${e.date}</div></div>
+          <div class="detail-cell"><div class="detail-clabel">Recipients</div><div class="detail-cval">${e.meta}</div></div>
+        </div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-stitle">Breakdown</div>
+        <div>
+          <div class="detail-line"><div class="dl-info"><div class="dl-title">Gross salaries</div></div><div class="dl-amt">$${fmt(gross)}</div></div>
+          <div class="detail-line"><div class="dl-info"><div class="dl-title">Statutory contributions</div></div><div class="dl-amt">$${fmt(stat)}</div></div>
+          <div class="detail-line"><div class="dl-info"><div class="dl-title">Bank & processing charges</div></div><div class="dl-amt">$${fmt(fees)}</div></div>
+          <div class="detail-line total"><div class="dl-info"><div class="dl-title">Total debited</div></div><div class="dl-amt">$${fmt(e.amount)}</div></div>
+        </div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-stitle">Employees</div>
+        <div class="emp-list">
+          ${employees.map(em=>`
+            <div class="emp-row">
+              <div class="emp-ava" style="background:#E8F2FF;color:#2684FF">${em.initial}</div>
+              <div class="emp-info">
+                <div class="emp-name">${em.name}</div>
+                <div class="emp-meta">${em.role} · ${em.empId}${em.note?' · '+em.note:''}</div>
+              </div>
+              <div class="emp-amt ${em.status==='skipped'?'muted':''}">${em.amount?`$${fmt(em.amount)}`:'—'}</div>
+              <span class="emp-pill ${em.status}"><span class="stdot"></span>${em.status==='lop'?'LOP':em.status[0].toUpperCase()+em.status.slice(1)}</span>
+            </div>`).join('')}
+        </div>
+      </div>`;
+  }
+  // Deposit locked (initial)
+  if(e.type==='deposit-locked'){
+    const roster = depositRoster(e);
+    return `
+      <div class="detail-section">
+        <div class="detail-stitle">Deposit details</div>
+        <div class="detail-grid">
+          <div class="detail-cell"><div class="detail-clabel">Reference</div><div class="detail-cval">${e.ref}</div></div>
+          <div class="detail-cell"><div class="detail-clabel">Status</div><div class="detail-cval">Locked</div></div>
+          <div class="detail-cell"><div class="detail-clabel">Held since</div><div class="detail-cval">${e.date}</div></div>
+          <div class="detail-cell"><div class="detail-clabel">Refund policy</div><div class="detail-cval">At offboarding · 30 days</div></div>
+        </div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-stitle">Held against · ${roster.length} ${roster.length===1?'employee':'employees'}</div>
+        ${roster.length ? `<div class="dep-roster">
+          <div class="dep-roster-head"><div>Employee</div><div>Ref</div><div style="text-align:right">Amount</div></div>
+          ${roster.map(emp=>`
+            <div class="dep-roster-row">
+              <div class="who"><div class="av" style="background:${emp.bg}">${emp.initial}</div><div class="nm">${emp.name}</div></div>
+              <div class="ref">${emp.adv}</div>
+              <div class="amt"><span class="cur">$</span>${fmt(emp.deposit)}</div>
+            </div>`).join('')}
+        </div>` : `<div style="font-size:12px;color:var(--n600);line-height:1.6">${e.meta}. Refundable at offboarding or adjustable for a new joiner.</div>`}
+        <div style="font-size:11px;color:var(--n500);line-height:1.5;margin-top:4px">Refundable at offboarding or adjustable for a new joiner.</div>
+      </div>`;
+  }
+  // Deposit adjustment
+  if(e.type==='deposit-adjust'){
+    return `
+      <div class="detail-section">
+        <div class="detail-stitle">Adjustment context</div>
+        <div style="font-size:12px;color:var(--n600);line-height:1.6">${e.meta}</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-stitle">Adjustment math</div>
+        <div>
+          <div class="detail-line"><div class="dl-info"><div class="dl-title">Original deposit · Sneha Arora</div></div><div class="dl-amt">$1,020</div></div>
+          <div class="detail-line"><div class="dl-info"><div class="dl-title">New required · Karthik Reddy</div></div><div class="dl-amt">$${fmt(e.amount-((e.amount>900)?0:0)+120)}</div></div>
+          <div class="detail-line total"><div class="dl-info"><div class="dl-title">Excess credited to wallet</div></div><div class="dl-amt">$${fmt(120)}</div></div>
+        </div>
+      </div>`;
+  }
+  // Deposit top-up due
+  if(e.type==='deposit-topup'){
+    return `
+      <div class="detail-section">
+        <div class="detail-stitle">Top-up reason</div>
+        <div style="font-size:12px;color:var(--n600);line-height:1.6">${e.meta}. An additional deposit is required to match the new compensation level.</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-stitle">Amounts</div>
+        <div>
+          <div class="detail-line"><div class="dl-info"><div class="dl-title">Existing locked deposit</div></div><div class="dl-amt">$1,140</div></div>
+          <div class="detail-line"><div class="dl-info"><div class="dl-title">New required</div></div><div class="dl-amt">$${fmt(1140+e.amount)}</div></div>
+          <div class="detail-line total"><div class="dl-info"><div class="dl-title">Top-up due</div></div><div class="dl-amt">$${fmt(e.amount)}</div></div>
+        </div>
+      </div>`;
+  }
+  return '';
+}
+
+function renderTimeline(){
+  const items = TIMELINES[currentClient.id] || defaultTimeline(currentClient);
+  const kindFiltered = currentTl==='all' ? items : items.filter(e=>eventCategory(e.type)===currentTl);
+  const timeFiltered = kindFiltered.filter(e => isInTimeRange(e.date));
+  const statusFiltered = currentStatus==='all' ? timeFiltered : timeFiltered.filter(e => (e.pill||'')===currentStatus);
+  const searchFiltered = !currentSearch ? statusFiltered : statusFiltered.filter(e =>
+    (e.title+' '+e.meta+' '+e.ref+' '+e.amount).toLowerCase().includes(currentSearch)
+  );
+  // sort
+  const dir = currentSortDir==='asc' ? 1 : -1;
+  const filtered = [...searchFiltered].sort((a,b)=>{
+    if(currentSortKey==='date'){ return (new Date(a.date) - new Date(b.date)) * dir; }
+    if(currentSortKey==='amount'){ return (a.amount - b.amount) * dir; }
+    if(currentSortKey==='title'){ return a.title.localeCompare(b.title) * dir; }
+    if(currentSortKey==='status'){ return (a.pill||'').localeCompare(b.pill||'') * dir; }
+    return 0;
+  });
+  const sign = (type) => (type==='invoice-paid' ? '+' : (type==='payment'||type==='deposit-topup'||type==='deposit-locked' ? '−' : (type==='deposit-adjust' ? '+' : '')));
+  const isIn = (type) => (type==='invoice-paid' || type==='deposit-adjust');
+  document.getElementById('timelineBody').innerHTML = filtered.length ? filtered.map((e,idx)=>`
+    <div class="tl-item" id="tlitem-${idx}">
+      <div class="tl-card" onclick="toggleTl(${idx})">
+        <div class="tl-date">${e.date}</div>
+        <div class="tl-name">
+          <div class="tl-dot ${eventDotClass(e.type)}">${eventIcon(e.type)}</div>
+          <div class="tl-name-text">
+            <div class="tl-name-title">${e.title}</div>
+            <div class="tl-name-meta">${e.meta}</div>
+          </div>
+        </div>
+        <div class="tl-amt ${isIn(e.type)?'in':''}">${sign(e.type)}<span class="cur">$</span>${fmt(e.amount)}</div>
+        <div><span class="tl-pill ${pillClass(e.pill)}">${e.pill}</span></div>
+        <svg class="chev" viewBox="0 0 14 14" fill="none"><path d="M3 5.5L7 9.5L11 5.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="tl-detail">${eventDetail(e)}</div>
+    </div>`).join('') : '<div style="padding:30px 0;text-align:center;color:var(--n400);font-size:13px">No events for this filter</div>';
+}
+
+function toggleTl(idx){
+  const el = document.getElementById('tlitem-'+idx);
+  if(el) el.classList.toggle('open');
+}
+
+function adminSetRail(ev, rail){
+  ev.stopPropagation();
+  const wrap = ev.currentTarget.closest('.detail-section');
+  wrap.querySelectorAll('.rail-tab').forEach(t=>t.classList.remove('active'));
+  ev.currentTarget.classList.add('active');
+  wrap.parentElement.querySelectorAll('.bank-card-mini').forEach(c=>{
+    c.style.display = c.dataset.rail===rail ? 'flex' : 'none';
+  });
+}
+
+// ====== ADJUSTMENT MODAL ======
+function openAdjustModal(){
+  if(!currentClient) return;
+  // reset
+  document.querySelectorAll('.adj-amount').forEach(i=>i.value='');
+  document.getElementById('adjReason').value='';
+  document.getElementById('adjInvoice').value='';
+  document.getElementById('adjDeposit').value='';
+  document.querySelector('input[name=adjType][value=credit]').checked = true;
+  toggleAdjFields();
+  document.getElementById('adjOverlay').classList.add('show');
+}
+function closeAdjustModal(){ document.getElementById('adjOverlay').classList.remove('show'); }
+function toggleAdjFields(){
+  const type = document.querySelector('input[name=adjType]:checked').value;
+  document.querySelectorAll('.adj-fields').forEach(f=>{
+    f.style.display = (f.dataset.for===type) ? 'flex' : 'none';
+  });
+}
+function adjInvoiceChange(){
+  const val = document.getElementById('adjInvoice').value;
+  const amtInput = document.getElementById('adjInvoiceAmt');
+  if(val){
+    const parts = val.split('|');
+    amtInput.value = parts[1];
+  } else { amtInput.value = ''; }
+}
+function adjDepositChange(){
+  const val = document.getElementById('adjDeposit').value;
+  const amtInput = document.getElementById('adjDepositAmt');
+  if(val){
+    const parts = val.split('|');
+    amtInput.value = parts[1];
+  } else { amtInput.value = ''; }
+}
+document.addEventListener('change', e=>{ if(e.target.name==='adjType') toggleAdjFields(); });
+
+// Validates the form, then shows the in-modal confirmation panel
+function showAdjustConfirm(){
+  const type = document.querySelector('input[name=adjType]:checked').value;
+  const reason = document.getElementById('adjReason').value.trim();
+  if(!reason){ document.getElementById('adjReason').focus(); return; }
+  const activeFields = document.querySelector('.adj-fields[data-for="'+type+'"]');
+  let amt = 0, ctx = '', rows = [];
+  const typeLabel = {credit:'Add credit to wallet', debit:'Deduct from wallet', 'mark-paid':'Mark invoice as paid', 'release-deposit':'Release / refund deposit'}[type];
+  rows.push(['Action', typeLabel]);
+
+  if(type==='credit' || type==='debit'){
+    amt = +activeFields.querySelector('.adj-amount').value;
+    if(!amt||amt<=0){ activeFields.querySelector('.adj-amount').focus(); return; }
+    rows.push(['Amount', '$'+fmt(amt)]);
+    if(type==='credit' && document.getElementById('adjIssueCN').checked){
+      const cn = 'CN-2026-'+String(13+Math.floor(Math.random()*20)).padStart(4,'0');
+      ctx = ' · '+cn;
+      rows.push(['Credit note', cn]);
+    }
+  } else if(type==='mark-paid'){
+    const inv = document.getElementById('adjInvoice').value;
+    if(!inv){ document.getElementById('adjInvoice').focus(); return; }
+    const parts = inv.split('|'); amt = +parts[1]; ctx = ' · '+parts[0];
+    rows.push(['Invoice', parts[0]]);
+    rows.push(['Amount', '$'+fmt(amt)]);
+  } else if(type==='release-deposit'){
+    const dep = document.getElementById('adjDeposit').value;
+    if(!dep){ document.getElementById('adjDeposit').focus(); return; }
+    const parts = dep.split('|'); amt = +document.getElementById('adjDepositAmt').value || +parts[1];
+    const dest = document.querySelector('input[name=adjDestination]:checked').value;
+    ctx = ' · '+parts[2]+' · '+(dest==='wallet'?'credited to wallet':'refunded to bank');
+    rows.push(['Employee', parts[2]]);
+    rows.push(['Deposit', parts[0]]);
+    rows.push(['Amount', '$'+fmt(amt)]);
+    rows.push(['Destination', dest==='wallet' ? 'Credit to wallet' : 'Refund to bank']);
+  }
+  rows.push(['__reason__', reason]);
+
+  document.getElementById('adjConfirmSummary').innerHTML = rows.map(r => {
+    if(r[0]==='__reason__') return `<div class="row reason"><span class="label">Reason</span><span class="val">"${r[1]}"</span></div>`;
+    return `<div class="row"><span class="label">${r[0]}</span><span class="val">${r[1]}</span></div>`;
+  }).join('');
+
+  window._pendingAdjust = {type, amt, ctx};
+  document.getElementById('adjConfirm').classList.add('show');
+}
+
+function cancelConfirm(){
+  document.getElementById('adjConfirm').classList.remove('show');
+}
+
+function submitAdjust(){
+  const pending = window._pendingAdjust;
+  if(!pending) return;
+  const labels = {credit:'Credit added', debit:'Wallet debited', 'mark-paid':'Invoice marked paid', 'release-deposit':'Deposit released'};
+  closeAdjustModal();
+  document.getElementById('adjConfirm').classList.remove('show');
+  showToast(`${labels[pending.type]} of $${fmt(pending.amt)}${pending.ctx} · logged to audit trail`);
+  window._pendingAdjust = null;
+}
+
+function showToast(msg){
+  document.getElementById('toastText').textContent = msg;
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 3500);
+}
+
+renderClients();
+</script>
+</body>
+</html>
