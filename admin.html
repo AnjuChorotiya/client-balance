@@ -487,7 +487,7 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
 
 <main class="main">
   <div class="topbar">
-    <span class="topbar-title">Deposits</span>
+    <span class="topbar-title"></span>
     <div class="topbar-right">
       <div class="search-box" style="background:var(--n0)">
         <svg viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.5"/><path d="M9.5 9.5L12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -1227,7 +1227,7 @@ function jumpToTimeline(){
 function backToList(){
   document.getElementById('clientPage').classList.add('hidden');
   document.getElementById('listView').classList.remove('hidden');
-  document.querySelector('.topbar-title').textContent = 'Deposits';
+  document.querySelector('.topbar-title').textContent = '';
   document.querySelector('.page-body').scrollTop = 0;
 }
 function closeDrawer(){ backToList(); } // back-compat alias
