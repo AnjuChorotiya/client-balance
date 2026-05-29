@@ -1013,7 +1013,7 @@ function clientRow(c){
   const risk = computeRisk(c);
   const riskCell = risk.pct===null
     ? `<span class="trisk muted">—</span>`
-    : `<span class="trisk ${risk.level}"><span class="stdot"></span><span>${risk.label}</span></span>`;
+    : `<span class="trisk ${risk.level}">${risk.label}</span>`;
   return `<div class="trow" data-status="${c.status}" data-region="${c.region}" data-risk="${risk.level}" data-csm="${c.csManager||''}" data-search="${(c.name+' '+c.region+' '+c.contact+' '+c.sub+' '+(c.csManager||'')).toLowerCase()}" onclick="openClient('${c.id}')">
     <div class="tclient">
       <div class="tlogo" style="background:${c.logoBg}">${c.initial}</div>
