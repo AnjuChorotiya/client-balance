@@ -1061,10 +1061,10 @@ function renderClients(){
     return 0;
   });
   document.getElementById('clientsBody').innerHTML = sorted.map(clientRow).join('');
-  document.getElementById('cAll').textContent = CLIENTS.length;
-  document.getElementById('cActive').textContent = CLIENTS.filter(c=>c.status==='active').length;
+  const cAll = document.getElementById('cAll'); if(cAll) cAll.textContent = CLIENTS.length;
+  const cActive = document.getElementById('cActive'); if(cActive) cActive.textContent = CLIENTS.filter(c=>c.status==='active').length;
   const cAt = document.getElementById('cAtRisk'); if(cAt) cAt.textContent = CLIENTS.filter(c=>c.status==='atrisk').length;
-  document.getElementById('cInactive').textContent = CLIENTS.filter(c=>c.status==='inactive').length;
+  const cInactive = document.getElementById('cInactive'); if(cInactive) cInactive.textContent = CLIENTS.filter(c=>c.status==='inactive').length;
   applyClientFilter();
 }
 
