@@ -288,6 +288,7 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
 .tl-dot.adjust{background:var(--purple50);color:var(--purple500)}
 .tl-dot.topup{background:var(--w50);color:var(--w500)}
 .tl-dot.refund{background:var(--n100);color:var(--n500)}
+.tl-dot.credit{background:var(--s50);color:var(--s500)}
 .tl-name-text{min-width:0;display:flex;flex-direction:column;gap:1px}
 .tl-name-title{font-size:13.5px;font-weight:600;color:var(--n900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tl-name-meta{font-size:11.5px;color:var(--n500);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -307,6 +308,8 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
 .tl-pill.adjusted::before{background:var(--purple500)}
 .tl-pill.due{color:var(--w700)}
 .tl-pill.due::before{background:var(--w500);box-shadow:0 0 0 3px #F790091a}
+.tl-pill.issued{color:var(--s700)}
+.tl-pill.issued::before{background:var(--s500)}
 
 /* expandable timeline detail */
 .tl-card .chev{width:14px;height:14px;color:var(--n400);flex-shrink:0;transition:transform 180ms}
@@ -595,6 +598,7 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
               <option value="invoice">Invoices</option>
               <option value="payment">Payments</option>
               <option value="deposit">Deposits</option>
+              <option value="credit">Credit notes</option>
             </select>
             <select class="tl-time" id="tlStatus" onchange="setStatusFilter(this.value)">
               <option value="all">All statuses</option>
@@ -835,7 +839,8 @@ const TIMELINES = {
   C001: [
     {date:'10 May 2026', type:'invoice-open', title:'Invoice INV-2026-0050 issued', meta:'May 2026 cycle · payroll + EOR', ref:'INV-2026-0050', amount:15200, pill:'Due'},
     {date:'05 May 2026', type:'payment', title:'Payment processed · April 2026 payroll', meta:'23 employees · 1 contractor', ref:'PAY-APR26', amount:13950, pill:'Paid'},
-    {date:'01 May 2026', type:'invoice-paid', title:'Invoice INV-2026-0042 paid', meta:'Bank transfer reconciled · NEFT-883120', ref:'INV-2026-0042', amount:15200, pill:'Paid'},
+    {date:'03 May 2026', type:'credit-note', title:'Credit note CN-2026-0012 issued', meta:'Overpayment on Apr cycle · auto-applies to May invoice', ref:'CN-2026-0012', amount:500, pill:'Issued'},
+    {date:'01 May 2026', type:'invoice-paid', title:'Invoice INV-2026-0042 paid', meta:'Bank transfer reconciled · NEFT-883120 · received $15,700 against $15,200 invoice', ref:'INV-2026-0042', amount:15700, pill:'Paid'},
     {date:'15 Apr 2026', type:'payment', title:'Off-cycle payment · joining bonus', meta:'EMP09 · Neha Kapoor', ref:'PAY-OFF-1188', amount:900, pill:'Paid'},
     {date:'05 Apr 2026', type:'payment', title:'Payment processed · March 2026 payroll', meta:'21 employees', ref:'PAY-MAR26', amount:13400, pill:'Paid'},
     {date:'02 Apr 2026', type:'deposit-topup', title:'Deposit top-up · Priya Singh', meta:'Salary revised · EMP02', ref:'ADV-2026-007', amount:300, pill:'Due'},
@@ -849,6 +854,7 @@ const TIMELINES = {
     {date:'22 May 2026', type:'invoice-open', title:'Invoice INV-2026-0094 issued', meta:'May 2026 cycle · overdue by 10 days', ref:'INV-2026-0094', amount:22400, pill:'Due'},
     {date:'10 May 2026', type:'payment', title:'Payment processed · April payroll (partial)', meta:'Funded via security deposit · 15 employees', ref:'PAY-APR26-B', amount:8500, pill:'Paid'},
     {date:'04 Apr 2026', type:'invoice-paid', title:'Invoice INV-2026-0067 paid', meta:'SEPA transfer reconciled', ref:'INV-2026-0067', amount:21800, pill:'Paid'},
+    {date:'02 Apr 2026', type:'credit-note', title:'Credit note CN-2026-0008 issued', meta:'Refund for cancelled add-on', ref:'CN-2026-0008', amount:1200, pill:'Issued'},
     {date:'05 Mar 2026', type:'payment', title:'Payment processed · February payroll', meta:'15 employees', ref:'PAY-FEB26', amount:20500, pill:'Paid'},
     {date:'12 Jan 2026', type:'deposit-locked', title:'Security deposit collected', meta:'15 active employees · onboarding', ref:'ADV-2026-DE-001…015', amount:38000, pill:'Locked', empRange:[0,14]}
   ],
@@ -1205,7 +1211,8 @@ function eventIcon(type){
     'payment':'<svg viewBox="0 0 14 14" fill="none"><path d="M7 2V12M3 8L7 12L11 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     'deposit-locked':'<svg viewBox="0 0 14 14" fill="none"><rect x="3" y="6" width="8" height="6" rx="0.8" stroke="currentColor" stroke-width="1.3"/><path d="M5 6V4.5C5 3.4 5.9 2.5 7 2.5C8.1 2.5 9 3.4 9 4.5V6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>',
     'deposit-adjust':'<svg viewBox="0 0 14 14" fill="none"><path d="M2 7H12M8 4L12 7L8 10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-    'deposit-topup':'<svg viewBox="0 0 14 14" fill="none"><path d="M7 2V12M2 7H12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>'
+    'deposit-topup':'<svg viewBox="0 0 14 14" fill="none"><path d="M7 2V12M2 7H12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
+    'credit-note':'<svg viewBox="0 0 14 14" fill="none"><path d="M2 5C2.5 3 4.5 2 7 2C9.76 2 12 4.24 12 7C12 9.76 9.76 12 7 12C5 12 3 11 2 9M2 5V2M2 5H5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>'
   };
   return icons[type] || '<svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="2" fill="currentColor"/></svg>';
 }
@@ -1217,10 +1224,12 @@ function eventDotClass(type){
   if(type==='deposit-locked') return 'deposit';
   if(type==='deposit-adjust') return 'adjust';
   if(type==='deposit-topup') return 'topup';
+  if(type==='credit-note') return 'credit';
   return '';
 }
 
 function eventCategory(type){
+  if(type==='credit-note') return 'credit';
   if(type.startsWith('invoice')) return 'invoice';
   if(type==='payment') return 'payment';
   if(type.startsWith('deposit')) return 'deposit';
@@ -1228,7 +1237,7 @@ function eventCategory(type){
 }
 
 function pillClass(pill){
-  const m = {Paid:'paid', Open:'open', Locked:'locked', Adjusted:'adjusted', Due:'due'};
+  const m = {Paid:'paid', Open:'open', Locked:'locked', Adjusted:'adjusted', Due:'due', Issued:'issued'};
   return m[pill] || 'paid';
 }
 
@@ -1359,6 +1368,23 @@ function eventDetail(e){
         </div>
       </div>`;
   }
+  // Credit note
+  if(e.type==='credit-note'){
+    return `
+      <div class="detail-section">
+        <div class="detail-stitle">Credit note details</div>
+        <div class="detail-grid">
+          <div class="detail-cell"><div class="detail-clabel">Reference</div><div class="detail-cval">${e.ref}</div></div>
+          <div class="detail-cell"><div class="detail-clabel">Status</div><div class="detail-cval">${e.pill}</div></div>
+          <div class="detail-cell"><div class="detail-clabel">Issued on</div><div class="detail-cval">${e.date}</div></div>
+          <div class="detail-cell"><div class="detail-clabel">Amount credited</div><div class="detail-cval">$${fmt(e.amount)}</div></div>
+        </div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-stitle">Context</div>
+        <div style="font-size:12px;color:var(--n600);line-height:1.6">${e.meta}. The credit balance is held against the client's account and will automatically reduce the next open invoice.</div>
+      </div>`;
+  }
   return '';
 }
 
@@ -1379,8 +1405,8 @@ function renderTimeline(){
     if(currentSortKey==='status'){ return (a.pill||'').localeCompare(b.pill||'') * dir; }
     return 0;
   });
-  const sign = (type) => (type==='invoice-paid' ? '+' : (type==='payment'||type==='deposit-topup'||type==='deposit-locked' ? '−' : (type==='deposit-adjust' ? '+' : '')));
-  const isIn = (type) => (type==='invoice-paid' || type==='deposit-adjust');
+  const sign = (type) => (type==='invoice-paid'||type==='credit-note' ? '+' : (type==='payment'||type==='deposit-topup'||type==='deposit-locked' ? '−' : (type==='deposit-adjust' ? '+' : '')));
+  const isIn = (type) => (type==='invoice-paid' || type==='deposit-adjust' || type==='credit-note');
   document.getElementById('timelineBody').innerHTML = filtered.length ? filtered.map((e,idx)=>`
     <div class="tl-item" id="tlitem-${idx}">
       <div class="tl-card" onclick="toggleTl(${idx})">
