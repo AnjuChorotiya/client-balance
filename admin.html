@@ -186,6 +186,14 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
 .adj-radio{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--n800);cursor:pointer}
 .adj-radio input{accent-color:var(--brand)}
 .adj-warn{display:flex;align-items:flex-start;gap:10px;padding:11px 14px;background:var(--w50);border-radius:var(--rmd);font-size:12px;color:var(--w700);line-height:1.5}
+.cn-ctx{background:var(--n50);border-radius:var(--rmd);padding:12px 14px}
+.cn-ctx-row{display:flex;align-items:center;gap:12px}
+.cn-ctx-icon{width:36px;height:36px;border-radius:8px;background:var(--p50);display:flex;align-items:center;justify-content:center;color:var(--brand);flex-shrink:0}
+.cn-ctx-icon svg{width:18px;height:18px}
+.cn-ctx-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.cn-ctx-title{font-size:14px;font-weight:700;color:var(--n900)}
+.cn-ctx-meta{font-size:12px;color:var(--n500)}
+.cn-ctx-amt{font-size:16px;font-weight:700;color:var(--n900);white-space:nowrap}
 
 /* in-modal confirmation panel */
 .adj-confirm{display:none;position:absolute;inset:0;background:var(--n0);padding:32px 28px;flex-direction:column;align-items:center;justify-content:flex-start;gap:12px;z-index:5;text-align:center;overflow-y:auto}
@@ -665,6 +673,48 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
     <div class="txn-panel-body" id="txnPanelBody"></div>
   </aside>
 </div>
+</div>
+
+<!-- RELEASE CREDIT NOTE MODAL -->
+<div class="modal-overlay" id="cnOverlay" onclick="if(event.target===this)closeCnModal()">
+  <div class="modal" style="width:520px">
+    <div class="m-header">
+      <div class="m-title">Release credit note</div>
+      <button class="m-close" onclick="closeCnModal()" aria-label="Close"><svg viewBox="0 0 12 12" fill="none"><path d="M1 1L11 11M11 1L1 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+    </div>
+    <div class="m-body">
+      <div class="fg">
+        <div class="flabel">Against</div>
+        <div class="cn-ctx">
+          <div class="cn-ctx-row">
+            <div class="cn-ctx-icon"><svg viewBox="0 0 16 16" fill="none"><rect x="3" y="2" width="10" height="12" rx="1" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M6 6H10M6 9H10M6 12H8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></div>
+            <div class="cn-ctx-info">
+              <div class="cn-ctx-title" id="cnCtxTitle">Invoice INV-XXXX</div>
+              <div class="cn-ctx-meta" id="cnCtxMeta">May 2026 cycle</div>
+            </div>
+            <div class="cn-ctx-amt" id="cnCtxAmt">$0</div>
+          </div>
+        </div>
+      </div>
+      <div class="fg">
+        <div class="flabel">Amount to credit <span class="req">*</span></div>
+        <div class="amount-input">
+          <span class="cur">$</span>
+          <input type="number" id="cnAmount" class="finput" placeholder="0.00"/>
+        </div>
+        <div class="adj-helper" id="cnHelper">Pre-filled with the full invoice amount. Edit for partial credit.</div>
+      </div>
+      <div class="fg">
+        <div class="flabel">Reason / audit note <span class="req">*</span></div>
+        <textarea id="cnReason" class="finput" rows="3" style="height:auto;padding:10px 14px;resize:vertical;min-height:80px" placeholder="e.g. Overpayment on Apr cycle · refund for cancelled add-on"></textarea>
+      </div>
+      <label class="adj-toggle"><input type="checkbox" id="cnAutoApply" checked><span>Auto-apply to next open invoice (recommended)</span></label>
+    </div>
+    <div class="m-footer">
+      <button class="btn-cancel" onclick="closeCnModal()">Cancel</button>
+      <button class="btn-confirm" onclick="submitCreditNote()">Issue credit note</button>
+    </div>
+  </div>
 </div>
 
 <!-- ADJUSTMENT MODAL -->
@@ -1486,7 +1536,27 @@ document.addEventListener('click', (e)=>{
 function releaseCreditNote(idx){
   const items = window._timelineCache || [];
   const e = items[idx]; if(!e) return;
-  showToast(`Credit note CN-2026-${String(20+idx).padStart(4,'0')} issued · $${fmt(e.amount)} · auto-applies to next invoice`);
+  document.getElementById('cnCtxTitle').textContent = e.title;
+  document.getElementById('cnCtxMeta').textContent = `${e.date} · ${e.ref}`;
+  document.getElementById('cnCtxAmt').textContent = '$'+fmt(e.amount);
+  document.getElementById('cnAmount').value = e.amount;
+  document.getElementById('cnReason').value = '';
+  document.getElementById('cnAutoApply').checked = true;
+  window._cnContext = e;
+  document.getElementById('cnOverlay').classList.add('show');
+}
+function closeCnModal(){ document.getElementById('cnOverlay').classList.remove('show'); }
+function submitCreditNote(){
+  const amt = +document.getElementById('cnAmount').value;
+  const reason = document.getElementById('cnReason').value.trim();
+  const autoApply = document.getElementById('cnAutoApply').checked;
+  const e = window._cnContext;
+  if(!amt||amt<=0){ document.getElementById('cnAmount').focus(); return; }
+  if(!reason){ document.getElementById('cnReason').focus(); return; }
+  const cn = 'CN-2026-'+String(20+Math.floor(Math.random()*40)).padStart(4,'0');
+  closeCnModal();
+  const dest = autoApply ? 'auto-applies to next invoice' : 'held as credit';
+  showToast(`Credit note ${cn} issued · $${fmt(amt)} against ${e?.ref||'invoice'} · ${dest} · logged to audit trail`);
 }
 function refundToBank(idx){
   const items = window._timelineCache || [];
