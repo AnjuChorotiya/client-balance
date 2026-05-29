@@ -434,7 +434,7 @@ function openDepDrawer(idx){
     const delta = originalDeposit - newRequired;
     let diffRow = '';
     if(delta > 0){
-      diffRow = `<div class="dr-diff-row"><span class="dr-diff-label">Excess credited to wallet</span><span class="dr-diff-val">₹${fmtINR(delta)}</span></div>`;
+      diffRow = `<div class="dr-diff-row"><span class="dr-diff-label">Excess credited to account</span><span class="dr-diff-val">₹${fmtINR(delta)}</span></div>`;
     } else if(delta < 0){
       diffRow = `<div class="dr-diff-row warn"><span class="dr-diff-label">Top-up required</span><span class="dr-diff-val">₹${fmtINR(Math.abs(delta))}</span></div>`;
     } else {
@@ -457,7 +457,7 @@ function openDepDrawer(idx){
         </div>
       </div>`;
   } else if(t.type==='Released'){
-    const destLabel = t.releaseDestination==='bank' ? 'refunded to your bank account' : 'refunded back to your wallet and is available as credit for future invoices';
+    const destLabel = t.releaseDestination==='bank' ? 'refunded to your bank account' : 'credited back to your account and available against future invoices';
     const destShort = t.releaseDestination==='bank' ? 'Bank refund' : 'Wallet credit';
     scenario = `
       <div class="dr-sec">
@@ -465,7 +465,7 @@ function openDepDrawer(idx){
         <div class="dr-scenario green">
           <div class="dr-sc-ico"><svg viewBox="0 0 16 16" fill="none"><path d="M2 6C2.5 4 4.5 3 6.5 3C9.26 3 11.5 5.24 11.5 8C11.5 10.76 9.26 13 6.5 13C4.5 13 2.5 12 2 10M2 6V3M2 6H5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
           <div class="dr-sc-text">
-            <div class="dr-sc-title">Deposit released to wallet</div>
+            <div class="dr-sc-title">Deposit released as credit</div>
             <strong>${t.empName}</strong>'s locked deposit of <strong>₹${fmtINR(t.amount)}</strong> was ${destLabel}.
           </div>
         </div>
