@@ -246,14 +246,14 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
 .tl-title{font-size:16px;font-weight:700;color:var(--n900)}
 .tl-filter{display:flex;gap:6px}
 .tl-controls{display:flex;align-items:center;gap:14px}
-.tl-time{height:32px;padding:0 30px 0 12px;font-family:var(--font);font-size:13px;font-weight:600;color:var(--n800);background:var(--n0);border:1px solid var(--bd-strong);border-radius:var(--rfull);cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10' fill='none'%3E%3Cpath d='M2 4L5 7L8 4' stroke='%236B7588' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;background-size:10px}
-.tl-time:hover{border-color:var(--n300)}
-.tl-time:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(38,132,255,0.15)}
-.tl-search{display:flex;align-items:center;gap:8px;height:32px;padding:0 12px;background:var(--n0);border:1px solid var(--bd-strong);border-radius:var(--rfull);width:240px;transition:border-color 120ms,box-shadow 120ms}
-.tl-search:focus-within{border-color:var(--brand);box-shadow:0 0 0 3px rgba(38,132,255,0.15)}
-.tl-search svg{width:13px;height:13px;color:var(--n400);flex-shrink:0}
-.tl-search input{flex:1;border:none;outline:none;font-family:var(--font);font-size:13px;color:var(--n800);background:transparent;min-width:0}
-.tl-search input::placeholder{color:var(--n400)}
+.tl-time{height:42px;padding:0 36px 0 16px;font-family:'Satoshi',sans-serif;font-size:14px;font-weight:500;color:#222224;background:#FFFFFF;border:1px solid #F0F1F1;border-radius:10px;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M3 5L6 8L9 5' stroke='%2385878D' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;background-size:12px;min-width:140px}
+.tl-time:hover{border-color:#C5DCFF}
+.tl-time:focus{border-color:#2684FF;box-shadow:0 0 0 3px rgba(38,132,255,0.12)}
+.tl-search{display:flex;align-items:center;gap:10px;height:42px;padding:0 16px;background:#FFFFFF;border:1px solid #F0F1F1;border-radius:10px;width:280px;transition:border-color 120ms,box-shadow 120ms}
+.tl-search:focus-within{border-color:#2684FF;box-shadow:0 0 0 3px rgba(38,132,255,0.12)}
+.tl-search svg{width:16px;height:16px;color:#85878D;flex-shrink:0}
+.tl-search input{flex:1;border:none;outline:none;font-family:'Satoshi',sans-serif;font-size:14px;font-weight:500;color:#222224;background:transparent;min-width:0}
+.tl-search input::placeholder{color:#85878D;font-weight:500}
 .tlh.sortable{cursor:pointer;user-select:none;display:flex;align-items:center;gap:4px}
 .tlh.sortable:hover{color:var(--brand)}
 .tlh.right.sortable{justify-content:flex-end}
@@ -268,13 +268,13 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
 
 /* ledger-style table */
 .timeline{background:var(--n0);border-radius:var(--rlg);border:1px solid var(--bd);padding:0 16px;overflow:hidden}
-.tlhead{display:grid;grid-template-columns:120px minmax(260px,1fr) 160px 140px 28px;padding:12px 8px;border-bottom:1px solid var(--n200);gap:16px;align-items:center}
+.tlhead{display:grid;grid-template-columns:120px minmax(240px,1fr) 150px 130px 76px;padding:12px 8px;border-bottom:1px solid var(--n200);gap:16px;align-items:center}
 .tlh{font-family:var(--font);font-size:12px;font-weight:700;color:var(--n900);text-transform:uppercase;letter-spacing:.4px}
 .tlh.right{text-align:right}
 .tlh.center{text-align:center}
 .tl-item{display:flex;flex-direction:column;border-bottom:1px solid var(--bd)}
 .tl-item:last-child{border-bottom:none}
-.tl-card{display:grid;grid-template-columns:120px minmax(260px,1fr) 160px 140px 28px;padding:14px 8px;gap:16px;align-items:center;cursor:pointer;transition:background 120ms}
+.tl-card{display:grid;grid-template-columns:120px minmax(240px,1fr) 150px 130px 76px;padding:14px 8px;gap:16px;align-items:center;cursor:pointer;transition:background 120ms}
 .tl-card:hover{background:var(--n50)}
 .tl-idx{font-size:13px;color:var(--n400);font-weight:500;text-align:center;font-variant-numeric:tabular-nums}
 .tl-date{font-size:13px;color:var(--n800);font-weight:500;white-space:nowrap}
@@ -314,6 +314,13 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
 /* expandable timeline detail */
 .tl-card .chev{width:14px;height:14px;color:var(--n400);flex-shrink:0;transition:transform 180ms}
 .tl-item.open .tl-card .chev{transform:rotate(180deg)}
+.tl-row-actions{display:flex;align-items:center;gap:4px;justify-content:flex-end}
+.tl-action{width:30px;height:30px;border-radius:8px;border:1px solid #F0F1F1;background:#FFFFFF;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:#2684FF;transition:background 120ms,border-color 120ms}
+.tl-action:hover{background:#E1EDFF;border-color:#C5DCFF}
+.tl-action svg{width:15px;height:15px}
+.tl-chev{width:24px;height:30px;border:none;background:transparent;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:#85878D;padding:0}
+.tl-chev:hover{color:#2684FF}
+.tl-chev svg{width:14px;height:14px}
 .tl-detail{display:none;background:#FAFBFC;padding:18px 24px;flex-direction:column;gap:14px;border-top:1px solid var(--bd)}
 .tl-item.open .tl-detail{display:flex}
 
@@ -1433,7 +1440,15 @@ function renderTimeline(){
   const sign = (type) => (type==='invoice-paid'||type==='credit-note' ? '+' : (type==='payment'||type==='deposit-topup'||type==='deposit-locked' ? '−' : (type==='deposit-adjust' ? '+' : '')));
   const isIn = (type) => (type==='invoice-paid' || type==='deposit-adjust' || type==='credit-note');
   window._timelineCache = filtered;
-  document.getElementById('timelineBody').innerHTML = filtered.length ? filtered.map((e,idx)=>`
+  document.getElementById('timelineBody').innerHTML = filtered.length ? filtered.map((e,idx)=>{
+    const cat = eventCategory(e.type);
+    let actionBtn = '';
+    if(cat==='invoice' || cat==='deposit'){
+      actionBtn = `<button class="tl-action" title="Release credit note" onclick="event.stopPropagation();releaseCreditNote(${idx})"><svg viewBox="0 0 16 16" fill="none"><path d="M2.5 6C3 4 5 3 7 3C10 3 12.5 5.5 12.5 8.5C12.5 11.5 10 14 7 14C4.5 14 2.5 12.5 2 10.5M2.5 6V3M2.5 6H5.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`;
+    } else if(cat==='credit'){
+      actionBtn = `<button class="tl-action" title="Refund to bank" onclick="event.stopPropagation();refundToBank(${idx})"><svg viewBox="0 0 16 16" fill="none"><path d="M2 13H14M3 13V8M6 13V8M10 13V8M13 13V8M2 8L8 3L14 8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`;
+    }
+    return `
     <div class="tl-item" id="tlitem-${idx}">
       <div class="tl-card" onclick="openTxnPanel(${idx})">
         <div class="tl-date">${e.date}</div>
@@ -1446,9 +1461,21 @@ function renderTimeline(){
         </div>
         <div class="tl-amt ${isIn(e.type)?'in':''}">${sign(e.type)}<span class="cur">$</span>${fmt(e.amount)}</div>
         <div><span class="tl-pill ${pillClass(e.pill)}">${e.pill}</span></div>
-        <svg class="chev" viewBox="0 0 14 14" fill="none"><path d="M5 3L9 7L5 11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div class="tl-row-actions">${actionBtn}<button class="tl-chev" onclick="event.stopPropagation();openTxnPanel(${idx})" aria-label="Open details"><svg viewBox="0 0 14 14" fill="none"><path d="M5 3L9 7L5 11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
       </div>
-    </div>`).join('') : '<div style="padding:30px 0;text-align:center;color:var(--n400);font-size:13px">No events for this filter</div>';
+    </div>`;
+  }).join('') : '<div style="padding:30px 0;text-align:center;color:var(--n400);font-size:13px">No events for this filter</div>';
+}
+
+function releaseCreditNote(idx){
+  const items = window._timelineCache || [];
+  const e = items[idx]; if(!e) return;
+  showToast(`Credit note CN-2026-${String(20+idx).padStart(4,'0')} issued · $${fmt(e.amount)} · auto-applies to next invoice`);
+}
+function refundToBank(idx){
+  const items = window._timelineCache || [];
+  const e = items[idx]; if(!e) return;
+  showToast(`Bank refund of $${fmt(e.amount)} initiated · linked to ${e.ref}`);
 }
 
 function openTxnPanel(idx){
