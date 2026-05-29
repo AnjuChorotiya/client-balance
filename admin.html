@@ -266,16 +266,16 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
 .tlf:hover{background:var(--n100);color:var(--n700)}
 .tlf.active{background:var(--p50);color:var(--brand)}
 
-/* ledger-style table */
-.timeline{background:var(--n0);border-radius:var(--rlg);border:1px solid var(--bd);padding:0 16px;overflow:hidden}
-.tlhead{display:grid;grid-template-columns:120px minmax(240px,1fr) 150px 130px 76px;padding:12px 8px;border-bottom:1px solid var(--n200);gap:16px;align-items:center}
-.tlh{font-family:var(--font);font-size:12px;font-weight:700;color:var(--n900);text-transform:uppercase;letter-spacing:.4px}
+/* ledger-style table — Wisemonk wm-table chrome */
+.timeline{background:var(--n0);border-radius:8px;overflow:hidden;border:1px solid #F0F1F1}
+.tlhead{display:grid;grid-template-columns:120px minmax(240px,1fr) 150px 130px 76px;padding:12px 16px;background:#F9FAFB;border-bottom:1px solid #E5E7EB;gap:16px;align-items:center}
+.tlh{font-family:'Open Sans',sans-serif;font-size:13px;font-weight:600;color:#404145;text-transform:none;letter-spacing:0}
 .tlh.right{text-align:right}
 .tlh.center{text-align:center}
-.tl-item{display:flex;flex-direction:column;border-bottom:1px solid var(--bd)}
+.tl-item{display:flex;flex-direction:column;border-bottom:1px solid #F0F1F1}
 .tl-item:last-child{border-bottom:none}
-.tl-card{display:grid;grid-template-columns:120px minmax(240px,1fr) 150px 130px 76px;padding:14px 8px;gap:16px;align-items:center;cursor:pointer;transition:background 120ms}
-.tl-card:hover{background:var(--n50)}
+.tl-card{display:grid;grid-template-columns:120px minmax(240px,1fr) 150px 130px 76px;padding:8px 16px;gap:16px;align-items:center;cursor:pointer;transition:background 0.2s ease;background:#FFFFFF}
+.tl-card:hover{background:#FAFBFC}
 .tl-idx{font-size:13px;color:var(--n400);font-weight:500;text-align:center;font-variant-numeric:tabular-nums}
 .tl-date{font-size:13px;color:var(--n800);font-weight:500;white-space:nowrap}
 .tl-name{display:flex;align-items:center;gap:10px;min-width:0}
@@ -314,13 +314,16 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
 /* expandable timeline detail */
 .tl-card .chev{width:14px;height:14px;color:var(--n400);flex-shrink:0;transition:transform 180ms}
 .tl-item.open .tl-card .chev{transform:rotate(180deg)}
-.tl-row-actions{display:flex;align-items:center;gap:4px;justify-content:flex-end}
-.tl-action{width:30px;height:30px;border-radius:8px;border:1px solid #F0F1F1;background:#FFFFFF;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:#2684FF;transition:background 120ms,border-color 120ms}
-.tl-action:hover{background:#E1EDFF;border-color:#C5DCFF}
-.tl-action svg{width:15px;height:15px}
-.tl-chev{width:24px;height:30px;border:none;background:transparent;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:#85878D;padding:0}
-.tl-chev:hover{color:#2684FF}
-.tl-chev svg{width:14px;height:14px}
+.tl-row-actions{display:flex;align-items:center;justify-content:flex-end;position:relative}
+.tl-kebab{width:30px;height:30px;border-radius:8px;border:none;background:transparent;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:#85878D;padding:0;transition:background 120ms,color 120ms}
+.tl-kebab:hover{background:#F0F1F1;color:#222224}
+.tl-kebab svg{width:16px;height:16px}
+.tl-row-menu{position:absolute;top:calc(100% + 4px);right:0;min-width:200px;background:#FFFFFF;border:1px solid #F0F1F1;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.1);padding:6px;z-index:100;display:none;flex-direction:column;gap:2px}
+.tl-row-menu.show{display:flex}
+.tl-row-menu button{display:inline-flex;align-items:center;gap:10px;padding:8px 12px;background:transparent;border:none;cursor:pointer;font-family:'Satoshi',sans-serif;font-size:13px;font-weight:500;color:#222224;text-align:left;border-radius:6px;width:100%}
+.tl-row-menu button:hover{background:#F9FAFB}
+.tl-row-menu button svg{width:14px;height:14px;color:#85878D;flex-shrink:0}
+.tl-row-menu button:hover svg{color:#2684FF}
 .tl-detail{display:none;background:#FAFBFC;padding:18px 24px;flex-direction:column;gap:14px;border-top:1px solid var(--bd)}
 .tl-item.open .tl-detail{display:flex}
 
@@ -1442,11 +1445,11 @@ function renderTimeline(){
   window._timelineCache = filtered;
   document.getElementById('timelineBody').innerHTML = filtered.length ? filtered.map((e,idx)=>{
     const cat = eventCategory(e.type);
-    let actionBtn = '';
+    let menuItems = `<button onclick="event.stopPropagation();openTxnPanel(${idx});closeAllRowMenus()"><svg viewBox="0 0 16 16" fill="none"><path d="M2 4H14M2 8H14M2 12H10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>View details</button>`;
     if(cat==='invoice' || cat==='deposit'){
-      actionBtn = `<button class="tl-action" title="Release credit note" onclick="event.stopPropagation();releaseCreditNote(${idx})"><svg viewBox="0 0 16 16" fill="none"><path d="M2.5 6C3 4 5 3 7 3C10 3 12.5 5.5 12.5 8.5C12.5 11.5 10 14 7 14C4.5 14 2.5 12.5 2 10.5M2.5 6V3M2.5 6H5.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`;
+      menuItems += `<button onclick="event.stopPropagation();releaseCreditNote(${idx});closeAllRowMenus()"><svg viewBox="0 0 16 16" fill="none"><path d="M2.5 6C3 4 5 3 7 3C10 3 12.5 5.5 12.5 8.5C12.5 11.5 10 14 7 14C4.5 14 2.5 12.5 2 10.5M2.5 6V3M2.5 6H5.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Release credit note</button>`;
     } else if(cat==='credit'){
-      actionBtn = `<button class="tl-action" title="Refund to bank" onclick="event.stopPropagation();refundToBank(${idx})"><svg viewBox="0 0 16 16" fill="none"><path d="M2 13H14M3 13V8M6 13V8M10 13V8M13 13V8M2 8L8 3L14 8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`;
+      menuItems += `<button onclick="event.stopPropagation();refundToBank(${idx});closeAllRowMenus()"><svg viewBox="0 0 16 16" fill="none"><path d="M2 13H14M3 13V8M6 13V8M10 13V8M13 13V8M2 8L8 3L14 8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Refund to bank</button>`;
     }
     return `
     <div class="tl-item" id="tlitem-${idx}">
@@ -1461,11 +1464,27 @@ function renderTimeline(){
         </div>
         <div class="tl-amt ${isIn(e.type)?'in':''}">${sign(e.type)}<span class="cur">$</span>${fmt(e.amount)}</div>
         <div><span class="tl-pill ${pillClass(e.pill)}">${e.pill}</span></div>
-        <div class="tl-row-actions">${actionBtn}<button class="tl-chev" onclick="event.stopPropagation();openTxnPanel(${idx})" aria-label="Open details"><svg viewBox="0 0 14 14" fill="none"><path d="M5 3L9 7L5 11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+        <div class="tl-row-actions">
+          <button class="tl-kebab" onclick="event.stopPropagation();toggleRowMenu(${idx})" aria-label="Actions"><svg viewBox="0 0 16 16" fill="none"><circle cx="3" cy="8" r="1.4" fill="currentColor"/><circle cx="8" cy="8" r="1.4" fill="currentColor"/><circle cx="13" cy="8" r="1.4" fill="currentColor"/></svg></button>
+          <div class="tl-row-menu" id="rowmenu-${idx}">${menuItems}</div>
+        </div>
       </div>
     </div>`;
   }).join('') : '<div style="padding:30px 0;text-align:center;color:var(--n400);font-size:13px">No events for this filter</div>';
 }
+
+function toggleRowMenu(idx){
+  const menu = document.getElementById('rowmenu-'+idx);
+  const wasOpen = menu.classList.contains('show');
+  closeAllRowMenus();
+  if(!wasOpen) menu.classList.add('show');
+}
+function closeAllRowMenus(){
+  document.querySelectorAll('.tl-row-menu.show').forEach(m=>m.classList.remove('show'));
+}
+document.addEventListener('click', (e)=>{
+  if(!e.target.closest('.tl-row-actions')) closeAllRowMenus();
+});
 
 function releaseCreditNote(idx){
   const items = window._timelineCache || [];
