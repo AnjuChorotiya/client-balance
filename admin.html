@@ -993,21 +993,20 @@ function isInTimeRange(dateStr){
 function fmt(n){ return n.toLocaleString('en-IN',{minimumFractionDigits:0,maximumFractionDigits:0}) }
 
 function computeRisk(c){
-  // Risk model: (deposit − outstanding) ÷ monthly salary = net months of cover.
+  // Formula: (deposit − outstanding) ÷ monthly exposure = months of deposit stored
   // Red <= 0 (deposit can't cover what's already owed)
-  // Amber > 0 & < 1 (less than 1 net month of coverage)
-  // Green >= 1 (1+ months covered after settling outstanding; best ≥ 2)
+  // Amber > 0 & < 1 (less than 1 month stored)
+  // Green >= 1 (1+ months stored; best ≥ 2)
   if(c.status==='inactive' || !c.monthly) return {pct:null, level:'na', label:'—'};
   const netCover = (c.deposit||0) - (c.outstanding||0);
-  const ratio = netCover / c.monthly;
-  // Map net ratio onto a 0–100 risk scale (0% safest, 100% most at-risk).
-  const pct = Math.max(0, Math.min(100, Math.round((2 - ratio) / 3 * 100)));
-  // Colour bands keyed off the displayed risk %: 🟢 0–33 · 🟡 34–66 · 🔴 67–100
+  const months = netCover / c.monthly;
   let level;
-  if(pct >= 67) level = 'high';
-  else if(pct >= 34) level = 'medium';
+  if(months <= 0) level = 'high';
+  else if(months < 1) level = 'medium';
   else level = 'low';
-  return {pct, level, label: pct+'%'};
+  // Show "X.X mo" where the number is months of deposit stored
+  const display = months.toFixed(1) + ' mo';
+  return {pct: months, level, label: display};
 }
 function clientRow(c){
   // Wallet displays the open invoice amount (or 0 if nothing due)
