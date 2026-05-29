@@ -64,7 +64,15 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
 
 /* tabs + search */
 .toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
-.toolbar-right{display:flex;align-items:center;gap:10px}
+.toolbar-right{display:flex;align-items:center;gap:12px;flex:1;justify-content:flex-end;min-width:0}
+.cl-search{flex:1;max-width:580px;display:flex;align-items:center;gap:10px;height:42px;padding:0 16px;background:#FFFFFF;border:1px solid #F0F1F1;border-radius:10px;transition:border-color 120ms,box-shadow 120ms}
+.cl-search:focus-within{border-color:#2684FF;box-shadow:0 0 0 3px rgba(38,132,255,0.12)}
+.cl-search svg{width:16px;height:16px;color:#85878D;flex-shrink:0}
+.cl-search input{flex:1;border:none;outline:none;background:transparent;font-family:'Satoshi',sans-serif;font-size:14px;font-weight:500;color:#222224;min-width:0}
+.cl-search input::placeholder{color:#85878D;font-weight:500}
+.cl-filter{height:42px;padding:0 36px 0 16px;background:#FFFFFF;border:1px solid #F0F1F1;border-radius:10px;font-family:'Satoshi',sans-serif;font-size:14px;font-weight:500;color:#222224;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M3 5L6 8L9 5' stroke='%2385878D' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;background-size:12px;min-width:170px}
+.cl-filter:hover{border-color:#C5DCFF}
+.cl-filter:focus{border-color:#2684FF;box-shadow:0 0 0 3px rgba(38,132,255,0.12)}
 .tabs{display:flex;align-items:center;gap:0}
 .tab{padding:10px 4px 12px;margin-right:24px;font-family:var(--font);font-size:15px;font-weight:500;color:var(--n500);cursor:pointer;border-bottom:2px solid transparent;display:inline-flex;align-items:center;gap:8px}
 .tab:hover{color:var(--n700)}
@@ -507,18 +515,18 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
             <div class="tab" onclick="setTab(this,'inactive')">Inactive <span class="tab-count" id="cInactive">1</span></div>
           </div>
           <div class="toolbar-right">
-            <div class="tl-search" style="width:240px">
-              <svg viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.5"/><path d="M9.5 9.5L12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-              <input id="clientSearch" type="text" placeholder="Search clients…" oninput="applyClientFilter()"/>
+            <div class="cl-search">
+              <svg viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.5"/><path d="M11 11L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              <input id="clientSearch" type="text" placeholder="Search" oninput="applyClientFilter()"/>
             </div>
-            <select class="tl-time" id="filterRisk" onchange="applyClientFilter()">
-              <option value="all">All risk</option>
-              <option value="low">Low risk</option>
-              <option value="medium">Medium risk</option>
-              <option value="high">High risk</option>
+            <select class="cl-filter" id="filterCsm" onchange="applyClientFilter()">
+              <option value="all">All CS managers</option>
+              <option value="Anju Verma">Anju Verma</option>
+              <option value="Rohan Mehta">Rohan Mehta</option>
+              <option value="Priya Sharma">Priya Sharma</option>
             </select>
-            <select class="tl-time" id="filterStatus" onchange="applyClientFilter()">
-              <option value="all">All statuses</option>
+            <select class="cl-filter" id="filterStatus" onchange="applyClientFilter()">
+              <option value="all">All status</option>
               <option value="active">Active</option>
               <option value="inactive">Inactive</option>
             </select>
@@ -733,14 +741,14 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
 <script>
 // ====== DATA ======
 const CLIENTS = [
-  {id:'C001', name:'Acme Inc', sub:'acme.com', region:'United States', flag:'🇺🇸', employees:23, wallet:10250, outstanding:15200, deposit:46500, monthly:13950, status:'active', logoBg:'#2684FF', initial:'A', contact:'contact@acme.com'},
-  {id:'C002', name:'TechFlow Labs', sub:'techflow.io', region:'India', flag:'🇮🇳', employees:8, wallet:32400, outstanding:0, deposit:24000, monthly:9400, status:'active', logoBg:'#2684FF', initial:'T', contact:'ops@techflow.io'},
-  {id:'C003', name:'Brightspark GmbH', sub:'brightspark.de', region:'Germany', flag:'🇩🇪', employees:15, wallet:8500, outstanding:22400, deposit:0, monthly:20500, status:'active', logoBg:'#2684FF', initial:'B', contact:'finance@brightspark.de'},
-  {id:'C004', name:'Nordic Health', sub:'nordichealth.se', region:'Sweden', flag:'🇸🇪', employees:6, wallet:14200, outstanding:0, deposit:18500, monthly:6475, status:'active', logoBg:'#2684FF', initial:'N', contact:'ops@nordichealth.se'},
-  {id:'C005', name:'CloudVault', sub:'cloudvault.co.uk', region:'United Kingdom', flag:'🇬🇧', employees:32, wallet:0, outstanding:18000, deposit:30000, monthly:46400, status:'active', logoBg:'#2684FF', initial:'C', contact:'billing@cloudvault.co.uk'},
-  {id:'C006', name:'DataPipe Co', sub:'datapipe.com', region:'United States', flag:'🇺🇸', employees:18, wallet:22500, outstanding:0, deposit:34200, monthly:22800, status:'active', logoBg:'#2684FF', initial:'D', contact:'admin@datapipe.com'},
-  {id:'C007', name:'Pixel Labs', sub:'pixellabs.ca', region:'Canada', flag:'🇨🇦', employees:11, wallet:14000, outstanding:0, deposit:22600, monthly:13200, status:'active', logoBg:'#2684FF', initial:'P', contact:'team@pixellabs.ca'},
-  {id:'C008', name:'RetailGenie', sub:'retailgenie.au', region:'Australia', flag:'🇦🇺', employees:9, wallet:0, outstanding:0, deposit:0, monthly:0, status:'inactive', logoBg:'#9AA2B2', initial:'R', contact:'paused — exited Apr 2026'}
+  {id:'C001', name:'Acme Inc', sub:'acme.com', region:'United States', flag:'🇺🇸', employees:23, wallet:10250, outstanding:15200, deposit:46500, monthly:13950, status:'active', logoBg:'#2684FF', initial:'A', contact:'contact@acme.com', csManager:'Anju Verma'},
+  {id:'C002', name:'TechFlow Labs', sub:'techflow.io', region:'India', flag:'🇮🇳', employees:8, wallet:32400, outstanding:0, deposit:24000, monthly:9400, status:'active', logoBg:'#2684FF', initial:'T', contact:'ops@techflow.io', csManager:'Rohan Mehta'},
+  {id:'C003', name:'Brightspark GmbH', sub:'brightspark.de', region:'Germany', flag:'🇩🇪', employees:15, wallet:8500, outstanding:22400, deposit:0, monthly:20500, status:'active', logoBg:'#2684FF', initial:'B', contact:'finance@brightspark.de', csManager:'Anju Verma'},
+  {id:'C004', name:'Nordic Health', sub:'nordichealth.se', region:'Sweden', flag:'🇸🇪', employees:6, wallet:14200, outstanding:0, deposit:18500, monthly:6475, status:'active', logoBg:'#2684FF', initial:'N', contact:'ops@nordichealth.se', csManager:'Priya Sharma'},
+  {id:'C005', name:'CloudVault', sub:'cloudvault.co.uk', region:'United Kingdom', flag:'🇬🇧', employees:32, wallet:0, outstanding:18000, deposit:30000, monthly:46400, status:'active', logoBg:'#2684FF', initial:'C', contact:'billing@cloudvault.co.uk', csManager:'Rohan Mehta'},
+  {id:'C006', name:'DataPipe Co', sub:'datapipe.com', region:'United States', flag:'🇺🇸', employees:18, wallet:22500, outstanding:0, deposit:34200, monthly:22800, status:'active', logoBg:'#2684FF', initial:'D', contact:'admin@datapipe.com', csManager:'Priya Sharma'},
+  {id:'C007', name:'Pixel Labs', sub:'pixellabs.ca', region:'Canada', flag:'🇨🇦', employees:11, wallet:14000, outstanding:0, deposit:22600, monthly:13200, status:'active', logoBg:'#2684FF', initial:'P', contact:'team@pixellabs.ca', csManager:'Anju Verma'},
+  {id:'C008', name:'RetailGenie', sub:'retailgenie.au', region:'Australia', flag:'🇦🇺', employees:9, wallet:0, outstanding:0, deposit:0, monthly:0, status:'inactive', logoBg:'#9AA2B2', initial:'R', contact:'paused — exited Apr 2026', csManager:'Rohan Mehta'}
 ];
 
 // Per-client employee roster
@@ -930,7 +938,7 @@ function clientRow(c){
   const riskCell = risk.pct===null
     ? `<span class="trisk muted">—</span>`
     : `<span class="trisk ${risk.level}"><span class="stdot"></span><span>${risk.label}</span></span>`;
-  return `<div class="trow" data-status="${c.status}" data-region="${c.region}" data-risk="${risk.level}" data-search="${(c.name+' '+c.region+' '+c.contact+' '+c.sub).toLowerCase()}" onclick="openClient('${c.id}')">
+  return `<div class="trow" data-status="${c.status}" data-region="${c.region}" data-risk="${risk.level}" data-csm="${c.csManager||''}" data-search="${(c.name+' '+c.region+' '+c.contact+' '+c.sub+' '+(c.csManager||'')).toLowerCase()}" onclick="openClient('${c.id}')">
     <div class="tclient">
       <div class="tlogo" style="background:${c.logoBg}">${c.initial}</div>
       <div class="tinfo"><div class="tname">${c.name}</div><div class="tsub">${c.sub}</div></div>
@@ -1002,6 +1010,8 @@ function applyClientFilter(){
   const risk = riskEl ? riskEl.value : 'all';
   const statusEl = document.getElementById('filterStatus');
   const statusDrop = statusEl ? statusEl.value : 'all';
+  const csmEl = document.getElementById('filterCsm');
+  const csm = csmEl ? csmEl.value : 'all';
   let last=null;
   document.querySelectorAll('.trow').forEach(r=>{
     r.classList.remove('last-visible');
@@ -1009,8 +1019,9 @@ function applyClientFilter(){
     const dropStatusMatch = statusDrop==='all' || r.dataset.status===statusDrop;
     const regionMatch = region==='all' || r.dataset.region===region;
     const riskMatch = risk==='all' || r.dataset.risk===risk;
+    const csmMatch = csm==='all' || r.dataset.csm===csm;
     const searchMatch = !q || r.dataset.search.includes(q);
-    const show = tabStatusMatch && dropStatusMatch && regionMatch && riskMatch && searchMatch;
+    const show = tabStatusMatch && dropStatusMatch && regionMatch && riskMatch && csmMatch && searchMatch;
     r.style.display = show ? 'grid' : 'none';
     if(show) last=r;
   });
