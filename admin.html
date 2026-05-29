@@ -566,7 +566,7 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
             <div class="th right sortable" onclick="setClientSort('outstanding')"><span>Outstanding amount</span><span class="sort-ind" id="csort-outstanding"><svg viewBox="0 0 10 10" fill="none"><path d="M3 4L5 6L7 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
             <div class="th right sortable" onclick="setClientSort('monthly')"><span>Monthly exposure</span><span class="sort-ind" id="csort-monthly"><svg viewBox="0 0 10 10" fill="none"><path d="M3 4L5 6L7 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
             <div class="th right sortable" onclick="setClientSort('deposit')"><span>Deposit held</span><span class="sort-ind" id="csort-deposit"><svg viewBox="0 0 10 10" fill="none"><path d="M3 4L5 6L7 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
-            <div class="th right sortable" onclick="setClientSort('risk')"><span>Risk</span><span class="sort-ind" id="csort-risk"><svg viewBox="0 0 10 10" fill="none"><path d="M3 4L5 6L7 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+            <div class="th right sortable" onclick="setClientSort('risk')"><span>Months stored</span><span class="sort-ind" id="csort-risk"><svg viewBox="0 0 10 10" fill="none"><path d="M3 4L5 6L7 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
             <div class="th right sortable" onclick="setClientSort('status')"><span>Status</span><span class="sort-ind" id="csort-status"><svg viewBox="0 0 10 10" fill="none"><path d="M3 4L5 6L7 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
             <div class="th"></div>
           </div>
@@ -1004,9 +1004,8 @@ function computeRisk(c){
   if(months <= 0) level = 'high';
   else if(months < 1) level = 'medium';
   else level = 'low';
-  // Show "X.X mo" where the number is months of deposit stored
-  const display = months.toFixed(1) + ' mo';
-  return {pct: months, level, label: display};
+  // Show the number of months of deposit stored (e.g., "2.2", "-1.1")
+  return {pct: months, level, label: months.toFixed(1)};
 }
 function clientRow(c){
   // Wallet displays the open invoice amount (or 0 if nothing due)
