@@ -734,7 +734,7 @@ function applyFilter(){
 function openDrawer(t){
   document.getElementById('drTitle').textContent = t.title;
   const isCredit = (t.kind==='in'||t.kind==='refund'||t.kind==='invoice');
-  const sign = isCredit ? '+' : '−';
+  const sign = '';
   const amtClass = isCredit ? 'in' : '';
   // Hide Download receipt for unpaid (Due/Pending) invoices
   const isUnpaid = t.kind==='invoice' && (t.status==='Pending' || t.status==='Open' || t.status==='Due' || t.isOpen);
