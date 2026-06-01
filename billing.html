@@ -145,10 +145,10 @@ body{font-family:var(--font);background:var(--bg);color:var(--n800);-webkit-font
 
 /* simple table — minimal style */
 .table{width:100%;background:#FFFFFF;border-radius:var(--rlg);border:none;padding:8px 20px;overflow:hidden}
-.thead{display:grid;grid-template-columns:140px minmax(280px,1fr) 180px 180px 32px;padding:14px 8px;border-bottom:1px solid var(--n200);gap:24px;align-items:center}
+.thead{display:grid;grid-template-columns:140px minmax(280px,1fr) 180px 32px;padding:14px 8px;border-bottom:1px solid var(--n200);gap:24px;align-items:center}
 .th{font-family:var(--font);font-size:13px;font-weight:700;color:var(--n900);text-transform:uppercase;letter-spacing:.4px}
 .th.right{text-align:right}
-.trow{display:grid;grid-template-columns:140px minmax(280px,1fr) 180px 180px 32px;padding:18px 8px;border-bottom:1px solid var(--bd);gap:24px;align-items:center;cursor:pointer}
+.trow{display:grid;grid-template-columns:140px minmax(280px,1fr) 180px 32px;padding:18px 8px;border-bottom:1px solid var(--bd);gap:24px;align-items:center;cursor:pointer}
 .tidx{font-size:13px;color:var(--n400);font-weight:500;text-align:center;font-variant-numeric:tabular-nums}
 .trow:last-child,.trow.last-visible{border-bottom:none}
 .trow:hover{background:var(--n50)}
@@ -317,7 +317,6 @@ body{font-family:var(--font);background:var(--bg);color:var(--n800);-webkit-font
   .bal-amt{font-size:48px}
   .bal-actions{gap:18px}
   .thead,.trow{grid-template-columns:110px 1fr 130px 32px}
-  .thead .th:nth-child(4),.trow > div:nth-child(4){display:none}
   .upcoming{flex-direction:column;align-items:flex-start;gap:14px}
 }
 </style>
@@ -445,7 +444,6 @@ body{font-family:var(--font);background:var(--bg);color:var(--n800);-webkit-font
             <div class="th">Date</div>
             <div class="th">Activity</div>
             <div class="th right">Amount</div>
-            <div class="th">Status</div>
             <div class="th"></div>
           </div>
           <div id="txBody"></div>
@@ -657,7 +655,6 @@ function rowHTML(t, idx){
       <div class="tact-text"><div class="tact-title">${t.title}</div><div class="tact-meta">${t.meta}</div></div>
     </div>
     <div class="tamt ${amtClass}">${sign}<span class="cur">₹</span>${fmtAmt(t.amount)}</div>
-    <div class="tstatus ${sCls}"><span class="stdot"></span>${t.status}</div>
     <div class="raw"><button class="rabtn" onclick="event.stopPropagation()"><svg viewBox="0 0 14 14" fill="none"><circle cx="2.5" cy="7" r="1.2" fill="currentColor"/><circle cx="7" cy="7" r="1.2" fill="currentColor"/><circle cx="11.5" cy="7" r="1.2" fill="currentColor"/></svg></button></div>
   </div>`;
 }
