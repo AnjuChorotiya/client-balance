@@ -306,6 +306,17 @@ body{font-family:var(--font);background:var(--bg);color:var(--n800);-webkit-font
 .dr-line.credit .dr-line-title{color:var(--n900)}
 .dr-line.credit .dr-line-sub{color:var(--n500)}
 .dr-line.credit .dr-line-amt{color:var(--n900);font-weight:600}
+.dr-line.expandable{cursor:pointer}
+.dr-line-chev{display:inline-block;margin-right:6px;color:var(--n500);font-weight:700;transition:transform .18s ease}
+.dr-line.expandable.open .dr-line-chev{transform:rotate(90deg)}
+.dr-emps{overflow:hidden;max-height:0;transition:max-height .3s ease;display:flex;flex-direction:column}
+.dr-emps.open{max-height:1600px}
+.dr-emp{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 0 9px 18px;border-bottom:1px dashed var(--bd)}
+.dr-emp:last-child{border-bottom:none}
+.dr-emp-info{display:flex;flex-direction:column;gap:1px;min-width:0}
+.dr-emp-name{font-size:12.5px;font-weight:600;color:var(--n800)}
+.dr-emp-role{font-size:11px;color:var(--n500)}
+.dr-emp-amt{font-size:12.5px;font-weight:600;color:var(--n700);white-space:nowrap}
 .dr-bank-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .dr-rail-toggle{display:inline-flex;background:var(--n100);border-radius:var(--rfull);padding:3px;gap:2px}
 .dr-rail-tab{padding:5px 12px;border:none;background:transparent;font-family:var(--font);font-size:12px;font-weight:600;color:var(--n500);cursor:pointer;border-radius:var(--rfull);transition:background 120ms,color 120ms}
@@ -641,7 +652,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--n800);-webkit-font
 <script>
 // Invoice = bill issued by Wisemonk. Payment = money paid by client (synced from Zoho Books).
 const TX = [
-  {id:'INV-2026-0050',date:'07 May 2026',year:'2026',kind:'invoice',title:'Invoice for May 2026',meta:'INV-2026-0050',type:'Invoice',ref:'INV-2026-0050',status:'Due in 4 days',amount:14700,balanceAfter:null,isOpen:true,paidOn:null,lineItems:[{label:'Payroll funding · May 2026 cycle',sub:'23 employees · 1 contractor',amount:13950},{label:'EOR service fee',sub:'Monthly platform & compliance',amount:1250},{label:'Adjustment CN-2026-0012 applied',sub:'From overpayment on Apr cycle',amount:-500,credit:true}]},
+  {id:'INV-2026-0050',date:'07 May 2026',year:'2026',kind:'invoice',title:'Invoice for May 2026',meta:'INV-2026-0050',type:'Invoice',ref:'INV-2026-0050',status:'Due in 4 days',amount:14700,balanceAfter:null,isOpen:true,paidOn:null,lineItems:[{label:'Payroll funding · May 2026 cycle',sub:'23 employees · 1 contractor',amount:13950,employees:[{name:'Aarav Sharma',role:'Senior Engineer',amount:720},{name:'Priya Singh',role:'Product Manager',amount:680},{name:'Vikram Iyer',role:'Engineering Lead',amount:650},{name:'Sneha Reddy',role:'Designer',amount:640},{name:'Rohan Gupta',role:'Backend Engineer',amount:630},{name:'Ananya Nair',role:'Data Analyst',amount:620},{name:'Karthik Menon',role:'DevOps Engineer',amount:610},{name:'Divya Pillai',role:'QA Engineer',amount:600},{name:'Arjun Rao',role:'Frontend Engineer',amount:590},{name:'Meera Joshi',role:'HR Specialist',amount:580},{name:'Siddharth Verma',role:'Account Manager',amount:570},{name:'Pooja Mehta',role:'Marketing Lead',amount:560},{name:'Rahul Kapoor',role:'Sales Executive',amount:550},{name:'Isha Agarwal',role:'Content Strategist',amount:540},{name:'Nikhil Desai',role:'Mobile Engineer',amount:530},{name:'Tara Krishnan',role:'Finance Analyst',amount:520},{name:'Aditya Bose',role:'Support Lead',amount:510},{name:'Kavya Shetty',role:'UX Researcher',amount:500},{name:'Manish Patel',role:'Operations',amount:490},{name:'Riya Malhotra',role:'Recruiter',amount:480},{name:'Varun Saxena',role:'Engineer',amount:470},{name:'Neha Chopra',role:'Associate',amount:460},{name:'Sanjay Kumar',role:'Analyst',amount:450},{name:'Dev Anand',role:'Contractor · Design',amount:1000}]},{label:'EOR service fee',sub:'Monthly platform & compliance',amount:1250},{label:'Adjustment CN-2026-0012 applied',sub:'From overpayment on Apr cycle',amount:-500,credit:true}]},
   {id:'TXN-2026-0511',date:'05 May 2026',year:'2026',kind:'out',title:'Payment received',meta:'TXN-2026-0511',type:'Payment',ref:'PAY-APR26',status:'Paid',amount:13950,balanceAfter:10250,bankRail:'NEFT',bankTxn:'NEFT-883120',appliedTo:'INV-2026-0042'},
   {id:'CN-2026-0012',date:'03 May 2026',year:'2026',kind:'credit',adjKind:'overpayment',title:'Overpayment credit',meta:'EMP02 Priya Singh · April overpayment',type:'Adjustment',ref:'CN-2026-0012',status:'Paid',amount:500,balanceAfter:24700,appliedTo:'INV-2026-0050'},
   {id:'ADJ-2026-0019',date:'02 May 2026',year:'2026',kind:'credit',adjKind:'lop',title:'LOP adjustment',meta:'EMP05 Vikram Iyer · 2 days loss of pay',type:'Adjustment',ref:'ADJ-2026-0019',status:'Paid',amount:420,balanceAfter:24500,appliedTo:'INV-2026-0050'},
@@ -732,6 +743,11 @@ function applyFilter(){
 }
 
 // drawer
+function toggleEmp(el){
+  el.classList.toggle('open');
+  var emps = el.nextElementSibling;
+  if(emps && emps.classList.contains('dr-emps')) emps.classList.toggle('open');
+}
 function openDrawer(t){
   document.getElementById('drTitle').textContent = t.title;
   const isCredit = (t.kind==='in'||t.kind==='refund'||t.kind==='invoice');
@@ -825,13 +841,14 @@ function openDrawer(t){
       <div class="dr-stitle">Line items</div>
       <div class="dr-lines">
         ${t.lineItems.map(li=>`
-          <div class="dr-line ${li.credit?'credit':''}">
+          <div class="dr-line ${li.credit?'credit':''} ${li.employees?'expandable':''}" ${li.employees?'onclick="toggleEmp(this)"':''}>
             <div class="dr-line-info">
-              <div class="dr-line-title">${li.label}</div>
+              <div class="dr-line-title">${li.employees?'<span class="dr-line-chev">›</span>':''}${li.label}</div>
               ${li.sub ? `<div class="dr-line-sub">${li.sub}</div>` : ''}
             </div>
             <div class="dr-line-amt">${li.amount<0?'−':''}$${fmtAmt(Math.abs(li.amount))}</div>
-          </div>`).join('')}
+          </div>
+          ${li.employees?`<div class="dr-emps">${li.employees.map(e=>`<div class="dr-emp"><div class="dr-emp-info"><span class="dr-emp-name">${e.name}</span><span class="dr-emp-role">${e.role}</span></div><div class="dr-emp-amt">$${fmtAmt(e.amount)}</div></div>`).join('')}</div>`:''}`).join('')}
         <div class="dr-line dr-line-total">
           <div class="dr-line-info"><div class="dr-line-title">Total</div></div>
           <div class="dr-line-amt">$${fmtAmt(t.amount)}</div>
