@@ -1134,11 +1134,8 @@ function openClient(id){
   document.getElementById('drAcct').innerHTML = `
     <div class="acct-head"><div class="acct-title">Account details</div></div>
     <div class="acct-grid">
-      <div class="acct-cell"><div class="acct-label">Client ID</div><div class="acct-val">${c.id}</div></div>
       <div class="acct-cell"><div class="acct-label">EOR plan</div><div class="acct-val">Standard · ${c.employees>15?'Annual':'Monthly'}</div></div>
-      <div class="acct-cell"><div class="acct-label">Onboarded</div><div class="acct-val">12 Jan 2026</div></div>
       <div class="acct-cell"><div class="acct-label">Billing cycle</div><div class="acct-val">5th of each month</div></div>
-      <div class="acct-cell"><div class="acct-label">Payment terms</div><div class="acct-val">Net 5 days</div></div>
       <div class="acct-cell"><div class="acct-label">Account manager</div><div class="acct-val">Anju Verma</div></div>
     </div>
   `;
