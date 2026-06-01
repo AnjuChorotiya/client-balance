@@ -748,7 +748,7 @@ function openDrawer(t){
       headBadge.textContent = 'Due';
       headBadge.classList.add('open');
       headBadge.style.display = 'inline-flex';
-    } else if(t.status==='Paid'){
+    } else if(t.status==='Paid' && t.kind!=='out'){
       headBadge.textContent = 'Paid';
       headBadge.classList.add('paid');
       headBadge.style.display = 'inline-flex';
@@ -833,10 +833,11 @@ function openDrawer(t){
         </div>
       </div>
     </div>` : ''}
+    ${t.kind!=='out' ? `
     <div class="dr-sec">
       <div class="dr-stitle">Note</div>
       <div style="font-size:13px;color:var(--n700);line-height:1.55">${t.meta}</div>
-    </div>
+    </div>` : ''}
     ${bankBlock}`;
   document.getElementById('txDrawer').classList.remove('hidden');
 }
