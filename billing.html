@@ -401,7 +401,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--n800);-webkit-font
         <div class="invoice-banner" id="invoiceBanner">
           <div class="ib-text">
             <div class="ib-title">Your invoice for May 2026 payroll is open</div>
-            <div class="ib-body">Invoice INV-2026-0050 of ₹14,700.00 (after ₹500 credit) is due on 10 May 2026 (in 4 days).<a class="ib-link" onclick="openInvoiceDetail()"> View invoice</a></div>
+            <div class="ib-body">Invoice INV-2026-0050 of ₹14,700.00 (after ₹500 adjustment) is due on 10 May 2026 (in 4 days).<a class="ib-link" onclick="openInvoiceDetail()"> View invoice</a></div>
           </div>
           <button class="ib-close" onclick="document.getElementById('invoiceBanner').style.display='none'"><svg viewBox="0 0 12 12" fill="none"><path d="M1 1L11 11M11 1L1 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
         </div>
@@ -439,7 +439,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--n800);-webkit-font
           <div class="tab-list">
             <span class="tab active" onclick="setFilter(this,'invoice')">Invoices <span class="tab-count" id="cntInv">0</span></span>
             <span class="tab" onclick="setFilter(this,'out')">Payments <span class="tab-count" id="cntPay">0</span></span>
-            <span class="tab" onclick="setFilter(this,'credit')">Credit notes <span class="tab-count" id="cntCN">0</span></span>
+            <span class="tab" onclick="setFilter(this,'credit')">Adjustments <span class="tab-count" id="cntCN">0</span></span>
           </div>
           <div class="search-box">
             <svg viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.5"/><path d="M9.5 9.5L12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -622,9 +622,9 @@ body{font-family:var(--font);background:var(--bg);color:var(--n800);-webkit-font
 <script>
 // Invoice = bill issued by Wisemonk. Payment = money paid by client (synced from Zoho Books).
 const TX = [
-  {id:'INV-2026-0050',date:'07 May 2026',year:'2026',kind:'invoice',title:'Invoice for May 2026',meta:'Due 10 May 2026 · in 4 days',type:'Invoice',ref:'INV-2026-0050',status:'Due',amount:14700,balanceAfter:null,isOpen:true,lineItems:[{label:'Payroll funding · May 2026 cycle',sub:'23 employees · 1 contractor',amount:13950},{label:'EOR service fee',sub:'Monthly platform & compliance',amount:1250},{label:'Credit note CN-2026-0012 applied',sub:'From overpayment on Apr cycle',amount:-500,credit:true}]},
+  {id:'INV-2026-0050',date:'07 May 2026',year:'2026',kind:'invoice',title:'Invoice for May 2026',meta:'Due 10 May 2026 · in 4 days',type:'Invoice',ref:'INV-2026-0050',status:'Due',amount:14700,balanceAfter:null,isOpen:true,lineItems:[{label:'Payroll funding · May 2026 cycle',sub:'23 employees · 1 contractor',amount:13950},{label:'EOR service fee',sub:'Monthly platform & compliance',amount:1250},{label:'Adjustment CN-2026-0012 applied',sub:'From overpayment on Apr cycle',amount:-500,credit:true}]},
   {id:'TXN-2026-0511',date:'05 May 2026',year:'2026',kind:'out',title:'Payment received',meta:'TXN-2026-0511',type:'Payment',ref:'PAY-APR26',status:'Paid',amount:13950,balanceAfter:10250,bankRail:'NEFT',bankTxn:'NEFT-883120',appliedTo:'INV-2026-0042'},
-  {id:'CN-2026-0012',date:'03 May 2026',year:'2026',kind:'credit',title:'Credit note CN-2026-0012 issued',meta:'Overpayment on April cycle · auto-applies to May invoice',type:'Credit note',ref:'CN-2026-0012',status:'Paid',amount:500,balanceAfter:24700,appliedTo:'INV-2026-0050'},
+  {id:'CN-2026-0012',date:'03 May 2026',year:'2026',kind:'credit',title:'Adjustment CN-2026-0012 issued',meta:'Overpayment on April cycle · auto-applies to May invoice',type:'Adjustment',ref:'CN-2026-0012',status:'Paid',amount:500,balanceAfter:24700,appliedTo:'INV-2026-0050'},
   {id:'INV-2026-0042',date:'01 May 2026',year:'2026',kind:'invoice',title:'Invoice for April 2026',meta:'Received ₹15,700 against ₹15,200 invoice',type:'Invoice',ref:'INV-2026-0042',status:'Paid',amount:15700,balanceAfter:24200},
   {id:'TXN-2026-0508',date:'15 Apr 2026',year:'2026',kind:'out',title:'Payment received',meta:'TXN-2026-0508',type:'Payment',ref:'PAY-OFF-1188',status:'Paid',amount:900,balanceAfter:9000,bankRail:'NEFT',bankTxn:'NEFT-879441',appliedTo:'INV-2026-0036'},
   {id:'TXN-2026-0507',date:'05 Apr 2026',year:'2026',kind:'out',title:'Payment received',meta:'TXN-2026-0507',type:'Payment',ref:'PAY-MAR26',status:'Paid',amount:13400,balanceAfter:9900,bankRail:'NEFT',bankTxn:'NEFT-871002',appliedTo:'INV-2026-0033'},
@@ -831,7 +831,7 @@ function openInvoiceDetail(){
     lineItems:[
       {label:'Payroll funding · May 2026 cycle', sub:'23 employees · 1 contractor', amount:13950},
       {label:'EOR service fee', sub:'Monthly platform & compliance', amount:1250},
-      {label:'Credit note CN-2026-0012 applied', sub:'From overpayment on Apr cycle', amount:-500, credit:true}
+      {label:'Adjustment CN-2026-0012 applied', sub:'From overpayment on Apr cycle', amount:-500, credit:true}
     ]
   });
   document.getElementById('drTitle').textContent = 'Invoice INV-2026-0050';
