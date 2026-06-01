@@ -46,6 +46,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--n800);-webkit-font
 .page-body::-webkit-scrollbar{width:4px}
 .page-body::-webkit-scrollbar-thumb{background:var(--n200);border-radius:10px}
 .container{max-width:1100px;width:100%;margin:0 auto}
+.page-heading{font-size:28px;font-weight:700;color:#222224;letter-spacing:-0.4px;line-height:1.1;margin:0 0 24px}
 
 /* balance header */
 .cards-row{display:grid;grid-template-columns:1.6fr 1fr;gap:18px;width:100%}
@@ -400,7 +401,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--n800);-webkit-font
 
 <main class="main">
   <div class="topbar">
-    <span class="topbar-title">Billings</span>
+    <span class="topbar-title"></span>
     <div class="topbar-right">
       <button class="bell"><svg viewBox="0 0 16 16" fill="none"><path d="M8 2C8 2 4.5 3 4.5 7.5V10.5L3 12H13L11.5 10.5V7.5C11.5 3 8 2 8 2Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M6.5 12C6.5 12.83 7.17 13.5 8 13.5C8.83 13.5 9.5 12.83 9.5 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span class="dot"></span></button>
       <div class="uchip"><div class="uavatar">SJ</div><span class="uname">Sarah Johnson<svg viewBox="0 0 12 12" fill="none"><path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
@@ -410,6 +411,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--n800);-webkit-font
   <div class="body-area">
     <div class="page-body">
       <div class="container">
+
+        <h1 class="page-heading">Billing</h1>
 
         <!-- upcoming invoice banner -->
         <div class="invoice-banner" id="invoiceBanner">
