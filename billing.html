@@ -151,13 +151,15 @@ body{font-family:var(--font);background:var(--bg);color:var(--n800);-webkit-font
 .trow{display:grid;grid-template-columns:120px minmax(220px,1fr) 160px 160px 140px 32px;padding:18px 8px;border-bottom:1px solid var(--bd);gap:18px;align-items:center;cursor:pointer}
 .tid{font-size:13px;color:var(--n700);font-weight:500;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tid.muted{color:var(--n400);font-weight:400}
-/* Hide Status column on Payments and Adjustments tabs (all rows are 'Paid' — redundant) */
+/* Payments tab: hide Status (all rows are Paid) */
 .table[data-filter="out"] .thead,
-.table[data-filter="out"] .trow,
+.table[data-filter="out"] .trow{grid-template-columns:120px minmax(220px,1fr) 160px 160px 32px}
+.table[data-filter="out"] .col-status{display:none}
+/* Adjustments tab: hide both Status and Invoice ID */
 .table[data-filter="credit"] .thead,
-.table[data-filter="credit"] .trow{grid-template-columns:120px minmax(220px,1fr) 160px 160px 32px}
-.table[data-filter="out"] .col-status,
-.table[data-filter="credit"] .col-status{display:none}
+.table[data-filter="credit"] .trow{grid-template-columns:120px minmax(220px,1fr) 160px 32px}
+.table[data-filter="credit"] .col-status,
+.table[data-filter="credit"] .col-invid{display:none}
 .tidx{font-size:13px;color:var(--n400);font-weight:500;text-align:center;font-variant-numeric:tabular-nums}
 .trow:last-child,.trow.last-visible{border-bottom:none}
 .trow:hover{background:var(--n50)}
@@ -327,9 +329,9 @@ body{font-family:var(--font);background:var(--bg);color:var(--n800);-webkit-font
   .bal-actions{gap:18px}
   .thead,.trow{grid-template-columns:100px 1fr 120px 120px 110px 32px;gap:12px}
   .table[data-filter="out"] .thead,
-  .table[data-filter="out"] .trow,
+  .table[data-filter="out"] .trow{grid-template-columns:100px 1fr 120px 120px 32px}
   .table[data-filter="credit"] .thead,
-  .table[data-filter="credit"] .trow{grid-template-columns:100px 1fr 120px 120px 32px}
+  .table[data-filter="credit"] .trow{grid-template-columns:100px 1fr 120px 32px}
   .upcoming{flex-direction:column;align-items:flex-start;gap:14px}
 }
 </style>
@@ -456,7 +458,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--n800);-webkit-font
           <div class="thead">
             <div class="th">Date</div>
             <div class="th">Activity</div>
-            <div class="th">Invoice ID</div>
+            <div class="th col-invid">Invoice ID</div>
             <div class="th right">Amount</div>
             <div class="th col-status">Status</div>
             <div class="th"></div>
@@ -656,7 +658,8 @@ function statusClass(t){
 
 function rowHTML(t, idx){
   const isPositive = (t.kind==='in'||t.kind==='refund'||t.kind==='invoice'||t.kind==='credit');
-  const sign = isPositive ? '+' : '−';
+  // No sign for adjustments — they aren't a cash flow, they're a reduction applied to an invoice
+  const sign = (t.kind==='credit') ? '' : (isPositive ? '+' : '−');
   const amtClass = isPositive ? 'in' : '';
   const icons = {
     in:'<svg viewBox="0 0 14 14" fill="none"><path d="M7 12V2M3 6L7 2L11 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
@@ -675,7 +678,7 @@ function rowHTML(t, idx){
       <div class="tact-dot ${t.kind}">${icons[t.kind]}</div>
       <div class="tact-text"><div class="tact-title">${t.title}</div><div class="tact-meta">${t.meta}</div></div>
     </div>
-    <div class="${invIdClass}">${invoiceId}</div>
+    <div class="${invIdClass} col-invid">${invoiceId}</div>
     <div class="tamt ${amtClass}">${sign}<span class="cur">₹</span>${fmtAmt(t.amount)}</div>
     <div class="tstatus col-status ${sCls}"><span class="stdot"></span>${t.status}</div>
     <div class="raw"><button class="rabtn" onclick="event.stopPropagation()"><svg viewBox="0 0 14 14" fill="none"><circle cx="2.5" cy="7" r="1.2" fill="currentColor"/><circle cx="7" cy="7" r="1.2" fill="currentColor"/><circle cx="11.5" cy="7" r="1.2" fill="currentColor"/></svg></button></div>
