@@ -269,8 +269,9 @@ body{font-family:var(--font);background:var(--bg);color:var(--n800);-webkit-font
 .dr-head{padding:16px 20px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;gap:12px}
 .dr-title-wrap{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
 .dr-head-badge{display:inline-flex;align-items:center;padding:3px 10px;background:var(--p50);color:var(--brand);font-size:12px;font-weight:600;border-radius:var(--rfull);letter-spacing:.2px}
-.dr-head-badge.paid{background:var(--s50);color:var(--s700)}
+.dr-head-badge.paid{background:var(--p50);color:var(--brand)}
 .dr-head-badge.open{background:var(--p50);color:var(--brand)}
+.dr-head-badge.partial{background:var(--n100);color:var(--n600)}
 .dr-title{font-size:15px;font-weight:700;color:var(--n900)}
 .dr-body{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:20px}
 .dr-amount{font-size:32px;font-weight:700;color:var(--n900);letter-spacing:-0.5px;line-height:1}
@@ -743,10 +744,14 @@ function openDrawer(t){
   // Header status badge — shown in the title bar
   const headBadge = document.getElementById('drHeadBadge');
   if(headBadge){
-    headBadge.classList.remove('open','paid');
+    headBadge.classList.remove('open','paid','partial');
     if(t.status==='Due' || t.status==='Open' || t.isOpen){
       headBadge.textContent = 'Due';
       headBadge.classList.add('open');
+      headBadge.style.display = 'inline-flex';
+    } else if(t.status && t.status.indexOf('Partial')===0){
+      headBadge.textContent = t.status;
+      headBadge.classList.add('partial');
       headBadge.style.display = 'inline-flex';
     } else if(t.status==='Paid' && t.kind!=='out'){
       headBadge.textContent = 'Paid';
@@ -805,7 +810,7 @@ function openDrawer(t){
   document.getElementById('drBody').innerHTML = `
     <div>
       <div class="dr-amount ${amtClass}">${sign}<span class="cur">$</span>${fmtAmt(t.amount)}</div>
-      <div class="dr-status-row">${(t.status==='Open' || t.status==='Due' || t.status==='Paid' || t.isOpen) ? '' : `<span class="badge ${badgeCls}">${t.status}</span>`}<span>${t.date}</span></div>
+      <div class="dr-status-row">${(t.status==='Open' || t.status==='Due' || t.status==='Paid' || t.isOpen || (t.status && t.status.indexOf('Partial')===0)) ? '' : `<span class="badge ${badgeCls}">${t.status}</span>`}<span>${t.date}</span></div>
     </div>
     <div class="dr-divider"></div>
     <div class="dr-sec">
