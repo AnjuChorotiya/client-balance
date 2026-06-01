@@ -302,7 +302,9 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
 .tl-name-meta{font-size:11.5px;color:var(--n500);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tl-amt-wrap{display:flex;justify-content:flex-end}
 .tl-amt{font-size:15px;font-weight:600;color:var(--n900);text-align:right;letter-spacing:-0.1px;font-variant-numeric:tabular-nums;white-space:nowrap}
-.tl-amt.in{color:var(--n900)}
+.tl-amt.in{color:var(--s700)}
+.tl-amt.dep{color:var(--n400);font-weight:500}
+.tl-amt.dep .cur{color:var(--n300)}
 .tl-amt .cur{font-size:12px;font-weight:500;color:var(--n400);margin-right:2px}
 .tl-pill{display:inline-flex;align-items:center;gap:8px;padding:0;font-size:13px;font-weight:500;background:none;color:var(--n700);text-transform:none;letter-spacing:0}
 .tl-pill::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--n400);flex-shrink:0}
@@ -347,7 +349,8 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
 .txn-panel-body{flex:1;overflow-y:auto;padding:22px 24px;display:flex;flex-direction:column;gap:20px}
 .txn-hero{display:flex;flex-direction:column;gap:8px;padding-bottom:18px;border-bottom:1px solid var(--bd)}
 .txn-hero-amt{font-size:30px;font-weight:700;color:var(--n900);letter-spacing:-0.4px;line-height:1.1}
-.txn-hero-amt.in{color:var(--n900)}
+.txn-hero-amt.in{color:var(--s700)}
+.txn-hero-amt.dep{color:var(--n500)}
 .txn-hero-amt .cur{font-size:15px;color:var(--n400);font-weight:500;margin:0 2px 0 1px}
 .txn-hero-meta{display:flex;align-items:center;gap:10px}
 .detail-section{display:flex;flex-direction:column;gap:8px}
@@ -820,7 +823,7 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
 <script>
 // ====== DATA ======
 const CLIENTS = [
-  {id:'C001', name:'Acme Inc', sub:'acme.com', region:'United States', flag:'🇺🇸', employees:23, wallet:10250, outstanding:15200, deposit:46500, monthly:13950, status:'active', logoBg:'#2684FF', initial:'A', contact:'contact@acme.com', csManager:'Anju Verma'},
+  {id:'C001', name:'Acme Inc', sub:'acme.com', region:'United States', flag:'🇺🇸', employees:23, wallet:10250, outstanding:16450, deposit:46500, monthly:13950, status:'active', logoBg:'#2684FF', initial:'A', contact:'contact@acme.com', csManager:'Anju Verma'},
   {id:'C002', name:'TechFlow Labs', sub:'techflow.io', region:'India', flag:'🇮🇳', employees:8, wallet:32400, outstanding:0, deposit:24000, monthly:9400, status:'active', logoBg:'#2684FF', initial:'T', contact:'ops@techflow.io', csManager:'Rohan Mehta'},
   {id:'C003', name:'Brightspark GmbH', sub:'brightspark.de', region:'Germany', flag:'🇩🇪', employees:15, wallet:8500, outstanding:22400, deposit:0, monthly:20500, status:'active', logoBg:'#2684FF', initial:'B', contact:'finance@brightspark.de', csManager:'Anju Verma'},
   {id:'C004', name:'Nordic Health', sub:'nordichealth.se', region:'Sweden', flag:'🇸🇪', employees:6, wallet:14200, outstanding:0, deposit:18500, monthly:6475, status:'active', logoBg:'#2684FF', initial:'N', contact:'ops@nordichealth.se', csManager:'Priya Sharma'},
@@ -914,16 +917,17 @@ const TIMELINES = {
   C001: [
     {date:'10 May 2026', type:'invoice-open', title:'Invoice INV-2026-0050 issued', meta:'May 2026 cycle · payroll + EOR', ref:'INV-2026-0050', amount:15200, pill:'Due'},
     {date:'06 May 2026', type:'invoice-paid', title:'Invoice INV-2026-0048 paid · equipment', meta:'Onboarding equipment · laptops, monitors & peripherals', ref:'INV-2026-0048', amount:2545, pill:'Paid', lines:[{label:'MacBook Pro 14" · M4', sub:'2 units · new hires', amount:1850},{label:'External monitor · 27"', sub:'2 units', amount:420},{label:'Peripherals & accessories', sub:'Keyboard, mouse, dock', amount:180},{label:'Shipping & handling', sub:'Bengaluru → remote', amount:95}]},
+    {date:'06 May 2026', type:'payment', title:'Client payment received · equipment invoice', meta:'Bank transfer · settles INV-2026-0048', ref:'PAY-EQ-0048', amount:2545, pill:'Paid'},
     {date:'05 May 2026', type:'payment', title:'Client payment received · April 2026', meta:'Bank transfer · synced from Zoho Books', ref:'PAY-APR26', amount:13950, pill:'Paid'},
     {date:'04 May 2026', type:'invoice-paid', title:'Invoice INV-2026-0045 paid · Q1 bonus', meta:'Q1 2026 performance bonus · 8 employees', ref:'INV-2026-0045', amount:3360, pill:'Paid', lines:[{label:'Performance bonus payout', sub:'8 employees · Q1 2026', amount:3200},{label:'Bonus processing fee', sub:'Tax & disbursement', amount:160}]},
+    {date:'04 May 2026', type:'payment', title:'Client payment received · Q1 bonus invoice', meta:'Bank transfer · settles INV-2026-0045', ref:'PAY-BON-0045', amount:3360, pill:'Paid'},
     {date:'03 May 2026', type:'credit-note', title:'Credit note CN-2026-0012 issued', meta:'Overpayment on Apr cycle · auto-applies to May invoice', ref:'CN-2026-0012', amount:500, pill:'Issued'},
     {date:'01 May 2026', type:'invoice-paid', title:'Invoice INV-2026-0042 partially paid', meta:'Bank transfer reconciled · NEFT-883120 · $13,950 received against $15,700 invoice · $1,750 outstanding', ref:'INV-2026-0042', amount:15700, pill:'Partially paid'},
-    {date:'15 Apr 2026', type:'payment', title:'Client payment received · off-cycle top-up', meta:'Bank transfer · synced from Zoho Books', ref:'PAY-OFF-1188', amount:900, pill:'Paid'},
-    {date:'05 Apr 2026', type:'payment', title:'Client payment received · March 2026', meta:'Bank transfer · synced from Zoho Books', ref:'PAY-MAR26', amount:13400, pill:'Paid'},
+    {date:'05 Apr 2026', type:'payment', title:'Client payment received · March 2026', meta:'Bank transfer · settles INV-2026-0033', ref:'PAY-MAR26', amount:13800, pill:'Paid'},
     {date:'02 Apr 2026', type:'deposit-topup', title:'Deposit top-up · Priya Singh', meta:'Salary revised · EMP02', ref:'ADV-2026-007', amount:300, pill:'Due'},
     {date:'01 Apr 2026', type:'invoice-paid', title:'Invoice INV-2026-0033 paid', meta:'Wire transfer reconciled', ref:'INV-2026-0033', amount:13800, pill:'Paid'},
     {date:'15 Mar 2026', type:'deposit-adjust', title:'Deposit adjusted · Karthik Reddy onboarding', meta:'Transferred from Sneha Arora (exit) · excess credited', ref:'ADV-2026-006', amount:900, pill:'Adjusted'},
-    {date:'05 Mar 2026', type:'payment', title:'Client payment received · February 2026', meta:'Bank transfer · synced from Zoho Books', ref:'PAY-FEB26', amount:13200, pill:'Paid'},
+    {date:'05 Mar 2026', type:'payment', title:'Client payment received · February 2026', meta:'Bank transfer · settles INV-2026-0021', ref:'PAY-FEB26', amount:13500, pill:'Paid'},
     {date:'01 Mar 2026', type:'invoice-paid', title:'Invoice INV-2026-0021 paid', meta:'Bank transfer reconciled', ref:'INV-2026-0021', amount:13500, pill:'Paid'},
     {date:'12 Jan 2026', type:'deposit-locked', title:'Security deposit collected', meta:'5 active employees · onboarding', ref:'ADV-2026-001…005', amount:4150, pill:'Locked', empRange:[0,4]}
   ],
@@ -1486,8 +1490,11 @@ function renderTimeline(){
     if(currentSortKey==='status'){ return (a.pill||'').localeCompare(b.pill||'') * dir; }
     return 0;
   });
-  const sign = (type) => (type==='invoice-paid'||type==='credit-note' ? '+' : (type==='payment'||type==='deposit-topup'||type==='deposit-locked' ? '−' : (type==='deposit-adjust' ? '+' : '')));
-  const isIn = (type) => (type==='invoice-paid' || type==='deposit-adjust' || type==='credit-note');
+  // Running ledger: invoices raised increase what the client owes (+); payments & credit notes reduce it (−).
+  // Deposits are a separate escrow pool and do not feed the billing Outstanding balance (neutral, no sign).
+  const isDep = (type) => type.indexOf('deposit')===0;
+  const sign = (type) => (isDep(type) ? '' : ((type==='invoice-open'||type==='invoice-paid') ? '+' : (type==='payment'||type==='credit-note') ? '−' : ''));
+  const isIn = (type) => (type==='payment' || type==='credit-note');
   window._timelineCache = filtered;
   document.getElementById('timelineBody').innerHTML = filtered.length ? filtered.map((e,idx)=>{
     const cat = eventCategory(e.type);
@@ -1508,7 +1515,7 @@ function renderTimeline(){
             <div class="tl-name-meta">${e.meta}</div>
           </div>
         </div>
-        <div class="tl-amt ${isIn(e.type)?'in':''}">${sign(e.type)}<span class="cur">$</span>${fmt(e.amount)}</div>
+        <div class="tl-amt ${isIn(e.type)?'in':''} ${isDep(e.type)?'dep':''}">${sign(e.type)}<span class="cur">$</span>${fmt(e.amount)}</div>
         <div><span class="tl-pill ${pillClass(e.pill)}">${e.pill}</span></div>
         <div class="tl-row-actions">
           <button class="tl-kebab" onclick="event.stopPropagation();toggleRowMenu(${idx})" aria-label="Actions"><svg viewBox="0 0 16 16" fill="none"><circle cx="3" cy="8" r="1.4" fill="currentColor"/><circle cx="8" cy="8" r="1.4" fill="currentColor"/><circle cx="13" cy="8" r="1.4" fill="currentColor"/></svg></button>
@@ -1567,12 +1574,13 @@ function openTxnPanel(idx){
   const items = window._timelineCache || [];
   const e = items[idx];
   if(!e) return;
-  const signFn = (type) => (type==='invoice-paid'||type==='credit-note' ? '+' : (type==='payment'||type==='deposit-topup'||type==='deposit-locked' ? '−' : (type==='deposit-adjust' ? '+' : '')));
-  const isInFn = (type) => (type==='invoice-paid' || type==='deposit-adjust' || type==='credit-note');
+  const isDepFn = (type) => type.indexOf('deposit')===0;
+  const signFn = (type) => (isDepFn(type) ? '' : ((type==='invoice-open'||type==='invoice-paid') ? '+' : (type==='payment'||type==='credit-note') ? '−' : ''));
+  const isInFn = (type) => (type==='payment' || type==='credit-note');
   document.getElementById('txnPanelTitle').textContent = e.title;
   document.getElementById('txnPanelBody').innerHTML = `
     <div class="txn-hero">
-      <div class="txn-hero-amt ${isInFn(e.type)?'in':''}">${signFn(e.type)}<span class="cur">$</span>${fmt(e.amount)}</div>
+      <div class="txn-hero-amt ${isInFn(e.type)?'in':''} ${isDepFn(e.type)?'dep':''}">${signFn(e.type)}<span class="cur">$</span>${fmt(e.amount)}</div>
       <div class="txn-hero-meta"><span class="tl-pill ${pillClass(e.pill)}">${e.pill}</span><span style="font-size:12px;color:var(--n500)">${e.date}</span></div>
     </div>
     ${eventDetail(e)}
