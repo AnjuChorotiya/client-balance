@@ -385,19 +385,19 @@ function typeBadge(type){
 function rowHTML(t, idx){
   const stCls = t.status==='Released' ? 'released' : '';
   const stLabel = t.status==='Released' ? 'Released' : 'Locked';
-  return `<div class="trow ₹{t.status==='Released'?'is-released':''}" data-search="₹{(t.id+' '+t.empName+' '+t.empRole+' '+t.amount+' '+(t.sub||'')).toLowerCase()}" onclick="openDepDrawer(₹{idx})">
-    <div class="tdate">₹{t.date}<span class="y">₹{t.year}</span></div>
-    <div class="tref">₹{t.id} ₹{typeBadge(t.type)}</div>
+  return `<div class="trow ${t.status==='Released'?'is-released':''}" data-search="${(t.id+' '+t.empName+' '+t.empRole+' '+t.amount+' '+(t.sub||'')).toLowerCase()}" onclick="openDepDrawer(${idx})">
+    <div class="tdate">${t.date}<span class="y">${t.year}</span></div>
+    <div class="tref">${t.id} ${typeBadge(t.type)}</div>
     <div class="treason">
-      <div class="tava" style="background:₹{t.avatarBg};color:₹{t.avatarColor}">₹{t.initials}</div>
+      <div class="tava" style="background:${t.avatarBg};color:${t.avatarColor}">${t.initials}</div>
       <div class="tinfo">
-        <div class="tinfo-title">₹{t.empName}</div>
-        <div class="tinfo-meta">₹{t.empRole} · ₹{t.empId}</div>
+        <div class="tinfo-title">${t.empName}</div>
+        <div class="tinfo-meta">${t.empRole} · ${t.empId}</div>
       </div>
     </div>
-    <div class="tamt"><span class="cur">₹</span>₹{fmtINR(t.amount)}</div>
-    <div class="tstatus ₹{stCls}"><span class="stdot"></span>₹{stLabel}</div>
-    <div class="raw" onclick="event.stopPropagation()"><button class="rabtn" title="More" onclick="openDepDrawer(₹{idx})"><svg viewBox="0 0 14 14" fill="none"><circle cx="2.5" cy="7" r="1.2" fill="currentColor"/><circle cx="7" cy="7" r="1.2" fill="currentColor"/><circle cx="11.5" cy="7" r="1.2" fill="currentColor"/></svg></button></div>
+    <div class="tamt"><span class="cur">₹</span>${fmtINR(t.amount)}</div>
+    <div class="tstatus ${stCls}"><span class="stdot"></span>${stLabel}</div>
+    <div class="raw" onclick="event.stopPropagation()"><button class="rabtn" title="More" onclick="openDepDrawer(${idx})"><svg viewBox="0 0 14 14" fill="none"><circle cx="2.5" cy="7" r="1.2" fill="currentColor"/><circle cx="7" cy="7" r="1.2" fill="currentColor"/><circle cx="11.5" cy="7" r="1.2" fill="currentColor"/></svg></button></div>
   </div>`;
 }
 
@@ -434,9 +434,9 @@ function openDepDrawer(idx){
     const delta = originalDeposit - newRequired;
     let diffRow = '';
     if(delta > 0){
-      diffRow = `<div class="dr-diff-row"><span class="dr-diff-label">Excess credited to account</span><span class="dr-diff-val">₹₹{fmtINR(delta)}</span></div>`;
+      diffRow = `<div class="dr-diff-row"><span class="dr-diff-label">Excess credited to account</span><span class="dr-diff-val">₹${fmtINR(delta)}</span></div>`;
     } else if(delta < 0){
-      diffRow = `<div class="dr-diff-row warn"><span class="dr-diff-label">Top-up required</span><span class="dr-diff-val">₹₹{fmtINR(Math.abs(delta))}</span></div>`;
+      diffRow = `<div class="dr-diff-row warn"><span class="dr-diff-label">Top-up required</span><span class="dr-diff-val">₹${fmtINR(Math.abs(delta))}</span></div>`;
     } else {
       diffRow = `<div class="dr-diff-row neutral"><span class="dr-diff-label">Exact match — no adjustment needed</span><span class="dr-diff-val">₹0</span></div>`;
     }
@@ -447,13 +447,13 @@ function openDepDrawer(idx){
           <div class="dr-sc-ico"><svg viewBox="0 0 16 16" fill="none"><path d="M2 8H14M9 4L13 8L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
           <div class="dr-sc-text">
             <div class="dr-sc-title">Adjusted from an exiting employee</div>
-            This deposit was originally held against <strong>Sneha Arora</strong> (EMP07), who exited on <strong>08 May 2026</strong>. Instead of refunding, the locked amount was transferred to cover the advance for the new joiner <strong>₹{t.empName}</strong>.
+            This deposit was originally held against <strong>Sneha Arora</strong> (EMP07), who exited on <strong>08 May 2026</strong>. Instead of refunding, the locked amount was transferred to cover the advance for the new joiner <strong>${t.empName}</strong>.
           </div>
         </div>
         <div class="dr-diff-card">
-          <div class="dr-diff-row"><span class="dr-diff-label">Original deposit · Sneha Arora</span><span class="dr-diff-val">₹₹{fmtINR(originalDeposit)}</span></div>
-          <div class="dr-diff-row"><span class="dr-diff-label">New required · ₹{t.empName}</span><span class="dr-diff-val">₹₹{fmtINR(newRequired)}</span></div>
-          ₹{diffRow}
+          <div class="dr-diff-row"><span class="dr-diff-label">Original deposit · Sneha Arora</span><span class="dr-diff-val">₹${fmtINR(originalDeposit)}</span></div>
+          <div class="dr-diff-row"><span class="dr-diff-label">New required · ${t.empName}</span><span class="dr-diff-val">₹${fmtINR(newRequired)}</span></div>
+          ${diffRow}
         </div>
       </div>`;
   } else if(t.type==='Released'){
@@ -466,16 +466,16 @@ function openDepDrawer(idx){
           <div class="dr-sc-ico"><svg viewBox="0 0 16 16" fill="none"><path d="M2 6C2.5 4 4.5 3 6.5 3C9.26 3 11.5 5.24 11.5 8C11.5 10.76 9.26 13 6.5 13C4.5 13 2.5 12 2 10M2 6V3M2 6H5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
           <div class="dr-sc-text">
             <div class="dr-sc-title">Deposit released as credit</div>
-            <strong>₹{t.empName}</strong>'s locked deposit of <strong>₹₹{fmtINR(t.amount)}</strong> was ₹{destLabel}.
+            <strong>${t.empName}</strong>'s locked deposit of <strong>₹${fmtINR(t.amount)}</strong> was ${destLabel}.
           </div>
         </div>
       </div>
       <div class="dr-sec">
         <div class="dr-stitle">Release details</div>
         <div class="dr-diff-card">
-          <div class="dr-diff-row"><span class="dr-diff-label">Original deposit</span><span class="dr-diff-val">₹₹{fmtINR(t.amount)}</span></div>
-          <div class="dr-diff-row"><span class="dr-diff-label">Released on</span><span class="dr-diff-val">₹{t.date} ₹{t.year}</span></div>
-          <div class="dr-diff-row"><span class="dr-diff-label">Refunded to</span><span class="dr-diff-val">₹{destShort}</span></div>
+          <div class="dr-diff-row"><span class="dr-diff-label">Original deposit</span><span class="dr-diff-val">₹${fmtINR(t.amount)}</span></div>
+          <div class="dr-diff-row"><span class="dr-diff-label">Released on</span><span class="dr-diff-val">${t.date} ${t.year}</span></div>
+          <div class="dr-diff-row"><span class="dr-diff-label">Refunded to</span><span class="dr-diff-val">${destShort}</span></div>
         </div>
       </div>`;
   } else if(t.type==='Top-up'){
@@ -486,7 +486,7 @@ function openDepDrawer(idx){
           <div class="dr-sc-ico"><svg viewBox="0 0 16 16" fill="none"><path d="M8 2V14M3 7L8 2L13 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
           <div class="dr-sc-text">
             <div class="dr-sc-title">Salary revised — additional deposit required</div>
-            <strong>₹{t.empName}</strong> received a salary increase effective <strong>15 May 2026</strong>. An additional <strong>₹₹{fmtINR(t.amount)}</strong> is required to match the new compensation level. Existing locked deposit: <strong>₹95,000</strong>.
+            <strong>${t.empName}</strong> received a salary increase effective <strong>15 May 2026</strong>. An additional <strong>₹${fmtINR(t.amount)}</strong> is required to match the new compensation level. Existing locked deposit: <strong>₹95,000</strong>.
           </div>
         </div>
       </div>`;
@@ -498,36 +498,36 @@ function openDepDrawer(idx){
           <div class="dr-sc-ico"><svg viewBox="0 0 16 16" fill="none"><rect x="3" y="7.5" width="10" height="6" rx="1" stroke="currentColor" stroke-width="1.4"/><path d="M5.5 7.5V5C5.5 3.62 6.62 2.5 8 2.5C9.38 2.5 10.5 3.62 10.5 5V7.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></div>
           <div class="dr-sc-text">
             <div class="dr-sc-title">Initial onboarding deposit</div>
-            Locked against <strong>₹{t.empName}</strong>'s active employment. Refundable at offboarding within 30 days of final settlement, or adjustable for a new joiner.
+            Locked against <strong>${t.empName}</strong>'s active employment. Refundable at offboarding within 30 days of final settlement, or adjustable for a new joiner.
           </div>
         </div>
       </div>`;
   }
   document.getElementById('drBody').innerHTML = `
     <div class="dr-emp">
-      <div class="dr-emp-ava" style="background:₹{t.avatarBg};color:₹{t.avatarColor}">₹{t.initials}</div>
+      <div class="dr-emp-ava" style="background:${t.avatarBg};color:${t.avatarColor}">${t.initials}</div>
       <div class="dr-emp-info">
-        <div class="dr-emp-name">₹{t.empName}</div>
-        <div class="dr-emp-role">₹{t.empRole} · ₹{t.empId}</div>
+        <div class="dr-emp-name">${t.empName}</div>
+        <div class="dr-emp-role">${t.empRole} · ${t.empId}</div>
       </div>
     </div>
     <div class="dr-amount-row">
-      <div class="dr-amt"><span class="cur">₹</span>₹{fmtINR(t.amount)}</div>
+      <div class="dr-amt"><span class="cur">₹</span>${fmtINR(t.amount)}</div>
       <div class="dr-amt-meta">
-        <span class="dr-status-pill ₹{pillCls}"><span class="stdot"></span>₹{statusLabel}</span>
-        <span style="font-size:12px;color:var(--n500)">₹{t.date} ₹{t.year}</span>
+        <span class="dr-status-pill ${pillCls}"><span class="stdot"></span>${statusLabel}</span>
+        <span style="font-size:12px;color:var(--n500)">${t.date} ${t.year}</span>
       </div>
     </div>
     <div class="dr-sec">
       <div class="dr-stitle">Details</div>
       <div class="dr-grid">
-        <div class="dr-cell"><span class="dr-clabel">Invoice</span><span class="dr-cval">₹{t.id}</span></div>
-        <div class="dr-cell"><span class="dr-clabel">Type</span><span class="dr-cval">₹{t.type}</span></div>
-        <div class="dr-cell"><span class="dr-clabel">Held since</span><span class="dr-cval">₹{t.date} ₹{t.year}</span></div>
-        <div class="dr-cell"><span class="dr-clabel">Employee</span><span class="dr-cval">₹{t.empName} (₹{t.empId})</span></div>
+        <div class="dr-cell"><span class="dr-clabel">Invoice</span><span class="dr-cval">${t.id}</span></div>
+        <div class="dr-cell"><span class="dr-clabel">Type</span><span class="dr-cval">${t.type}</span></div>
+        <div class="dr-cell"><span class="dr-clabel">Held since</span><span class="dr-cval">${t.date} ${t.year}</span></div>
+        <div class="dr-cell"><span class="dr-clabel">Employee</span><span class="dr-cval">${t.empName} (${t.empId})</span></div>
       </div>
     </div>
-    ₹{scenario}`;
+    ${scenario}`;
   // footer action
   document.getElementById('drFoot').innerHTML = `<button class="btn-cancel" onclick="closeDepDrawer()" style="flex:1">Close</button>`;
   document.getElementById('depDrawer').classList.remove('hidden');
