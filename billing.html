@@ -641,18 +641,18 @@ body{font-family:var(--font);background:var(--bg);color:var(--n800);-webkit-font
 // Invoice = bill issued by Wisemonk. Payment = money paid by client (synced from Zoho Books).
 const TX = [
   {id:'INV-2026-0050',date:'07 May 2026',year:'2026',kind:'invoice',title:'Invoice for May 2026',meta:'INV-2026-0050',type:'Invoice',ref:'INV-2026-0050',status:'Due in 4 days',amount:14700,balanceAfter:null,isOpen:true,paidOn:null,lineItems:[{label:'Payroll funding · May 2026 cycle',sub:'23 employees · 1 contractor',amount:13950},{label:'EOR service fee',sub:'Monthly platform & compliance',amount:1250},{label:'Adjustment CN-2026-0012 applied',sub:'From overpayment on Apr cycle',amount:-500,credit:true}]},
-  {id:'TXN-2026-0511',date:'05 May 2026',year:'2026',kind:'out',title:'Payment received',meta:'TXN-2026-0511',type:'Payment',ref:'PAY-APR26',status:'Paid',amount:13950,balanceAfter:10250,bankRail:'NEFT',bankTxn:'NEFT-883120',appliedTo:'INV-2026-0042',payNo:'3146',refNo:'1779866529BATUC0',mode:'Bank remittance',branch:'Head Office',unused:0},
+  {id:'TXN-2026-0511',date:'05 May 2026',year:'2026',kind:'out',title:'Payment received',meta:'TXN-2026-0511',type:'Payment',ref:'PAY-APR26',status:'Paid',amount:13950,balanceAfter:10250,bankRail:'NEFT',bankTxn:'NEFT-883120',appliedTo:'INV-2026-0042'},
   {id:'CN-2026-0012',date:'03 May 2026',year:'2026',kind:'credit',adjKind:'overpayment',title:'Overpayment credit',meta:'EMP02 Priya Singh · April overpayment',type:'Adjustment',ref:'CN-2026-0012',status:'Paid',amount:500,balanceAfter:24700,appliedTo:'INV-2026-0050'},
   {id:'ADJ-2026-0019',date:'02 May 2026',year:'2026',kind:'credit',adjKind:'lop',title:'LOP adjustment',meta:'EMP05 Vikram Iyer · 2 days loss of pay',type:'Adjustment',ref:'ADJ-2026-0019',status:'Paid',amount:420,balanceAfter:24500,appliedTo:'INV-2026-0050'},
   {id:'INV-2026-0042',date:'01 May 2026',year:'2026',kind:'invoice',title:'Invoice for April 2026',meta:'INV-2026-0042',type:'Invoice',ref:'INV-2026-0042',status:'Partially paid',amount:15700,balanceAfter:24200,paidOn:'05 May 2026'},
   {id:'ADJ-2026-0014',date:'28 Apr 2026',year:'2026',kind:'credit',adjKind:'exit',title:'Exit settlement',meta:'EMP04 Sneha Arora · final settlement',type:'Adjustment',ref:'ADJ-2026-0014',status:'Paid',amount:1200,balanceAfter:8400,appliedTo:'INV-2026-0042'},
   {id:'ADJ-2026-0011',date:'22 Apr 2026',year:'2026',kind:'credit',adjKind:'skipped',title:'Payroll skipped',meta:'EMP08 Meera Joshi · unpaid leave',type:'Adjustment',ref:'ADJ-2026-0011',status:'Paid',amount:740,balanceAfter:7200,appliedTo:'INV-2026-0042'},
-  {id:'TXN-2026-0508',date:'15 Apr 2026',year:'2026',kind:'out',title:'Payment received',meta:'TXN-2026-0508',type:'Payment',ref:'PAY-OFF-1188',status:'Paid',amount:900,balanceAfter:9000,bankRail:'NEFT',bankTxn:'NEFT-879441',appliedTo:'INV-2026-0036',payNo:'3131',refNo:'1779868325R125U4',mode:'Bank remittance',branch:'Head Office',unused:0},
-  {id:'TXN-2026-0507',date:'05 Apr 2026',year:'2026',kind:'out',title:'Payment received',meta:'TXN-2026-0507',type:'Payment',ref:'PAY-MAR26',status:'Paid',amount:13400,balanceAfter:9900,bankRail:'NEFT',bankTxn:'NEFT-871002',appliedTo:'INV-2026-0033',payNo:'3127',refNo:'1779870976YCM5VX',mode:'Bank remittance',branch:'Head Office',unused:0},
+  {id:'TXN-2026-0508',date:'15 Apr 2026',year:'2026',kind:'out',title:'Payment received',meta:'TXN-2026-0508',type:'Payment',ref:'PAY-OFF-1188',status:'Paid',amount:900,balanceAfter:9000,bankRail:'NEFT',bankTxn:'NEFT-879441',appliedTo:'INV-2026-0036'},
+  {id:'TXN-2026-0507',date:'05 Apr 2026',year:'2026',kind:'out',title:'Payment received',meta:'TXN-2026-0507',type:'Payment',ref:'PAY-MAR26',status:'Paid',amount:13400,balanceAfter:9900,bankRail:'NEFT',bankTxn:'NEFT-871002',appliedTo:'INV-2026-0033'},
   {id:'INV-2026-0033',date:'01 Apr 2026',year:'2026',kind:'invoice',title:'Invoice for March 2026',meta:'INV-2026-0033',type:'Invoice',ref:'INV-2026-0033',status:'Paid',amount:13800,balanceAfter:23300,paidOn:'05 Apr 2026'},
-  {id:'TXN-2026-0505',date:'05 Mar 2026',year:'2026',kind:'out',title:'Payment received',meta:'TXN-2026-0505',type:'Payment',ref:'PAY-FEB26',status:'Paid',amount:13200,balanceAfter:9500,bankRail:'NEFT',bankTxn:'NEFT-862715',appliedTo:'INV-2026-0021',payNo:'3108',refNo:'1779891072C6OYC8',mode:'Bank remittance',branch:'Head Office',unused:0},
+  {id:'TXN-2026-0505',date:'05 Mar 2026',year:'2026',kind:'out',title:'Payment received',meta:'TXN-2026-0505',type:'Payment',ref:'PAY-FEB26',status:'Paid',amount:13200,balanceAfter:9500,bankRail:'NEFT',bankTxn:'NEFT-862715',appliedTo:'INV-2026-0021'},
   {id:'INV-2026-0021',date:'01 Mar 2026',year:'2026',kind:'invoice',title:'Invoice for February 2026',meta:'INV-2026-0021',type:'Invoice',ref:'INV-2026-0021',status:'Paid',amount:13500,balanceAfter:22700,paidOn:'05 Mar 2026'},
-  {id:'TXN-2026-0504',date:'05 Feb 2026',year:'2026',kind:'out',title:'Payment received',meta:'TXN-2026-0504',type:'Payment',ref:'PAY-JAN26',status:'Paid',amount:12800,balanceAfter:9200,bankRail:'NEFT',bankTxn:'NEFT-854609',appliedTo:'INV-2026-0010',payNo:'3103',refNo:'1779884787LL59S',mode:'Bank remittance',branch:'Head Office',unused:0}
+  {id:'TXN-2026-0504',date:'05 Feb 2026',year:'2026',kind:'out',title:'Payment received',meta:'TXN-2026-0504',type:'Payment',ref:'PAY-JAN26',status:'Paid',amount:12800,balanceAfter:9200,bankRail:'NEFT',bankTxn:'NEFT-854609',appliedTo:'INV-2026-0010'}
 ];
 
 let currentFilter = 'invoice';
@@ -764,18 +764,13 @@ function openDrawer(t){
         <div class="dr-cell"><span class="dr-clabel">Reference</span><span class="dr-cval">${t.ref}</span></div>`;
   const breakdown = t.kind==='out' ? `
     <div class="dr-sec">
-      <div class="dr-stitle">Payment details</div>
+      <div class="dr-stitle">Transfer details</div>
       <div>
-        <div class="dr-mini-row"><span class="dr-mini-label">Payment #</span><span class="dr-mini-val">${t.payNo||t.id}</span></div>
-        <div class="dr-mini-row"><span class="dr-mini-label">Payment date</span><span class="dr-mini-val">${t.date}</span></div>
-        <div class="dr-mini-row"><span class="dr-mini-label">Branch</span><span class="dr-mini-val">${t.branch||'Head Office'}</span></div>
-        <div class="dr-mini-row"><span class="dr-mini-label">Reference number</span><span class="dr-mini-val">${t.refNo||t.bankTxn||t.ref}</span></div>
-        <div class="dr-mini-row"><span class="dr-mini-label">Invoice #</span><span class="dr-mini-val">${t.appliedTo||'Open invoice'}</span></div>
-        <div class="dr-mini-row"><span class="dr-mini-label">Mode</span><span class="dr-mini-val">${t.mode||'Bank remittance'}</span></div>
-        <div class="dr-mini-row"><span class="dr-mini-label">Status</span><span class="dr-mini-val">${t.status}</span></div>
-        <div class="dr-mini-row"><span class="dr-mini-label">Unused amount</span><span class="dr-mini-val">$${fmtAmt(t.unused||0)}</span></div>
+        <div class="dr-mini-row"><span class="dr-mini-label">Rail</span><span class="dr-mini-val">${t.bankRail||'Bank transfer'}</span></div>
+        <div class="dr-mini-row"><span class="dr-mini-label">Bank reference</span><span class="dr-mini-val">${t.bankTxn||t.ref}</span></div>
+        <div class="dr-mini-row"><span class="dr-mini-label">Applied to</span><span class="dr-mini-val">${t.appliedTo||'Open invoice'}</span></div>
         <div class="dr-mini-row"><span class="dr-mini-label">Source</span><span class="dr-mini-val">Zoho Books</span></div>
-        <div class="dr-mini-row total"><span class="dr-mini-label">Amount received</span><span class="dr-mini-val">$${fmtAmt(t.amount)}</span></div>
+        <div class="dr-mini-row total"><span class="dr-mini-label">Amount paid</span><span class="dr-mini-val">$${fmtAmt(t.amount)}</span></div>
       </div>
     </div>` : '';
   const badgeCls = (t.pending || t.status==='Open' || t.status==='Pending') ? 'bw' : (t.kind==='refund' ? 'bn' : 'bs');
