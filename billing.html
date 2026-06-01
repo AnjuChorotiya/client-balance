@@ -151,10 +151,13 @@ body{font-family:var(--font);background:var(--bg);color:var(--n800);-webkit-font
 .trow{display:grid;grid-template-columns:120px minmax(220px,1fr) 160px 160px 140px 32px;padding:18px 8px;border-bottom:1px solid var(--bd);gap:18px;align-items:center;cursor:pointer}
 .tid{font-size:13px;color:var(--n700);font-weight:500;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tid.muted{color:var(--n400);font-weight:400}
-/* Hide Status column when viewing Payments tab (all rows are 'Paid' — redundant) */
+/* Hide Status column on Payments and Adjustments tabs (all rows are 'Paid' — redundant) */
 .table[data-filter="out"] .thead,
-.table[data-filter="out"] .trow{grid-template-columns:120px minmax(220px,1fr) 160px 160px 32px}
-.table[data-filter="out"] .col-status{display:none}
+.table[data-filter="out"] .trow,
+.table[data-filter="credit"] .thead,
+.table[data-filter="credit"] .trow{grid-template-columns:120px minmax(220px,1fr) 160px 160px 32px}
+.table[data-filter="out"] .col-status,
+.table[data-filter="credit"] .col-status{display:none}
 .tidx{font-size:13px;color:var(--n400);font-weight:500;text-align:center;font-variant-numeric:tabular-nums}
 .trow:last-child,.trow.last-visible{border-bottom:none}
 .trow:hover{background:var(--n50)}
@@ -324,7 +327,9 @@ body{font-family:var(--font);background:var(--bg);color:var(--n800);-webkit-font
   .bal-actions{gap:18px}
   .thead,.trow{grid-template-columns:100px 1fr 120px 120px 110px 32px;gap:12px}
   .table[data-filter="out"] .thead,
-  .table[data-filter="out"] .trow{grid-template-columns:100px 1fr 120px 120px 32px}
+  .table[data-filter="out"] .trow,
+  .table[data-filter="credit"] .thead,
+  .table[data-filter="credit"] .trow{grid-template-columns:100px 1fr 120px 120px 32px}
   .upcoming{flex-direction:column;align-items:flex-start;gap:14px}
 }
 </style>
