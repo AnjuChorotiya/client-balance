@@ -757,6 +757,11 @@ function openDrawer(t){
     }
   }
   const balAfter = t.balanceAfter==null ? 'Pending' : '$'+fmtAmt(t.balanceAfter);
+  const detailsCells = t.kind==='out' ? `
+        <div class="dr-cell"><span class="dr-clabel">Invoice</span><span class="dr-cval">${t.appliedTo||'—'}</span></div>
+        <div class="dr-cell"><span class="dr-clabel">Transaction ID</span><span class="dr-cval">${t.id}</span></div>` : `
+        <div class="dr-cell"><span class="dr-clabel">Type</span><span class="dr-cval">${t.type}</span></div>
+        <div class="dr-cell"><span class="dr-clabel">Reference</span><span class="dr-cval">${t.ref}</span></div>`;
   const breakdown = t.kind==='out' ? `
     <div class="dr-sec">
       <div class="dr-stitle">Transfer details</div>
@@ -806,9 +811,7 @@ function openDrawer(t){
     <div class="dr-divider"></div>
     <div class="dr-sec">
       <div class="dr-stitle">Details</div>
-      <div class="dr-grid">
-        <div class="dr-cell"><span class="dr-clabel">Type</span><span class="dr-cval">${t.type}</span></div>
-        <div class="dr-cell"><span class="dr-clabel">Reference</span><span class="dr-cval">${t.ref}</span></div>
+      <div class="dr-grid">${detailsCells}
       </div>
     </div>
     ${breakdown}
