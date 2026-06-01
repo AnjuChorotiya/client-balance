@@ -145,21 +145,23 @@ body{font-family:var(--font);background:var(--bg);color:var(--n800);-webkit-font
 
 /* simple table — minimal style */
 .table{width:100%;background:#FFFFFF;border-radius:var(--rlg);border:none;padding:8px 20px;overflow:hidden}
-.thead{display:grid;grid-template-columns:120px minmax(220px,1fr) 160px 160px 140px 32px;padding:14px 8px;border-bottom:1px solid var(--n200);gap:18px;align-items:center}
+.thead{display:grid;grid-template-columns:120px minmax(220px,1fr) 150px 130px 150px 130px 32px;padding:14px 8px;border-bottom:1px solid var(--n200);gap:16px;align-items:center}
 .th{font-family:var(--font);font-size:13px;font-weight:700;color:var(--n900);text-transform:uppercase;letter-spacing:.4px}
 .th.right{text-align:right}
-.trow{display:grid;grid-template-columns:120px minmax(220px,1fr) 160px 160px 140px 32px;padding:18px 8px;border-bottom:1px solid var(--bd);gap:18px;align-items:center;cursor:pointer}
+.trow{display:grid;grid-template-columns:120px minmax(220px,1fr) 150px 130px 150px 130px 32px;padding:18px 8px;border-bottom:1px solid var(--bd);gap:16px;align-items:center;cursor:pointer}
 .tid{font-size:13px;color:var(--n700);font-weight:500;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tid.muted{color:var(--n400);font-weight:400}
-/* Payments tab: hide Status (all rows are Paid) */
+/* Payments tab: hide Status and Paid-on (paid-on is invoice-specific) */
 .table[data-filter="out"] .thead,
 .table[data-filter="out"] .trow{grid-template-columns:120px minmax(220px,1fr) 160px 160px 32px}
-.table[data-filter="out"] .col-status{display:none}
-/* Adjustments tab: hide both Status and Invoice ID */
+.table[data-filter="out"] .col-status,
+.table[data-filter="out"] .col-paidon{display:none}
+/* Adjustments tab: hide Status, Invoice ID, and Paid-on */
 .table[data-filter="credit"] .thead,
 .table[data-filter="credit"] .trow{grid-template-columns:120px minmax(220px,1fr) 160px 32px}
 .table[data-filter="credit"] .col-status,
-.table[data-filter="credit"] .col-invid{display:none}
+.table[data-filter="credit"] .col-invid,
+.table[data-filter="credit"] .col-paidon{display:none}
 .tidx{font-size:13px;color:var(--n400);font-weight:500;text-align:center;font-variant-numeric:tabular-nums}
 .trow:last-child,.trow.last-visible{border-bottom:none}
 .trow:hover{background:var(--n50)}
@@ -327,7 +329,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--n800);-webkit-font
   .page-body{padding:32px 24px}
   .bal-amt{font-size:48px}
   .bal-actions{gap:18px}
-  .thead,.trow{grid-template-columns:100px 1fr 120px 120px 110px 32px;gap:12px}
+  .thead,.trow{grid-template-columns:90px 1fr 110px 100px 110px 90px 32px;gap:10px}
   .table[data-filter="out"] .thead,
   .table[data-filter="out"] .trow{grid-template-columns:100px 1fr 120px 120px 32px}
   .table[data-filter="credit"] .thead,
@@ -459,6 +461,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--n800);-webkit-font
             <div class="th">Date</div>
             <div class="th">Activity</div>
             <div class="th col-invid">Invoice ID</div>
+            <div class="th col-paidon">Paid on</div>
             <div class="th right">Amount</div>
             <div class="th col-status">Status</div>
             <div class="th"></div>
@@ -629,18 +632,18 @@ body{font-family:var(--font);background:var(--bg);color:var(--n800);-webkit-font
 <script>
 // Invoice = bill issued by Wisemonk. Payment = money paid by client (synced from Zoho Books).
 const TX = [
-  {id:'INV-2026-0050',date:'07 May 2026',year:'2026',kind:'invoice',title:'Invoice for May 2026',meta:'Due 10 May 2026 · in 4 days',type:'Invoice',ref:'INV-2026-0050',status:'Due',amount:14700,balanceAfter:null,isOpen:true,lineItems:[{label:'Payroll funding · May 2026 cycle',sub:'23 employees · 1 contractor',amount:13950},{label:'EOR service fee',sub:'Monthly platform & compliance',amount:1250},{label:'Adjustment CN-2026-0012 applied',sub:'From overpayment on Apr cycle',amount:-500,credit:true}]},
+  {id:'INV-2026-0050',date:'07 May 2026',year:'2026',kind:'invoice',title:'Invoice for May 2026',meta:'Due 10 May 2026 · in 4 days',type:'Invoice',ref:'INV-2026-0050',status:'Due',amount:14700,balanceAfter:null,isOpen:true,paidOn:null,lineItems:[{label:'Payroll funding · May 2026 cycle',sub:'23 employees · 1 contractor',amount:13950},{label:'EOR service fee',sub:'Monthly platform & compliance',amount:1250},{label:'Adjustment CN-2026-0012 applied',sub:'From overpayment on Apr cycle',amount:-500,credit:true}]},
   {id:'TXN-2026-0511',date:'05 May 2026',year:'2026',kind:'out',title:'Payment received',meta:'TXN-2026-0511',type:'Payment',ref:'PAY-APR26',status:'Paid',amount:13950,balanceAfter:10250,bankRail:'NEFT',bankTxn:'NEFT-883120',appliedTo:'INV-2026-0042'},
   {id:'CN-2026-0012',date:'03 May 2026',year:'2026',kind:'credit',adjKind:'overpayment',title:'Overpayment credit',meta:'EMP02 Priya Singh · April overpayment',type:'Adjustment',ref:'CN-2026-0012',status:'Paid',amount:500,balanceAfter:24700,appliedTo:'INV-2026-0050'},
   {id:'ADJ-2026-0019',date:'02 May 2026',year:'2026',kind:'credit',adjKind:'lop',title:'LOP adjustment',meta:'EMP05 Vikram Iyer · 2 days loss of pay',type:'Adjustment',ref:'ADJ-2026-0019',status:'Paid',amount:420,balanceAfter:24500,appliedTo:'INV-2026-0050'},
-  {id:'INV-2026-0042',date:'01 May 2026',year:'2026',kind:'invoice',title:'Invoice for April 2026',meta:'Received ₹15,700 against ₹15,200 invoice',type:'Invoice',ref:'INV-2026-0042',status:'Paid',amount:15700,balanceAfter:24200},
+  {id:'INV-2026-0042',date:'01 May 2026',year:'2026',kind:'invoice',title:'Invoice for April 2026',meta:'Received ₹15,700 against ₹15,200 invoice',type:'Invoice',ref:'INV-2026-0042',status:'Paid',amount:15700,balanceAfter:24200,paidOn:'05 May 2026'},
   {id:'ADJ-2026-0014',date:'28 Apr 2026',year:'2026',kind:'credit',adjKind:'exit',title:'Exit settlement',meta:'EMP04 Sneha Arora · final settlement',type:'Adjustment',ref:'ADJ-2026-0014',status:'Paid',amount:1200,balanceAfter:8400,appliedTo:'INV-2026-0042'},
   {id:'ADJ-2026-0011',date:'22 Apr 2026',year:'2026',kind:'credit',adjKind:'skipped',title:'Payroll skipped',meta:'EMP08 Meera Joshi · unpaid leave',type:'Adjustment',ref:'ADJ-2026-0011',status:'Paid',amount:740,balanceAfter:7200,appliedTo:'INV-2026-0042'},
   {id:'TXN-2026-0508',date:'15 Apr 2026',year:'2026',kind:'out',title:'Payment received',meta:'TXN-2026-0508',type:'Payment',ref:'PAY-OFF-1188',status:'Paid',amount:900,balanceAfter:9000,bankRail:'NEFT',bankTxn:'NEFT-879441',appliedTo:'INV-2026-0036'},
   {id:'TXN-2026-0507',date:'05 Apr 2026',year:'2026',kind:'out',title:'Payment received',meta:'TXN-2026-0507',type:'Payment',ref:'PAY-MAR26',status:'Paid',amount:13400,balanceAfter:9900,bankRail:'NEFT',bankTxn:'NEFT-871002',appliedTo:'INV-2026-0033'},
-  {id:'INV-2026-0033',date:'01 Apr 2026',year:'2026',kind:'invoice',title:'Invoice for March 2026',meta:'Bank transfer reconciled',type:'Invoice',ref:'INV-2026-0033',status:'Paid',amount:13800,balanceAfter:23300},
+  {id:'INV-2026-0033',date:'01 Apr 2026',year:'2026',kind:'invoice',title:'Invoice for March 2026',meta:'Bank transfer reconciled',type:'Invoice',ref:'INV-2026-0033',status:'Paid',amount:13800,balanceAfter:23300,paidOn:'05 Apr 2026'},
   {id:'TXN-2026-0505',date:'05 Mar 2026',year:'2026',kind:'out',title:'Payment received',meta:'TXN-2026-0505',type:'Payment',ref:'PAY-FEB26',status:'Paid',amount:13200,balanceAfter:9500,bankRail:'NEFT',bankTxn:'NEFT-862715',appliedTo:'INV-2026-0021'},
-  {id:'INV-2026-0021',date:'01 Mar 2026',year:'2026',kind:'invoice',title:'Invoice for February 2026',meta:'Bank transfer reconciled',type:'Invoice',ref:'INV-2026-0021',status:'Paid',amount:13500,balanceAfter:22700},
+  {id:'INV-2026-0021',date:'01 Mar 2026',year:'2026',kind:'invoice',title:'Invoice for February 2026',meta:'Bank transfer reconciled',type:'Invoice',ref:'INV-2026-0021',status:'Paid',amount:13500,balanceAfter:22700,paidOn:'05 Mar 2026'},
   {id:'TXN-2026-0504',date:'05 Feb 2026',year:'2026',kind:'out',title:'Payment received',meta:'TXN-2026-0504',type:'Payment',ref:'PAY-JAN26',status:'Paid',amount:12800,balanceAfter:9200,bankRail:'NEFT',bankTxn:'NEFT-854609',appliedTo:'INV-2026-0010'}
 ];
 
@@ -679,6 +682,7 @@ function rowHTML(t, idx){
       <div class="tact-text"><div class="tact-title">${t.title}</div><div class="tact-meta">${t.meta}</div></div>
     </div>
     <div class="${invIdClass} col-invid">${invoiceId}</div>
+    <div class="tid col-paidon ${t.paidOn?'':'muted'}">${t.paidOn || '—'}</div>
     <div class="tamt ${amtClass}">${sign}<span class="cur">₹</span>${fmtAmt(t.amount)}</div>
     <div class="tstatus col-status ${sCls}"><span class="stdot"></span>${t.status}</div>
     <div class="raw"><button class="rabtn" onclick="event.stopPropagation()"><svg viewBox="0 0 14 14" fill="none"><circle cx="2.5" cy="7" r="1.2" fill="currentColor"/><circle cx="7" cy="7" r="1.2" fill="currentColor"/><circle cx="11.5" cy="7" r="1.2" fill="currentColor"/></svg></button></div>
