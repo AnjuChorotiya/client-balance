@@ -430,7 +430,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--n800);-webkit-font
         <div class="invoice-banner" id="invoiceBanner">
           <div class="ib-text">
             <div class="ib-title">Your invoice for May 2026 payroll is open</div>
-            <div class="ib-body">Invoice INV-2026-0050 of $14,700.00 (after $500 adjustment) is due on 10 May 2026 (in 4 days).<a class="ib-link" onclick="openInvoiceDetail()"> View invoice</a></div>
+            <div class="ib-body">Invoice INV-2026-0050 of $14,700.00 (after $500 credit) is due on 10 May 2026 (in 4 days).<a class="ib-link" onclick="openInvoiceDetail()"> View invoice</a></div>
           </div>
           <button class="ib-close" onclick="document.getElementById('invoiceBanner').style.display='none'"><svg viewBox="0 0 12 12" fill="none"><path d="M1 1L11 11M11 1L1 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
         </div>
@@ -468,7 +468,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--n800);-webkit-font
           <div class="tab-list">
             <span class="tab active" onclick="setFilter(this,'invoice')">Invoices <span class="tab-count" id="cntInv">0</span></span>
             <span class="tab" onclick="setFilter(this,'out')">Payments <span class="tab-count" id="cntPay">0</span></span>
-            <span class="tab" onclick="setFilter(this,'credit')">Adjustments <span class="tab-count" id="cntCN">0</span></span>
+            <span class="tab" onclick="setFilter(this,'credit')">Credits <span class="tab-count" id="cntCN">0</span></span>
           </div>
           <div class="search-box">
             <svg viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.5"/><path d="M9.5 9.5L12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -652,15 +652,15 @@ body{font-family:var(--font);background:var(--bg);color:var(--n800);-webkit-font
 <script>
 // Invoice = bill issued by Wisemonk. Payment = money paid by client (synced from Zoho Books).
 const TX = [
-  {id:'INV-2026-0050',date:'07 May 2026',year:'2026',kind:'invoice',title:'Invoice for May 2026',meta:'INV-2026-0050',type:'Invoice',ref:'INV-2026-0050',status:'Due in 4 days',amount:14700,balanceAfter:null,isOpen:true,paidOn:null,lineItems:[{label:'Payroll funding · May 2026 cycle',sub:'23 employees · 1 contractor',amount:13950,employees:[{name:'Aarav Sharma',role:'Senior Engineer',amount:720},{name:'Priya Singh',role:'Product Manager',amount:680},{name:'Vikram Iyer',role:'Engineering Lead',amount:650},{name:'Sneha Reddy',role:'Designer',amount:640},{name:'Rohan Gupta',role:'Backend Engineer',amount:630},{name:'Ananya Nair',role:'Data Analyst',amount:620},{name:'Karthik Menon',role:'DevOps Engineer',amount:610},{name:'Divya Pillai',role:'QA Engineer',amount:600},{name:'Arjun Rao',role:'Frontend Engineer',amount:590},{name:'Meera Joshi',role:'HR Specialist',amount:580},{name:'Siddharth Verma',role:'Account Manager',amount:570},{name:'Pooja Mehta',role:'Marketing Lead',amount:560},{name:'Rahul Kapoor',role:'Sales Executive',amount:550},{name:'Isha Agarwal',role:'Content Strategist',amount:540},{name:'Nikhil Desai',role:'Mobile Engineer',amount:530},{name:'Tara Krishnan',role:'Finance Analyst',amount:520},{name:'Aditya Bose',role:'Support Lead',amount:510},{name:'Kavya Shetty',role:'UX Researcher',amount:500},{name:'Manish Patel',role:'Operations',amount:490},{name:'Riya Malhotra',role:'Recruiter',amount:480},{name:'Varun Saxena',role:'Engineer',amount:470},{name:'Neha Chopra',role:'Associate',amount:460},{name:'Sanjay Kumar',role:'Analyst',amount:450},{name:'Dev Anand',role:'Contractor · Design',amount:1000}]},{label:'EOR service fee',sub:'Monthly platform & compliance',amount:1250},{label:'Adjustment CN-2026-0012 applied',sub:'From overpayment on Apr cycle',amount:-500,credit:true}]},
+  {id:'INV-2026-0050',date:'07 May 2026',year:'2026',kind:'invoice',title:'Invoice for May 2026',meta:'INV-2026-0050',type:'Invoice',ref:'INV-2026-0050',status:'Due in 4 days',amount:14700,balanceAfter:null,isOpen:true,paidOn:null,lineItems:[{label:'Payroll funding · May 2026 cycle',sub:'23 employees · 1 contractor',amount:13950,employees:[{name:'Aarav Sharma',role:'Senior Engineer',amount:720},{name:'Priya Singh',role:'Product Manager',amount:680},{name:'Vikram Iyer',role:'Engineering Lead',amount:650},{name:'Sneha Reddy',role:'Designer',amount:640},{name:'Rohan Gupta',role:'Backend Engineer',amount:630},{name:'Ananya Nair',role:'Data Analyst',amount:620},{name:'Karthik Menon',role:'DevOps Engineer',amount:610},{name:'Divya Pillai',role:'QA Engineer',amount:600},{name:'Arjun Rao',role:'Frontend Engineer',amount:590},{name:'Meera Joshi',role:'HR Specialist',amount:580},{name:'Siddharth Verma',role:'Account Manager',amount:570},{name:'Pooja Mehta',role:'Marketing Lead',amount:560},{name:'Rahul Kapoor',role:'Sales Executive',amount:550},{name:'Isha Agarwal',role:'Content Strategist',amount:540},{name:'Nikhil Desai',role:'Mobile Engineer',amount:530},{name:'Tara Krishnan',role:'Finance Analyst',amount:520},{name:'Aditya Bose',role:'Support Lead',amount:510},{name:'Kavya Shetty',role:'UX Researcher',amount:500},{name:'Manish Patel',role:'Operations',amount:490},{name:'Riya Malhotra',role:'Recruiter',amount:480},{name:'Varun Saxena',role:'Engineer',amount:470},{name:'Neha Chopra',role:'Associate',amount:460},{name:'Sanjay Kumar',role:'Analyst',amount:450},{name:'Dev Anand',role:'Contractor · Design',amount:1000}]},{label:'EOR service fee',sub:'Monthly platform & compliance',amount:1250},{label:'Credit note CN-2026-0012 applied',sub:'From overpayment on Apr cycle',amount:-500,credit:true}]},
   {id:'INV-2026-0048',date:'06 May 2026',year:'2026',kind:'invoice',title:'Invoice for Equipment',meta:'INV-2026-0048',type:'Invoice',ref:'INV-2026-0048',status:'Paid',amount:2545,balanceAfter:null,paidOn:'08 May 2026',lineItems:[{label:'MacBook Pro 14" · M4',sub:'2 units · new hires',amount:1850},{label:'External monitor · 27"',sub:'2 units',amount:420},{label:'Peripherals & accessories',sub:'Keyboard, mouse, dock',amount:180},{label:'Shipping & handling',sub:'Bengaluru → remote',amount:95}]},
   {id:'TXN-2026-0511',date:'05 May 2026',year:'2026',kind:'out',title:'Payment received',meta:'TXN-2026-0511',type:'Payment',ref:'PAY-APR26',status:'Paid',amount:13950,balanceAfter:10250,bankRail:'NEFT',bankTxn:'NEFT-883120',appliedTo:'INV-2026-0042'},
   {id:'INV-2026-0045',date:'04 May 2026',year:'2026',kind:'invoice',title:'Invoice for Performance Bonus — Q1 2026',meta:'INV-2026-0045',type:'Invoice',ref:'INV-2026-0045',status:'Paid',amount:3360,balanceAfter:null,paidOn:'07 May 2026',lineItems:[{label:'Performance bonus payout',sub:'8 employees · Q1 2026',amount:3200,employees:[{name:'Aarav Sharma',role:'Senior Engineer',amount:500},{name:'Priya Singh',role:'Product Manager',amount:450},{name:'Vikram Iyer',role:'Engineering Lead',amount:420},{name:'Sneha Reddy',role:'Designer',amount:400},{name:'Rohan Gupta',role:'Backend Engineer',amount:380},{name:'Ananya Nair',role:'Data Analyst',amount:360},{name:'Karthik Menon',role:'DevOps Engineer',amount:350},{name:'Divya Pillai',role:'QA Engineer',amount:340}]},{label:'Bonus processing fee',sub:'Tax & disbursement',amount:160}]},
-  {id:'CN-2026-0012',date:'03 May 2026',year:'2026',kind:'credit',adjKind:'overpayment',title:'Overpayment credit',meta:'EMP02 Priya Singh · April overpayment',type:'Adjustment',ref:'CN-2026-0012',status:'Paid',amount:500,balanceAfter:24700,appliedTo:'INV-2026-0050'},
-  {id:'ADJ-2026-0019',date:'02 May 2026',year:'2026',kind:'credit',adjKind:'lop',title:'LOP adjustment',meta:'EMP05 Vikram Iyer · 2 days loss of pay',type:'Adjustment',ref:'ADJ-2026-0019',status:'Paid',amount:420,balanceAfter:24500,appliedTo:'INV-2026-0050'},
+  {id:'CN-2026-0012',date:'03 May 2026',year:'2026',kind:'credit',adjKind:'overpayment',title:'Overpayment credit',meta:'EMP02 Priya Singh · April overpayment',type:'Credit note',ref:'CN-2026-0012',status:'Paid',amount:500,balanceAfter:24700,appliedTo:'INV-2026-0050'},
+  {id:'ADJ-2026-0019',date:'02 May 2026',year:'2026',kind:'credit',adjKind:'lop',title:'LOP credit',meta:'EMP05 Vikram Iyer · 2 days loss of pay',type:'Credit note',ref:'ADJ-2026-0019',status:'Paid',amount:420,balanceAfter:24500,appliedTo:'INV-2026-0050'},
   {id:'INV-2026-0042',date:'01 May 2026',year:'2026',kind:'invoice',title:'Invoice for April 2026',meta:'INV-2026-0042',type:'Invoice',ref:'INV-2026-0042',status:'Partially paid',amount:15700,balanceAfter:24200,paidOn:'05 May 2026',lineItems:[{label:'Payroll funding · April 2026 cycle',sub:'24 employees · 1 contractor',amount:14450,employees:[{name:'Aarav Sharma',role:'Senior Engineer',amount:720},{name:'Priya Singh',role:'Product Manager',amount:680},{name:'Vikram Iyer',role:'Engineering Lead',amount:650},{name:'Sneha Reddy',role:'Designer',amount:640},{name:'Rohan Gupta',role:'Backend Engineer',amount:630},{name:'Ananya Nair',role:'Data Analyst',amount:620},{name:'Karthik Menon',role:'DevOps Engineer',amount:610},{name:'Divya Pillai',role:'QA Engineer',amount:600},{name:'Arjun Rao',role:'Frontend Engineer',amount:590},{name:'Meera Joshi',role:'HR Specialist',amount:580},{name:'Siddharth Verma',role:'Account Manager',amount:570},{name:'Pooja Mehta',role:'Marketing Lead',amount:560},{name:'Rahul Kapoor',role:'Sales Executive',amount:550},{name:'Isha Agarwal',role:'Content Strategist',amount:540},{name:'Nikhil Desai',role:'Mobile Engineer',amount:530},{name:'Tara Krishnan',role:'Finance Analyst',amount:520},{name:'Aditya Bose',role:'Support Lead',amount:510},{name:'Kavya Shetty',role:'UX Researcher',amount:500},{name:'Manish Patel',role:'Operations',amount:490},{name:'Riya Malhotra',role:'Recruiter',amount:480},{name:'Varun Saxena',role:'Engineer',amount:470},{name:'Neha Chopra',role:'Associate',amount:460},{name:'Sanjay Kumar',role:'Analyst',amount:450},{name:'Sneha Arora',role:'Engineer · exited',amount:500},{name:'Dev Anand',role:'Contractor · Design',amount:1000}]},{label:'EOR service fee',sub:'Monthly platform & compliance',amount:1250}]},
-  {id:'ADJ-2026-0014',date:'28 Apr 2026',year:'2026',kind:'credit',adjKind:'exit',title:'Exit settlement',meta:'EMP04 Sneha Arora · final settlement',type:'Adjustment',ref:'ADJ-2026-0014',status:'Paid',amount:1200,balanceAfter:8400,appliedTo:'INV-2026-0042'},
-  {id:'ADJ-2026-0011',date:'22 Apr 2026',year:'2026',kind:'credit',adjKind:'skipped',title:'Payroll skipped',meta:'EMP08 Meera Joshi · unpaid leave',type:'Adjustment',ref:'ADJ-2026-0011',status:'Paid',amount:740,balanceAfter:7200,appliedTo:'INV-2026-0042'},
+  {id:'ADJ-2026-0014',date:'28 Apr 2026',year:'2026',kind:'credit',adjKind:'exit',title:'Exit settlement',meta:'EMP04 Sneha Arora · final settlement',type:'Credit note',ref:'ADJ-2026-0014',status:'Paid',amount:1200,balanceAfter:8400,appliedTo:'INV-2026-0042'},
+  {id:'ADJ-2026-0011',date:'22 Apr 2026',year:'2026',kind:'credit',adjKind:'skipped',title:'Payroll skipped',meta:'EMP08 Meera Joshi · unpaid leave',type:'Credit note',ref:'ADJ-2026-0011',status:'Paid',amount:740,balanceAfter:7200,appliedTo:'INV-2026-0042'},
   {id:'TXN-2026-0508',date:'15 Apr 2026',year:'2026',kind:'out',title:'Payment received',meta:'TXN-2026-0508',type:'Payment',ref:'PAY-OFF-1188',status:'Paid',amount:900,balanceAfter:9000,bankRail:'NEFT',bankTxn:'NEFT-879441',appliedTo:'INV-2026-0036'},
   {id:'TXN-2026-0507',date:'05 Apr 2026',year:'2026',kind:'out',title:'Payment received',meta:'TXN-2026-0507',type:'Payment',ref:'PAY-MAR26',status:'Paid',amount:13400,balanceAfter:9900,bankRail:'NEFT',bankTxn:'NEFT-871002',appliedTo:'INV-2026-0033'},
   {id:'INV-2026-0033',date:'01 Apr 2026',year:'2026',kind:'invoice',title:'Invoice for March 2026',meta:'INV-2026-0033',type:'Invoice',ref:'INV-2026-0033',status:'Paid',amount:13800,balanceAfter:23300,paidOn:'05 Apr 2026',lineItems:[{label:'Payroll funding · March 2026 cycle',sub:'20 employees · 1 contractor',amount:12550,employees:[{name:'Aarav Sharma',role:'Senior Engineer',amount:720},{name:'Priya Singh',role:'Product Manager',amount:680},{name:'Vikram Iyer',role:'Engineering Lead',amount:650},{name:'Sneha Reddy',role:'Designer',amount:640},{name:'Rohan Gupta',role:'Backend Engineer',amount:630},{name:'Ananya Nair',role:'Data Analyst',amount:620},{name:'Karthik Menon',role:'DevOps Engineer',amount:610},{name:'Divya Pillai',role:'QA Engineer',amount:600},{name:'Arjun Rao',role:'Frontend Engineer',amount:590},{name:'Meera Joshi',role:'HR Specialist',amount:580},{name:'Siddharth Verma',role:'Account Manager',amount:570},{name:'Pooja Mehta',role:'Marketing Lead',amount:560},{name:'Rahul Kapoor',role:'Sales Executive',amount:550},{name:'Isha Agarwal',role:'Content Strategist',amount:540},{name:'Nikhil Desai',role:'Mobile Engineer',amount:530},{name:'Tara Krishnan',role:'Finance Analyst',amount:520},{name:'Aditya Bose',role:'Support Lead',amount:510},{name:'Kavya Shetty',role:'UX Researcher',amount:500},{name:'Manish Patel',role:'Operations',amount:490},{name:'Riya Malhotra',role:'Recruiter',amount:480},{name:'Dev Anand',role:'Contractor · Design',amount:980}]},{label:'EOR service fee',sub:'Monthly platform & compliance',amount:1250}]},
@@ -777,6 +777,10 @@ function openDrawer(t){
       headBadge.textContent = t.status;
       headBadge.classList.add('partial');
       headBadge.style.display = 'inline-flex';
+    } else if(t.kind==='credit'){
+      headBadge.textContent = 'Issued';
+      headBadge.classList.add('paid');
+      headBadge.style.display = 'inline-flex';
     } else if(t.status==='Paid' && t.kind!=='out'){
       headBadge.textContent = 'Paid';
       headBadge.classList.add('paid');
@@ -788,7 +792,11 @@ function openDrawer(t){
   const balAfter = t.balanceAfter==null ? 'Pending' : '$'+fmtAmt(t.balanceAfter);
   const detailsCells = t.kind==='out' ? `
         <div class="dr-cell"><span class="dr-clabel">Invoice</span><span class="dr-cval">${t.appliedTo||'—'}</span></div>
-        <div class="dr-cell"><span class="dr-clabel">Transaction ID</span><span class="dr-cval">${t.id}</span></div>` : `
+        <div class="dr-cell"><span class="dr-clabel">Transaction ID</span><span class="dr-cval">${t.id}</span></div>` : t.kind==='credit' ? `
+        <div class="dr-cell"><span class="dr-clabel">Reference</span><span class="dr-cval">${t.ref}</span></div>
+        <div class="dr-cell"><span class="dr-clabel">Status</span><span class="dr-cval">Issued</span></div>
+        <div class="dr-cell"><span class="dr-clabel">Issued on</span><span class="dr-cval">${t.date}</span></div>
+        <div class="dr-cell"><span class="dr-clabel">Amount credited</span><span class="dr-cval">$${fmtAmt(t.amount)}</span></div>` : `
         <div class="dr-cell"><span class="dr-clabel">Type</span><span class="dr-cval">${t.type}</span></div>
         <div class="dr-cell"><span class="dr-clabel">Reference</span><span class="dr-cval">${t.ref}</span></div>`;
   const breakdown = t.kind==='out' ? `
@@ -838,7 +846,7 @@ function openDrawer(t){
     </div>
     <div class="dr-divider"></div>
     <div class="dr-sec">
-      <div class="dr-stitle">Details</div>
+      <div class="dr-stitle">${t.kind==='credit' ? 'Credit note details' : 'Details'}</div>
       <div class="dr-grid">${detailsCells}
       </div>
     </div>
@@ -863,11 +871,15 @@ function openDrawer(t){
         </div>
       </div>
     </div>` : ''}
-    ${t.kind!=='out' ? `
+    ${t.kind==='credit' ? `
+    <div class="dr-sec">
+      <div class="dr-stitle">Context</div>
+      <div style="font-size:13px;color:var(--n700);line-height:1.55">${t.meta}. The credit balance is held against your account and automatically reduces your next open invoice${t.appliedTo ? ` (${t.appliedTo})` : ''}.</div>
+    </div>` : (t.kind!=='out' ? `
     <div class="dr-sec">
       <div class="dr-stitle">Note</div>
       <div style="font-size:13px;color:var(--n700);line-height:1.55">${t.meta}</div>
-    </div>` : ''}
+    </div>` : '')}
     ${bankBlock}`;
   document.getElementById('txDrawer').classList.remove('hidden');
 }
@@ -882,7 +894,7 @@ function openInvoiceDetail(){
     lineItems:[
       {label:'Payroll funding · May 2026 cycle', sub:'23 employees · 1 contractor', amount:13950},
       {label:'EOR service fee', sub:'Monthly platform & compliance', amount:1250},
-      {label:'Adjustment CN-2026-0012 applied', sub:'From overpayment on Apr cycle', amount:-500, credit:true}
+      {label:'Credit note CN-2026-0012 applied', sub:'From overpayment on Apr cycle', amount:-500, credit:true}
     ]
   });
   document.getElementById('drTitle').textContent = 'Invoice INV-2026-0050';
