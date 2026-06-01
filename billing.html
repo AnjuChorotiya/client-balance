@@ -739,7 +739,7 @@ function openDrawer(t){
   // Hide Download receipt for unpaid (Due/Pending) invoices
   const isUnpaid = t.kind==='invoice' && (t.status==='Pending' || t.status==='Open' || t.status==='Due' || t.isOpen);
   const dl = document.getElementById('drDownload');
-  if(dl) dl.style.display = isUnpaid ? 'none' : 'flex';
+  if(dl) dl.style.display = (isUnpaid || t.kind==='out') ? 'none' : 'flex';
   // Header status badge — shown in the title bar
   const headBadge = document.getElementById('drHeadBadge');
   if(headBadge){
