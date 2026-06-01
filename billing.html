@@ -629,7 +629,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--n800);-webkit-font
 <script>
 // Invoice = bill issued by Wisemonk. Payment = money paid by client (synced from Zoho Books).
 const TX = [
-  {id:'INV-2026-0050',date:'07 May 2026',year:'2026',kind:'invoice',title:'Invoice for May 2026',meta:'INV-2026-0050',type:'Invoice',ref:'INV-2026-0050',status:'Due',amount:14700,balanceAfter:null,isOpen:true,paidOn:null,lineItems:[{label:'Payroll funding · May 2026 cycle',sub:'23 employees · 1 contractor',amount:13950},{label:'EOR service fee',sub:'Monthly platform & compliance',amount:1250},{label:'Adjustment CN-2026-0012 applied',sub:'From overpayment on Apr cycle',amount:-500,credit:true}]},
+  {id:'INV-2026-0050',date:'07 May 2026',year:'2026',kind:'invoice',title:'Invoice for May 2026',meta:'INV-2026-0050',type:'Invoice',ref:'INV-2026-0050',status:'Due in 4 days',amount:14700,balanceAfter:null,isOpen:true,paidOn:null,lineItems:[{label:'Payroll funding · May 2026 cycle',sub:'23 employees · 1 contractor',amount:13950},{label:'EOR service fee',sub:'Monthly platform & compliance',amount:1250},{label:'Adjustment CN-2026-0012 applied',sub:'From overpayment on Apr cycle',amount:-500,credit:true}]},
   {id:'TXN-2026-0511',date:'05 May 2026',year:'2026',kind:'out',title:'Payment received',meta:'TXN-2026-0511',type:'Payment',ref:'PAY-APR26',status:'Paid',amount:13950,balanceAfter:10250,bankRail:'NEFT',bankTxn:'NEFT-883120',appliedTo:'INV-2026-0042'},
   {id:'CN-2026-0012',date:'03 May 2026',year:'2026',kind:'credit',adjKind:'overpayment',title:'Overpayment credit',meta:'EMP02 Priya Singh · April overpayment',type:'Adjustment',ref:'CN-2026-0012',status:'Paid',amount:500,balanceAfter:24700,appliedTo:'INV-2026-0050'},
   {id:'ADJ-2026-0019',date:'02 May 2026',year:'2026',kind:'credit',adjKind:'lop',title:'LOP adjustment',meta:'EMP05 Vikram Iyer · 2 days loss of pay',type:'Adjustment',ref:'ADJ-2026-0019',status:'Paid',amount:420,balanceAfter:24500,appliedTo:'INV-2026-0050'},
@@ -650,7 +650,7 @@ function fmtAmt(n){return n.toLocaleString('en-IN',{minimumFractionDigits:2,maxi
 
 function statusClass(t){
   if(t.pending) return 'pending';
-  if(t.status==='Due') return 'due';
+  if(t.status && t.status.indexOf('Due')===0) return 'due';
   if(t.kind==='refund') return 'refund';
   if(t.kind==='invoice') return 'invoice';
   return 'complete';
@@ -834,7 +834,7 @@ function openInvoiceDetail(){
   openDrawer({
     id:'INV-2026-0050', date:'10 May 2026', year:'2026', kind:'invoice',
     title:'Invoice · May 2026 cycle', meta:'EOR fee + payroll processing',
-    type:'Invoice', ref:'INV-2026-0050', status:'Due',
+    type:'Invoice', ref:'INV-2026-0050', status:'Due in 4 days',
     amount:14700, balanceAfter:null, isOpen:true,
     lineItems:[
       {label:'Payroll funding · May 2026 cycle', sub:'23 employees · 1 contractor', amount:13950},
