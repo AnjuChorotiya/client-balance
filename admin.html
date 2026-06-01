@@ -318,6 +318,8 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
 .tl-pill.due::before{background:var(--w500);box-shadow:0 0 0 3px #F790091a}
 .tl-pill.issued{color:var(--s700)}
 .tl-pill.issued::before{background:var(--s500)}
+.tl-pill.partial{color:var(--n600)}
+.tl-pill.partial::before{background:var(--n400)}
 
 /* expandable timeline detail */
 .tl-card .chev{width:14px;height:14px;color:var(--n400);flex-shrink:0;transition:transform 180ms}
@@ -622,6 +624,7 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
             <select class="tl-time" id="tlStatus" onchange="setStatusFilter(this.value)">
               <option value="all">All statuses</option>
               <option value="Paid">Paid</option>
+              <option value="Partially paid">Partially paid</option>
               <option value="Due">Due</option>
               <option value="Locked">Locked</option>
               <option value="Adjusted">Adjusted</option>
@@ -910,9 +913,11 @@ function defaultEmployees(c){
 const TIMELINES = {
   C001: [
     {date:'10 May 2026', type:'invoice-open', title:'Invoice INV-2026-0050 issued', meta:'May 2026 cycle · payroll + EOR', ref:'INV-2026-0050', amount:15200, pill:'Due'},
+    {date:'06 May 2026', type:'invoice-paid', title:'Invoice INV-2026-0048 paid · equipment', meta:'Onboarding equipment · laptops, monitors & peripherals', ref:'INV-2026-0048', amount:2545, pill:'Paid', lines:[{label:'MacBook Pro 14" · M4', sub:'2 units · new hires', amount:1850},{label:'External monitor · 27"', sub:'2 units', amount:420},{label:'Peripherals & accessories', sub:'Keyboard, mouse, dock', amount:180},{label:'Shipping & handling', sub:'Bengaluru → remote', amount:95}]},
     {date:'05 May 2026', type:'payment', title:'Client payment received · April 2026', meta:'Bank transfer · synced from Zoho Books', ref:'PAY-APR26', amount:13950, pill:'Paid'},
+    {date:'04 May 2026', type:'invoice-paid', title:'Invoice INV-2026-0045 paid · Q1 bonus', meta:'Q1 2026 performance bonus · 8 employees', ref:'INV-2026-0045', amount:3360, pill:'Paid', lines:[{label:'Performance bonus payout', sub:'8 employees · Q1 2026', amount:3200},{label:'Bonus processing fee', sub:'Tax & disbursement', amount:160}]},
     {date:'03 May 2026', type:'credit-note', title:'Credit note CN-2026-0012 issued', meta:'Overpayment on Apr cycle · auto-applies to May invoice', ref:'CN-2026-0012', amount:500, pill:'Issued'},
-    {date:'01 May 2026', type:'invoice-paid', title:'Invoice INV-2026-0042 paid', meta:'Bank transfer reconciled · NEFT-883120 · received $15,700 against $15,200 invoice', ref:'INV-2026-0042', amount:15700, pill:'Paid'},
+    {date:'01 May 2026', type:'invoice-paid', title:'Invoice INV-2026-0042 partially paid', meta:'Bank transfer reconciled · NEFT-883120 · $13,950 received against $15,700 invoice · $1,750 outstanding', ref:'INV-2026-0042', amount:15700, pill:'Partially paid'},
     {date:'15 Apr 2026', type:'payment', title:'Client payment received · off-cycle top-up', meta:'Bank transfer · synced from Zoho Books', ref:'PAY-OFF-1188', amount:900, pill:'Paid'},
     {date:'05 Apr 2026', type:'payment', title:'Client payment received · March 2026', meta:'Bank transfer · synced from Zoho Books', ref:'PAY-MAR26', amount:13400, pill:'Paid'},
     {date:'02 Apr 2026', type:'deposit-topup', title:'Deposit top-up · Priya Singh', meta:'Salary revised · EMP02', ref:'ADV-2026-007', amount:300, pill:'Due'},
@@ -1304,7 +1309,7 @@ function eventCategory(type){
 }
 
 function pillClass(pill){
-  const m = {Paid:'paid', Open:'open', Locked:'locked', Adjusted:'adjusted', Due:'due', Issued:'issued'};
+  const m = {Paid:'paid', Open:'open', Locked:'locked', Adjusted:'adjusted', Due:'due', Issued:'issued', 'Partially paid':'partial'};
   return m[pill] || 'paid';
 }
 
@@ -1314,6 +1319,10 @@ function eventDetail(e){
     const isOpen = e.type==='invoice-open';
     const payrollAmt = Math.round(e.amount*0.92);
     const feeAmt = e.amount - payrollAmt;
+    const lines = e.lines || [
+      {label:`Payroll funding · ${e.date.split(' ').slice(1).join(' ')} cycle`, sub:e.meta, amount:payrollAmt},
+      {label:'EOR service fee', sub:'Monthly platform & compliance', amount:feeAmt}
+    ];
     return `
       <div class="detail-section">
         <div class="detail-stitle">Invoice details</div>
@@ -1327,8 +1336,7 @@ function eventDetail(e){
       <div class="detail-section">
         <div class="detail-stitle">Line items</div>
         <div>
-          <div class="detail-line"><div class="dl-info"><div class="dl-title">Payroll funding · ${e.date.split(' ').slice(1).join(' ')} cycle</div><div class="dl-sub">${e.meta}</div></div><div class="dl-amt">$${fmt(payrollAmt)}</div></div>
-          <div class="detail-line"><div class="dl-info"><div class="dl-title">EOR service fee</div><div class="dl-sub">Monthly platform & compliance</div></div><div class="dl-amt">$${fmt(feeAmt)}</div></div>
+          ${lines.map(li=>`<div class="detail-line"><div class="dl-info"><div class="dl-title">${li.label}</div><div class="dl-sub">${li.sub}</div></div><div class="dl-amt">$${fmt(li.amount)}</div></div>`).join('')}
           <div class="detail-line total"><div class="dl-info"><div class="dl-title">Total</div></div><div class="dl-amt">$${fmt(e.amount)}</div></div>
         </div>
       </div>`;
