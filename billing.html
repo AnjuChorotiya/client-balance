@@ -191,6 +191,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--n800);-webkit-font
 .tstatus.invoice{color:var(--p700)}
 .tstatus.due .stdot{background:var(--w500)}
 .tstatus.due{color:var(--w700);font-weight:600}
+.tstatus.partial .stdot{background:#0E7490;box-shadow:0 0 0 3px #0E74901a}
+.tstatus.partial{color:#0E7490;font-weight:600}
 .raw{display:flex;justify-content:flex-end}
 .rabtn{width:28px;height:28px;border-radius:var(--rmd);border:1px solid transparent;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer}
 .rabtn:hover{background:var(--n100)}
@@ -633,7 +635,7 @@ const TX = [
   {id:'TXN-2026-0511',date:'05 May 2026',year:'2026',kind:'out',title:'Payment received',meta:'TXN-2026-0511',type:'Payment',ref:'PAY-APR26',status:'Paid',amount:13950,balanceAfter:10250,bankRail:'NEFT',bankTxn:'NEFT-883120',appliedTo:'INV-2026-0042'},
   {id:'CN-2026-0012',date:'03 May 2026',year:'2026',kind:'credit',adjKind:'overpayment',title:'Overpayment credit',meta:'EMP02 Priya Singh · April overpayment',type:'Adjustment',ref:'CN-2026-0012',status:'Paid',amount:500,balanceAfter:24700,appliedTo:'INV-2026-0050'},
   {id:'ADJ-2026-0019',date:'02 May 2026',year:'2026',kind:'credit',adjKind:'lop',title:'LOP adjustment',meta:'EMP05 Vikram Iyer · 2 days loss of pay',type:'Adjustment',ref:'ADJ-2026-0019',status:'Paid',amount:420,balanceAfter:24500,appliedTo:'INV-2026-0050'},
-  {id:'INV-2026-0042',date:'01 May 2026',year:'2026',kind:'invoice',title:'Invoice for April 2026',meta:'INV-2026-0042',type:'Invoice',ref:'INV-2026-0042',status:'Paid',amount:15700,balanceAfter:24200,paidOn:'05 May 2026'},
+  {id:'INV-2026-0042',date:'01 May 2026',year:'2026',kind:'invoice',title:'Invoice for April 2026',meta:'INV-2026-0042',type:'Invoice',ref:'INV-2026-0042',status:'Partially paid',amount:15700,balanceAfter:24200,paidOn:'05 May 2026'},
   {id:'ADJ-2026-0014',date:'28 Apr 2026',year:'2026',kind:'credit',adjKind:'exit',title:'Exit settlement',meta:'EMP04 Sneha Arora · final settlement',type:'Adjustment',ref:'ADJ-2026-0014',status:'Paid',amount:1200,balanceAfter:8400,appliedTo:'INV-2026-0042'},
   {id:'ADJ-2026-0011',date:'22 Apr 2026',year:'2026',kind:'credit',adjKind:'skipped',title:'Payroll skipped',meta:'EMP08 Meera Joshi · unpaid leave',type:'Adjustment',ref:'ADJ-2026-0011',status:'Paid',amount:740,balanceAfter:7200,appliedTo:'INV-2026-0042'},
   {id:'TXN-2026-0508',date:'15 Apr 2026',year:'2026',kind:'out',title:'Payment received',meta:'TXN-2026-0508',type:'Payment',ref:'PAY-OFF-1188',status:'Paid',amount:900,balanceAfter:9000,bankRail:'NEFT',bankTxn:'NEFT-879441',appliedTo:'INV-2026-0036'},
@@ -650,6 +652,7 @@ function fmtAmt(n){return n.toLocaleString('en-IN',{minimumFractionDigits:2,maxi
 
 function statusClass(t){
   if(t.pending) return 'pending';
+  if(t.status && t.status.indexOf('Partial')===0) return 'partial';
   if(t.status && t.status.indexOf('Due')===0) return 'due';
   if(t.kind==='refund') return 'refund';
   if(t.kind==='invoice') return 'invoice';
