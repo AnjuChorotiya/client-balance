@@ -151,11 +151,16 @@ body{font-family:var(--font);background:var(--bg);color:var(--n800);-webkit-font
 .trow{display:grid;grid-template-columns:130px minmax(260px,1fr) 150px 160px 140px 32px;padding:18px 8px;border-bottom:1px solid var(--bd);gap:18px;align-items:center;cursor:pointer}
 .tid{font-size:13px;color:var(--n700);font-weight:500;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tid.muted{color:var(--n400);font-weight:400}
-/* Payments & Adjustments tabs: hide Status and Paid-on (both invoice-specific) */
+/* Invoice column shows on the Payments tab only */
+.col-invid{display:none}
+/* Payments tab: Date, Activity, Invoice, Amount, kebab */
 .table[data-filter="out"] .thead,
-.table[data-filter="out"] .trow,
+.table[data-filter="out"] .trow{grid-template-columns:130px minmax(260px,1fr) 160px 160px 32px}
+.table[data-filter="out"] .col-invid{display:block}
+/* Adjustments tab: Date, Activity, Amount, kebab */
 .table[data-filter="credit"] .thead,
 .table[data-filter="credit"] .trow{grid-template-columns:130px minmax(260px,1fr) 160px 32px}
+/* Hide Status and Paid-on (both invoice-specific) on Payments & Adjustments */
 .table[data-filter="out"] .col-status,
 .table[data-filter="out"] .col-paidon,
 .table[data-filter="credit"] .col-status,
@@ -331,7 +336,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--n800);-webkit-font
   .bal-actions{gap:18px}
   .thead,.trow{grid-template-columns:95px 1fr 110px 110px 90px 32px;gap:12px}
   .table[data-filter="out"] .thead,
-  .table[data-filter="out"] .trow,
+  .table[data-filter="out"] .trow{grid-template-columns:100px 1fr 110px 120px 32px}
   .table[data-filter="credit"] .thead,
   .table[data-filter="credit"] .trow{grid-template-columns:100px 1fr 120px 32px}
   .upcoming{flex-direction:column;align-items:flex-start;gap:14px}
@@ -460,6 +465,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--n800);-webkit-font
           <div class="thead">
             <div class="th">Date</div>
             <div class="th">Activity</div>
+            <div class="th col-invid">Invoice</div>
             <div class="th col-paidon">Paid on</div>
             <div class="th right">Amount</div>
             <div class="th col-status">Status</div>
@@ -678,6 +684,7 @@ function rowHTML(t, idx){
       <div class="tact-dot ${t.kind}">${icons[t.kind]}</div>
       <div class="tact-text"><div class="tact-title">${t.title}</div>${t.meta?`<div class="tact-meta">${t.meta}</div>`:''}</div>
     </div>
+    <div class="tid col-invid ${t.appliedTo?'':'muted'}">${t.appliedTo || '—'}</div>
     <div class="tid col-paidon ${t.paidOn?'':'muted'}">${t.paidOn || '—'}</div>
     <div class="tamt ${amtClass}">${sign}<span class="cur">₹</span>${fmtAmt(t.amount)}</div>
     <div class="tstatus col-status ${sCls}"><span class="stdot"></span>${t.status}</div>
