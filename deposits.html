@@ -280,7 +280,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--n800);-webkit-font
           <div class="ta-icon"><svg viewBox="0 0 18 18" fill="none"><path d="M9 2V16M3 8L9 2L15 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
           <div class="ta-text">
             <div class="ta-title">1 deposit top-up required</div>
-            <div class="ta-body"><strong>Priya Singh</strong> received a salary revision on 15 May 2026. An additional <strong>₹25,000</strong> is required to match the new compensation. <a class="ta-link" onclick="document.getElementById('topupAlert').classList.add('hidden')">Pay top-up</a></div>
+            <div class="ta-body"><strong>Priya Singh</strong> received a salary revision on 15 May 2026. An additional <strong>$25,000</strong> is required to match the new compensation. <a class="ta-link" onclick="document.getElementById('topupAlert').classList.add('hidden')">Pay top-up</a></div>
           </div>
           <button class="ta-close" onclick="document.getElementById('topupAlert').classList.add('hidden')"><svg viewBox="0 0 12 12" fill="none"><path d="M1 1L11 11M11 1L1 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
         </div>
@@ -312,8 +312,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--n800);-webkit-font
                 </div>
               </div>
             </div>
-            <div class="sum-amt"><span class="cur">₹</span>4,85,000<span class="dec">.00</span></div>
-            <div class="sum-meta">Across <strong id="depCount">6</strong> locked deposits · 1 top-up of ₹25,000 due · 1 released this month · oldest held since 12 Jan 2026</div>
+            <div class="sum-amt"><span class="cur">$</span>485,000<span class="dec">.00</span></div>
+            <div class="sum-meta">Across <strong id="depCount">6</strong> locked deposits · 1 top-up of $25,000 due · 1 released this month · oldest held since 12 Jan 2026</div>
           </div>
         </div>
 
@@ -374,7 +374,7 @@ const ADV = [
   {id:'ADV-2026-008', date:'25 May', year:'2026', empName:'Pooja Mehta', empId:'EMP08', empRole:'Backend Engineer', avatarBg:'#E8F2FF', avatarColor:'#2684FF', initials:'PM', amount:80000, status:'Released', type:'Released', exitDate:'22 May 2026', releaseDestination:'wallet'}
 ];
 
-function fmtINR(n){ return n.toLocaleString('en-IN') }
+function fmtUSD(n){ return n.toLocaleString('en-US') }
 
 function typeBadge(type){
   if(type==='Top-up') return '<span class="type-badge tb-amber">Top-up</span>';
@@ -395,7 +395,7 @@ function rowHTML(t, idx){
         <div class="tinfo-meta">${t.empRole} · ${t.empId}</div>
       </div>
     </div>
-    <div class="tamt"><span class="cur">₹</span>${fmtINR(t.amount)}</div>
+    <div class="tamt"><span class="cur">$</span>${fmtUSD(t.amount)}</div>
     <div class="tstatus ${stCls}"><span class="stdot"></span>${stLabel}</div>
     <div class="raw" onclick="event.stopPropagation()"><button class="rabtn" title="More" onclick="openDepDrawer(${idx})"><svg viewBox="0 0 14 14" fill="none"><circle cx="2.5" cy="7" r="1.2" fill="currentColor"/><circle cx="7" cy="7" r="1.2" fill="currentColor"/><circle cx="11.5" cy="7" r="1.2" fill="currentColor"/></svg></button></div>
   </div>`;
@@ -434,11 +434,11 @@ function openDepDrawer(idx){
     const delta = originalDeposit - newRequired;
     let diffRow = '';
     if(delta > 0){
-      diffRow = `<div class="dr-diff-row"><span class="dr-diff-label">Excess credited to account</span><span class="dr-diff-val">₹${fmtINR(delta)}</span></div>`;
+      diffRow = `<div class="dr-diff-row"><span class="dr-diff-label">Excess credited to account</span><span class="dr-diff-val">$${fmtUSD(delta)}</span></div>`;
     } else if(delta < 0){
-      diffRow = `<div class="dr-diff-row warn"><span class="dr-diff-label">Top-up required</span><span class="dr-diff-val">₹${fmtINR(Math.abs(delta))}</span></div>`;
+      diffRow = `<div class="dr-diff-row warn"><span class="dr-diff-label">Top-up required</span><span class="dr-diff-val">$${fmtUSD(Math.abs(delta))}</span></div>`;
     } else {
-      diffRow = `<div class="dr-diff-row neutral"><span class="dr-diff-label">Exact match — no adjustment needed</span><span class="dr-diff-val">₹0</span></div>`;
+      diffRow = `<div class="dr-diff-row neutral"><span class="dr-diff-label">Exact match — no adjustment needed</span><span class="dr-diff-val">$0</span></div>`;
     }
     scenario = `
       <div class="dr-sec">
@@ -451,8 +451,8 @@ function openDepDrawer(idx){
           </div>
         </div>
         <div class="dr-diff-card">
-          <div class="dr-diff-row"><span class="dr-diff-label">Original deposit · Sneha Arora</span><span class="dr-diff-val">₹${fmtINR(originalDeposit)}</span></div>
-          <div class="dr-diff-row"><span class="dr-diff-label">New required · ${t.empName}</span><span class="dr-diff-val">₹${fmtINR(newRequired)}</span></div>
+          <div class="dr-diff-row"><span class="dr-diff-label">Original deposit · Sneha Arora</span><span class="dr-diff-val">$${fmtUSD(originalDeposit)}</span></div>
+          <div class="dr-diff-row"><span class="dr-diff-label">New required · ${t.empName}</span><span class="dr-diff-val">$${fmtUSD(newRequired)}</span></div>
           ${diffRow}
         </div>
       </div>`;
@@ -466,14 +466,14 @@ function openDepDrawer(idx){
           <div class="dr-sc-ico"><svg viewBox="0 0 16 16" fill="none"><path d="M2 6C2.5 4 4.5 3 6.5 3C9.26 3 11.5 5.24 11.5 8C11.5 10.76 9.26 13 6.5 13C4.5 13 2.5 12 2 10M2 6V3M2 6H5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
           <div class="dr-sc-text">
             <div class="dr-sc-title">Deposit released as credit</div>
-            <strong>${t.empName}</strong>'s locked deposit of <strong>₹${fmtINR(t.amount)}</strong> was ${destLabel}.
+            <strong>${t.empName}</strong>'s locked deposit of <strong>$${fmtUSD(t.amount)}</strong> was ${destLabel}.
           </div>
         </div>
       </div>
       <div class="dr-sec">
         <div class="dr-stitle">Release details</div>
         <div class="dr-diff-card">
-          <div class="dr-diff-row"><span class="dr-diff-label">Original deposit</span><span class="dr-diff-val">₹${fmtINR(t.amount)}</span></div>
+          <div class="dr-diff-row"><span class="dr-diff-label">Original deposit</span><span class="dr-diff-val">$${fmtUSD(t.amount)}</span></div>
           <div class="dr-diff-row"><span class="dr-diff-label">Released on</span><span class="dr-diff-val">${t.date} ${t.year}</span></div>
           <div class="dr-diff-row"><span class="dr-diff-label">Refunded to</span><span class="dr-diff-val">${destShort}</span></div>
         </div>
@@ -486,7 +486,7 @@ function openDepDrawer(idx){
           <div class="dr-sc-ico"><svg viewBox="0 0 16 16" fill="none"><path d="M8 2V14M3 7L8 2L13 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
           <div class="dr-sc-text">
             <div class="dr-sc-title">Salary revised — additional deposit required</div>
-            <strong>${t.empName}</strong> received a salary increase effective <strong>15 May 2026</strong>. An additional <strong>₹${fmtINR(t.amount)}</strong> is required to match the new compensation level. Existing locked deposit: <strong>₹95,000</strong>.
+            <strong>${t.empName}</strong> received a salary increase effective <strong>15 May 2026</strong>. An additional <strong>$${fmtUSD(t.amount)}</strong> is required to match the new compensation level. Existing locked deposit: <strong>$95,000</strong>.
           </div>
         </div>
       </div>`;
@@ -512,7 +512,7 @@ function openDepDrawer(idx){
       </div>
     </div>
     <div class="dr-amount-row">
-      <div class="dr-amt"><span class="cur">₹</span>${fmtINR(t.amount)}</div>
+      <div class="dr-amt"><span class="cur">$</span>${fmtUSD(t.amount)}</div>
       <div class="dr-amt-meta">
         <span class="dr-status-pill ${pillCls}"><span class="stdot"></span>${statusLabel}</span>
         <span style="font-size:12px;color:var(--n500)">${t.date} ${t.year}</span>

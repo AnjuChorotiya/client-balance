@@ -527,12 +527,12 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
           </div>
           <div class="stat-card">
             <div class="stat-label">Outstanding invoices</div>
-            <div class="stat-val"><span class="cur">₹</span>1,84,500</div>
+            <div class="stat-val"><span class="cur">$</span>184,500</div>
             <div class="stat-meta"><span>across 11 clients</span></div>
           </div>
           <div class="stat-card">
             <div class="stat-label">Deposits held</div>
-            <div class="stat-val"><span class="cur">₹</span>2,46,200</div>
+            <div class="stat-val"><span class="cur">$</span>246,200</div>
             <div class="stat-meta"><span>across 89 employees</span></div>
           </div>
         </div>
@@ -682,14 +682,14 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
               <div class="cn-ctx-title" id="cnCtxTitle">Invoice INV-XXXX</div>
               <div class="cn-ctx-meta" id="cnCtxMeta">May 2026 cycle</div>
             </div>
-            <div class="cn-ctx-amt" id="cnCtxAmt">₹0</div>
+            <div class="cn-ctx-amt" id="cnCtxAmt">$0</div>
           </div>
         </div>
       </div>
       <div class="fg">
         <div class="flabel">Amount to credit <span class="req">*</span></div>
         <div class="amount-input">
-          <span class="cur">₹</span>
+          <span class="cur">$</span>
           <input type="number" id="cnAmount" class="finput" placeholder="0.00"/>
         </div>
         <div class="adj-helper" id="cnHelper">Pre-filled with the full invoice amount. Edit for partial credit.</div>
@@ -729,7 +729,7 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
       <div class="adj-fields" data-for="credit">
         <div class="fg">
           <div class="flabel">Amount <span class="req">*</span></div>
-          <div class="amount-input"><span class="cur">₹</span><input type="number" class="finput adj-amount" placeholder="0.00"/></div>
+          <div class="amount-input"><span class="cur">$</span><input type="number" class="finput adj-amount" placeholder="0.00"/></div>
           <div class="adj-helper">Increases the client's available credit. A credit note (e.g. CN-2026-00XX) will be issued and auto-applied to their next open invoice.</div>
         </div>
         <label class="adj-toggle"><input type="checkbox" id="adjIssueCN" checked><span>Issue as credit note (recommended)</span></label>
@@ -739,7 +739,7 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
       <div class="adj-fields" data-for="debit" style="display:none">
         <div class="fg">
           <div class="flabel">Amount <span class="req">*</span></div>
-          <div class="amount-input"><span class="cur">₹</span><input type="number" class="finput adj-amount" placeholder="0.00"/></div>
+          <div class="amount-input"><span class="cur">$</span><input type="number" class="finput adj-amount" placeholder="0.00"/></div>
           <div class="adj-helper">Decreases the client's available credit. Use only for corrections or reversing a previously-credited amount.</div>
         </div>
       </div>
@@ -750,9 +750,9 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
           <div class="flabel">Select open invoice <span class="req">*</span></div>
           <select class="finput" id="adjInvoice" onchange="adjInvoiceChange()">
             <option value="">Choose invoice…</option>
-            <option value="INV-2026-0050|15200">INV-2026-0050 · May 2026 cycle · ₹15,200.00</option>
-            <option value="INV-2026-0094|22400">INV-2026-0094 · Apr cycle (overdue 10d) · ₹22,400.00</option>
-            <option value="INV-2026-0091|48750">INV-2026-0091 · Apr cycle (overdue 14d) · ₹48,750.00</option>
+            <option value="INV-2026-0050|15200">INV-2026-0050 · May 2026 cycle · $15,200.00</option>
+            <option value="INV-2026-0094|22400">INV-2026-0094 · Apr cycle (overdue 10d) · $22,400.00</option>
+            <option value="INV-2026-0091|48750">INV-2026-0091 · Apr cycle (overdue 14d) · $48,750.00</option>
           </select>
           <div class="adj-helper">Invoice will be marked Paid for its full amount. For partial payments, use "Add credit" instead.</div>
           <input type="hidden" class="adj-amount" id="adjInvoiceAmt" value=""/>
@@ -765,16 +765,16 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
           <div class="flabel">Select locked deposit <span class="req">*</span></div>
           <select class="finput" id="adjDeposit" onchange="adjDepositChange()">
             <option value="">Choose deposit…</option>
-            <option value="ADV-2026-001|85000|Rahul Kumar">ADV-2026-001 · Rahul Kumar · ₹85,000</option>
-            <option value="ADV-2026-002|95000|Priya Singh">ADV-2026-002 · Priya Singh · ₹95,000</option>
-            <option value="ADV-2026-003|75000|Arjun Verma">ADV-2026-003 · Arjun Verma · ₹75,000</option>
-            <option value="ADV-2026-004|65000|Neha Kapoor">ADV-2026-004 · Neha Kapoor · ₹65,000</option>
-            <option value="ADV-2026-005|95000|Vikram Iyer">ADV-2026-005 · Vikram Iyer · ₹95,000</option>
+            <option value="ADV-2026-001|85000|Rahul Kumar">ADV-2026-001 · Rahul Kumar · $85,000</option>
+            <option value="ADV-2026-002|95000|Priya Singh">ADV-2026-002 · Priya Singh · $95,000</option>
+            <option value="ADV-2026-003|75000|Arjun Verma">ADV-2026-003 · Arjun Verma · $75,000</option>
+            <option value="ADV-2026-004|65000|Neha Kapoor">ADV-2026-004 · Neha Kapoor · $65,000</option>
+            <option value="ADV-2026-005|95000|Vikram Iyer">ADV-2026-005 · Vikram Iyer · $95,000</option>
           </select>
         </div>
         <div class="fg">
           <div class="flabel">Amount to release</div>
-          <div class="amount-input"><span class="cur">₹</span><input type="number" class="finput adj-amount" id="adjDepositAmt" placeholder="0.00"/></div>
+          <div class="amount-input"><span class="cur">$</span><input type="number" class="finput adj-amount" id="adjDepositAmt" placeholder="0.00"/></div>
           <div class="adj-helper">Defaults to full locked amount. Edit for partial release.</div>
         </div>
         <div class="fg">
@@ -912,7 +912,7 @@ const TIMELINES = {
     {date:'10 May 2026', type:'invoice-open', title:'Invoice INV-2026-0050 issued', meta:'May 2026 cycle · payroll + EOR', ref:'INV-2026-0050', amount:15200, pill:'Due'},
     {date:'05 May 2026', type:'payment', title:'Client payment received · April 2026', meta:'Bank transfer · synced from Zoho Books', ref:'PAY-APR26', amount:13950, pill:'Paid'},
     {date:'03 May 2026', type:'credit-note', title:'Credit note CN-2026-0012 issued', meta:'Overpayment on Apr cycle · auto-applies to May invoice', ref:'CN-2026-0012', amount:500, pill:'Issued'},
-    {date:'01 May 2026', type:'invoice-paid', title:'Invoice INV-2026-0042 paid', meta:'Bank transfer reconciled · NEFT-883120 · received ₹15,700 against ₹15,200 invoice', ref:'INV-2026-0042', amount:15700, pill:'Paid'},
+    {date:'01 May 2026', type:'invoice-paid', title:'Invoice INV-2026-0042 paid', meta:'Bank transfer reconciled · NEFT-883120 · received $15,700 against $15,200 invoice', ref:'INV-2026-0042', amount:15700, pill:'Paid'},
     {date:'15 Apr 2026', type:'payment', title:'Client payment received · off-cycle top-up', meta:'Bank transfer · synced from Zoho Books', ref:'PAY-OFF-1188', amount:900, pill:'Paid'},
     {date:'05 Apr 2026', type:'payment', title:'Client payment received · March 2026', meta:'Bank transfer · synced from Zoho Books', ref:'PAY-MAR26', amount:13400, pill:'Paid'},
     {date:'02 Apr 2026', type:'deposit-topup', title:'Deposit top-up · Priya Singh', meta:'Salary revised · EMP02', ref:'ADV-2026-007', amount:300, pill:'Due'},
@@ -990,7 +990,7 @@ function isInTimeRange(dateStr){
   return true;
 }
 
-function fmt(n){ return n.toLocaleString('en-IN',{minimumFractionDigits:0,maximumFractionDigits:0}) }
+function fmt(n){ return n.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0}) }
 
 function computeRisk(c){
   // Formula: (deposit − outstanding) ÷ monthly exposure = months of deposit stored
@@ -1020,9 +1020,9 @@ function clientRow(c){
       <div class="tinfo"><div class="tname">${c.name}</div><div class="tsub">${c.sub}</div></div>
     </div>
     <div class="tnum muted" style="text-align:right">${c.employees}</div>
-    <div class="tnum tamt-out ${wal?'':'zero'}" style="text-align:right">${wal?`<span class="cur">₹</span>${fmt(wal)}`:'<span class="cur" style="color:var(--n400)">$</span><span style="color:var(--n400)">0</span>'}</div>
-    <div class="tnum" style="text-align:right;color:var(--n800)">${c.monthly?`<span class="cur">₹</span>${fmt(c.monthly)}`:'—'}</div>
-    <div class="tnum muted" style="text-align:right">${c.deposit?`<span class="cur">₹</span>${fmt(c.deposit)}`:'—'}</div>
+    <div class="tnum tamt-out ${wal?'':'zero'}" style="text-align:right">${wal?`<span class="cur">$</span>${fmt(wal)}`:'<span class="cur" style="color:var(--n400)">$</span><span style="color:var(--n400)">0</span>'}</div>
+    <div class="tnum" style="text-align:right;color:var(--n800)">${c.monthly?`<span class="cur">$</span>${fmt(c.monthly)}`:'—'}</div>
+    <div class="tnum muted" style="text-align:right">${c.deposit?`<span class="cur">$</span>${fmt(c.deposit)}`:'—'}</div>
     <div style="text-align:right">${riskCell}</div>
     <div style="text-align:right"><span class="tstatus ${c.status}"><span class="stdot"></span>${c.status[0].toUpperCase()+c.status.slice(1)}</span></div>
     <div class="raw"><button class="rabtn" onclick="event.stopPropagation();openClient('${c.id}')"><svg viewBox="0 0 14 14" fill="none"><circle cx="2.5" cy="7" r="1.2" fill="currentColor"/><circle cx="7" cy="7" r="1.2" fill="currentColor"/><circle cx="11.5" cy="7" r="1.2" fill="currentColor"/></svg></button></div>
@@ -1125,8 +1125,8 @@ function openClient(id){
   // financial summary
   const wal = c.outstanding || 0;
   document.getElementById('drSumm').innerHTML = `
-    <div class="summ-cell"><div class="summ-label">Outstanding</div><div class="summ-val ${wal?'warn':'muted'}">${wal?`<span class="cur">₹</span>${fmt(wal)}`:'₹0'}</div></div>
-    <div class="summ-cell"><div class="summ-label">Deposit held</div><div class="summ-val">${c.deposit?`<span class="cur">₹</span>${fmt(c.deposit)}`:'<span class="muted">₹0</span>'}</div></div>
+    <div class="summ-cell"><div class="summ-label">Outstanding</div><div class="summ-val ${wal?'warn':'muted'}">${wal?`<span class="cur">$</span>${fmt(wal)}`:'$0'}</div></div>
+    <div class="summ-cell"><div class="summ-label">Deposit held</div><div class="summ-val">${c.deposit?`<span class="cur">$</span>${fmt(c.deposit)}`:'<span class="muted">$0</span>'}</div></div>
     <div class="summ-cell"><div class="summ-label">Employees</div><div class="summ-val">${c.employees}</div></div>
   `;
 
@@ -1227,8 +1227,8 @@ function empRow(e){
       </div>
     </div>
     <div class="emp-amt">
-      <div class="val"><span class="cur">₹</span>${fmt(e.salary)}</div>
-      <div class="sub">Deposit ₹${fmt(e.deposit)}</div>
+      <div class="val"><span class="cur">$</span>${fmt(e.salary)}</div>
+      <div class="sub">Deposit $${fmt(e.deposit)}</div>
     </div>
   </div>`;
 }
@@ -1327,9 +1327,9 @@ function eventDetail(e){
       <div class="detail-section">
         <div class="detail-stitle">Line items</div>
         <div>
-          <div class="detail-line"><div class="dl-info"><div class="dl-title">Payroll funding · ${e.date.split(' ').slice(1).join(' ')} cycle</div><div class="dl-sub">${e.meta}</div></div><div class="dl-amt">₹${fmt(payrollAmt)}</div></div>
-          <div class="detail-line"><div class="dl-info"><div class="dl-title">EOR service fee</div><div class="dl-sub">Monthly platform & compliance</div></div><div class="dl-amt">₹${fmt(feeAmt)}</div></div>
-          <div class="detail-line total"><div class="dl-info"><div class="dl-title">Total</div></div><div class="dl-amt">₹${fmt(e.amount)}</div></div>
+          <div class="detail-line"><div class="dl-info"><div class="dl-title">Payroll funding · ${e.date.split(' ').slice(1).join(' ')} cycle</div><div class="dl-sub">${e.meta}</div></div><div class="dl-amt">$${fmt(payrollAmt)}</div></div>
+          <div class="detail-line"><div class="dl-info"><div class="dl-title">EOR service fee</div><div class="dl-sub">Monthly platform & compliance</div></div><div class="dl-amt">$${fmt(feeAmt)}</div></div>
+          <div class="detail-line total"><div class="dl-info"><div class="dl-title">Total</div></div><div class="dl-amt">$${fmt(e.amount)}</div></div>
         </div>
       </div>`;
   }
@@ -1367,15 +1367,15 @@ function eventDetail(e){
             <div style="font-size:13px;font-weight:600;color:#121620">${c.name}</div>
             <div style="font-size:11px;color:#6B7588;margin-top:2px">${rail} · ${bankTxn}</div>
           </div>
-          <div style="font-size:13px;font-weight:600;color:#121620">₹${fmt(e.amount)}</div>
+          <div style="font-size:13px;font-weight:600;color:#121620">$${fmt(e.amount)}</div>
         </div>
       </div>
       <div class="detail-section">
         <div class="detail-stitle">Applied against</div>
         <div>
-          <div class="detail-line"><div class="dl-info"><div class="dl-title">${appliedInv}</div><div class="dl-sub">Auto-matched by Zoho Books</div></div><div class="dl-amt">₹${fmt(e.amount)}</div></div>
+          <div class="detail-line"><div class="dl-info"><div class="dl-title">${appliedInv}</div><div class="dl-sub">Auto-matched by Zoho Books</div></div><div class="dl-amt">$${fmt(e.amount)}</div></div>
           ${isPartial ? `<div class="detail-line"><div class="dl-info"><div class="dl-title">Shortfall covered from security deposit</div><div class="dl-sub">Auto-drawn to cover payroll obligation</div></div><div class="dl-amt" style="color:#CA8A04">Topup due</div></div>` : ''}
-          <div class="detail-line total"><div class="dl-info"><div class="dl-title">Total received</div></div><div class="dl-amt">₹${fmt(e.amount)}</div></div>
+          <div class="detail-line total"><div class="dl-info"><div class="dl-title">Total received</div></div><div class="dl-amt">$${fmt(e.amount)}</div></div>
         </div>
       </div>
       <div class="detail-section">
@@ -1403,7 +1403,7 @@ function eventDetail(e){
             <div class="dep-roster-row">
               <div class="who"><div class="av" style="background:${emp.bg}">${emp.initial}</div><div class="nm">${emp.name}</div></div>
               <div class="ref">${emp.adv}</div>
-              <div class="amt"><span class="cur">₹</span>${fmt(emp.deposit)}</div>
+              <div class="amt"><span class="cur">$</span>${fmt(emp.deposit)}</div>
             </div>`).join('')}
         </div>` : `<div style="font-size:12px;color:var(--n600);line-height:1.6">${e.meta}. Refundable at offboarding or adjustable for a new joiner.</div>`}
         <div style="font-size:11px;color:var(--n500);line-height:1.5;margin-top:4px">Refundable at offboarding or adjustable for a new joiner.</div>
@@ -1419,9 +1419,9 @@ function eventDetail(e){
       <div class="detail-section">
         <div class="detail-stitle">Adjustment math</div>
         <div>
-          <div class="detail-line"><div class="dl-info"><div class="dl-title">Original deposit · Sneha Arora</div></div><div class="dl-amt">₹1,020</div></div>
-          <div class="detail-line"><div class="dl-info"><div class="dl-title">New required · Karthik Reddy</div></div><div class="dl-amt">₹${fmt(e.amount-((e.amount>900)?0:0)+120)}</div></div>
-          <div class="detail-line total"><div class="dl-info"><div class="dl-title">Excess credited to account</div></div><div class="dl-amt">₹${fmt(120)}</div></div>
+          <div class="detail-line"><div class="dl-info"><div class="dl-title">Original deposit · Sneha Arora</div></div><div class="dl-amt">$1,020</div></div>
+          <div class="detail-line"><div class="dl-info"><div class="dl-title">New required · Karthik Reddy</div></div><div class="dl-amt">$${fmt(e.amount-((e.amount>900)?0:0)+120)}</div></div>
+          <div class="detail-line total"><div class="dl-info"><div class="dl-title">Excess credited to account</div></div><div class="dl-amt">$${fmt(120)}</div></div>
         </div>
       </div>`;
   }
@@ -1435,9 +1435,9 @@ function eventDetail(e){
       <div class="detail-section">
         <div class="detail-stitle">Amounts</div>
         <div>
-          <div class="detail-line"><div class="dl-info"><div class="dl-title">Existing locked deposit</div></div><div class="dl-amt">₹1,140</div></div>
-          <div class="detail-line"><div class="dl-info"><div class="dl-title">New required</div></div><div class="dl-amt">₹${fmt(1140+e.amount)}</div></div>
-          <div class="detail-line total"><div class="dl-info"><div class="dl-title">Top-up due</div></div><div class="dl-amt">₹${fmt(e.amount)}</div></div>
+          <div class="detail-line"><div class="dl-info"><div class="dl-title">Existing locked deposit</div></div><div class="dl-amt">$1,140</div></div>
+          <div class="detail-line"><div class="dl-info"><div class="dl-title">New required</div></div><div class="dl-amt">$${fmt(1140+e.amount)}</div></div>
+          <div class="detail-line total"><div class="dl-info"><div class="dl-title">Top-up due</div></div><div class="dl-amt">$${fmt(e.amount)}</div></div>
         </div>
       </div>`;
   }
@@ -1450,7 +1450,7 @@ function eventDetail(e){
           <div class="detail-cell"><div class="detail-clabel">Reference</div><div class="detail-cval">${e.ref}</div></div>
           <div class="detail-cell"><div class="detail-clabel">Status</div><div class="detail-cval">${e.pill}</div></div>
           <div class="detail-cell"><div class="detail-clabel">Issued on</div><div class="detail-cval">${e.date}</div></div>
-          <div class="detail-cell"><div class="detail-clabel">Amount credited</div><div class="detail-cval">₹${fmt(e.amount)}</div></div>
+          <div class="detail-cell"><div class="detail-clabel">Amount credited</div><div class="detail-cval">$${fmt(e.amount)}</div></div>
         </div>
       </div>
       <div class="detail-section">
@@ -1500,7 +1500,7 @@ function renderTimeline(){
             <div class="tl-name-meta">${e.meta}</div>
           </div>
         </div>
-        <div class="tl-amt ${isIn(e.type)?'in':''}">${sign(e.type)}<span class="cur">₹</span>${fmt(e.amount)}</div>
+        <div class="tl-amt ${isIn(e.type)?'in':''}">${sign(e.type)}<span class="cur">$</span>${fmt(e.amount)}</div>
         <div><span class="tl-pill ${pillClass(e.pill)}">${e.pill}</span></div>
         <div class="tl-row-actions">
           <button class="tl-kebab" onclick="event.stopPropagation();toggleRowMenu(${idx})" aria-label="Actions"><svg viewBox="0 0 16 16" fill="none"><circle cx="3" cy="8" r="1.4" fill="currentColor"/><circle cx="8" cy="8" r="1.4" fill="currentColor"/><circle cx="13" cy="8" r="1.4" fill="currentColor"/></svg></button>
@@ -1547,12 +1547,12 @@ function submitCreditNote(){
   const cn = 'CN-2026-'+String(20+Math.floor(Math.random()*40)).padStart(4,'0');
   closeCnModal();
   const dest = autoApply ? 'auto-applies to next invoice' : 'held as credit';
-  showToast(`Credit note ${cn} issued · ₹${fmt(amt)} against ${e?.ref||'invoice'} · ${dest} · logged to audit trail`);
+  showToast(`Credit note ${cn} issued · $${fmt(amt)} against ${e?.ref||'invoice'} · ${dest} · logged to audit trail`);
 }
 function refundToBank(idx){
   const items = window._timelineCache || [];
   const e = items[idx]; if(!e) return;
-  showToast(`Bank refund of ₹${fmt(e.amount)} initiated · linked to ${e.ref}`);
+  showToast(`Bank refund of $${fmt(e.amount)} initiated · linked to ${e.ref}`);
 }
 
 function openTxnPanel(idx){
@@ -1564,7 +1564,7 @@ function openTxnPanel(idx){
   document.getElementById('txnPanelTitle').textContent = e.title;
   document.getElementById('txnPanelBody').innerHTML = `
     <div class="txn-hero">
-      <div class="txn-hero-amt ${isInFn(e.type)?'in':''}">${signFn(e.type)}<span class="cur">₹</span>${fmt(e.amount)}</div>
+      <div class="txn-hero-amt ${isInFn(e.type)?'in':''}">${signFn(e.type)}<span class="cur">$</span>${fmt(e.amount)}</div>
       <div class="txn-hero-meta"><span class="tl-pill ${pillClass(e.pill)}">${e.pill}</span><span style="font-size:12px;color:var(--n500)">${e.date}</span></div>
     </div>
     ${eventDetail(e)}
@@ -1682,7 +1682,7 @@ function submitAdjust(){
   const labels = {credit:'Credit added', debit:'Credit deducted', 'mark-paid':'Invoice marked paid', 'release-deposit':'Deposit released'};
   closeAdjustModal();
   document.getElementById('adjConfirm').classList.remove('show');
-  showToast(`${labels[pending.type]} of ₹${fmt(pending.amt)}${pending.ctx} · logged to audit trail`);
+  showToast(`${labels[pending.type]} of $${fmt(pending.amt)}${pending.ctx} · logged to audit trail`);
   window._pendingAdjust = null;
 }
 
