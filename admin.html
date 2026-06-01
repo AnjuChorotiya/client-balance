@@ -1336,47 +1336,53 @@ function eventDetail(e){
         </div>
       </div>`;
   }
-  // Payment processed (money out to employees)
+  // Client payment received (incoming · synced from Zoho Books)
   if(e.type==='payment'){
-    const gross = Math.round(e.amount*0.92);
-    const stat = Math.round(e.amount*0.06);
-    const fees = e.amount - gross - stat;
-    const employees = paymentRoster(e);
-    const counts = employees.reduce((a,em)=>{ a[em.status] = (a[em.status]||0)+1; return a; }, {});
-    const cPaid = counts.paid||0, cLop = counts.lop||0, cSkip = counts.skipped||0;
+    const c = currentClient || {name:'Client', region:'India', initial:'C', logoBg:'#2684FF'};
+    // Pick a plausible rail per region
+    const railMap = {
+      'India':'NEFT', 'United States':'Wire', 'United Kingdom':'Faster Payments',
+      'Germany':'SEPA', 'Sweden':'SEPA', 'Canada':'Wire', 'Australia':'PayID'
+    };
+    const rail = railMap[c.region] || 'Bank transfer';
+    // Deterministic bank txn id from ref
+    const seed = e.ref.split('').reduce((a,ch)=>a+ch.charCodeAt(0),0);
+    const bankTxn = `${rail.replace(/\s/g,'').slice(0,4).toUpperCase()}-${(seed*7919 % 900000 + 100000)}`;
+    // Derive applied invoice from month in title
+    const monthMatch = e.title.match(/(January|February|March|April|May|June|July|August|September|October|November|December)\s+2026/);
+    const appliedInv = monthMatch ? `Invoice for ${monthMatch[0]} cycle` : 'Open invoice on account';
+    const isPartial = /partial|shortfall|deposit/i.test(e.meta);
     return `
       <div class="detail-section">
-        <div class="detail-stitle">Payment details</div>
+        <div class="detail-stitle">Payment received</div>
         <div class="detail-grid">
           <div class="detail-cell"><div class="detail-clabel">Reference</div><div class="detail-cval">${e.ref}</div></div>
-          <div class="detail-cell"><div class="detail-clabel">Status</div><div class="detail-cval">${e.pill}</div></div>
-          <div class="detail-cell"><div class="detail-clabel">Run date</div><div class="detail-cval">${e.date}</div></div>
-          <div class="detail-cell"><div class="detail-clabel">Recipients</div><div class="detail-cval">${e.meta}</div></div>
+          <div class="detail-cell"><div class="detail-clabel">Status</div><div class="detail-cval">${e.pill} · reconciled</div></div>
+          <div class="detail-cell"><div class="detail-clabel">Received on</div><div class="detail-cval">${e.date}</div></div>
+          <div class="detail-cell"><div class="detail-clabel">Source</div><div class="detail-cval">Zoho Books · ${rail}</div></div>
         </div>
       </div>
       <div class="detail-section">
-        <div class="detail-stitle">Breakdown</div>
+        <div class="detail-stitle">Payer</div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:#F8FAFC;border:1px solid #EEF0F4;border-radius:8px">
+          <div style="width:36px;height:36px;border-radius:8px;background:${c.logoBg};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px">${c.initial}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:600;color:#121620">${c.name}</div>
+            <div style="font-size:11px;color:#6B7588;margin-top:2px">${rail} · ${bankTxn}</div>
+          </div>
+          <div style="font-size:13px;font-weight:600;color:#121620">₹${fmt(e.amount)}</div>
+        </div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-stitle">Applied against</div>
         <div>
-          <div class="detail-line"><div class="dl-info"><div class="dl-title">Gross salaries</div></div><div class="dl-amt">₹${fmt(gross)}</div></div>
-          <div class="detail-line"><div class="dl-info"><div class="dl-title">Statutory contributions</div></div><div class="dl-amt">₹${fmt(stat)}</div></div>
-          <div class="detail-line"><div class="dl-info"><div class="dl-title">Bank & processing charges</div></div><div class="dl-amt">₹${fmt(fees)}</div></div>
-          <div class="detail-line total"><div class="dl-info"><div class="dl-title">Total debited</div></div><div class="dl-amt">₹${fmt(e.amount)}</div></div>
+          <div class="detail-line"><div class="dl-info"><div class="dl-title">${appliedInv}</div><div class="dl-sub">Auto-matched by Zoho Books</div></div><div class="dl-amt">₹${fmt(e.amount)}</div></div>
+          ${isPartial ? `<div class="detail-line"><div class="dl-info"><div class="dl-title">Shortfall covered from security deposit</div><div class="dl-sub">Auto-drawn to cover payroll obligation</div></div><div class="dl-amt" style="color:#CA8A04">Topup due</div></div>` : ''}
+          <div class="detail-line total"><div class="dl-info"><div class="dl-title">Total received</div></div><div class="dl-amt">₹${fmt(e.amount)}</div></div>
         </div>
       </div>
       <div class="detail-section">
-        <div class="detail-stitle">Employees</div>
-        <div class="emp-list">
-          ${employees.map(em=>`
-            <div class="emp-row">
-              <div class="emp-ava" style="background:#E8F2FF;color:#2684FF">${em.initial}</div>
-              <div class="emp-info">
-                <div class="emp-name">${em.name}</div>
-                <div class="emp-meta">${em.role} · ${em.empId}${em.note?' · '+em.note:''}</div>
-              </div>
-              <div class="emp-amt ${em.status==='skipped'?'muted':''}">${em.amount?`₹${fmt(em.amount)}`:'—'}</div>
-              <span class="emp-pill ${em.status}"><span class="stdot"></span>${em.status==='lop'?'LOP':em.status[0].toUpperCase()+em.status.slice(1)}</span>
-            </div>`).join('')}
-        </div>
+        <div style="font-size:11px;color:#9AA2B2;line-height:1.5;padding:8px 12px;background:#F8FAFC;border-radius:6px">Synced from Zoho Books bank feed. Wisemonk reconciles incoming transfers against open invoices automatically; over/under amounts route to credit notes or top-up alerts.</div>
       </div>`;
   }
   // Deposit locked (initial)
