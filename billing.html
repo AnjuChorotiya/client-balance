@@ -667,8 +667,7 @@ function statusClass(t){
 
 function rowHTML(t, idx){
   const isPositive = (t.kind==='in'||t.kind==='refund'||t.kind==='invoice'||t.kind==='credit');
-  // No sign for adjustments — they aren't a cash flow, they're a reduction applied to an invoice
-  const sign = (t.kind==='credit') ? '' : (isPositive ? '+' : '−');
+  const sign = '';
   const amtClass = isPositive ? 'in' : '';
   const icons = {
     in:'<svg viewBox="0 0 14 14" fill="none"><path d="M7 12V2M3 6L7 2L11 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
