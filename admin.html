@@ -910,29 +910,29 @@ function defaultEmployees(c){
 const TIMELINES = {
   C001: [
     {date:'10 May 2026', type:'invoice-open', title:'Invoice INV-2026-0050 issued', meta:'May 2026 cycle · payroll + EOR', ref:'INV-2026-0050', amount:15200, pill:'Due'},
-    {date:'05 May 2026', type:'payment', title:'Payment processed · April 2026 payroll', meta:'23 employees · 1 contractor', ref:'PAY-APR26', amount:13950, pill:'Paid'},
+    {date:'05 May 2026', type:'payment', title:'Client payment received · April 2026', meta:'Bank transfer · synced from Zoho Books', ref:'PAY-APR26', amount:13950, pill:'Paid'},
     {date:'03 May 2026', type:'credit-note', title:'Credit note CN-2026-0012 issued', meta:'Overpayment on Apr cycle · auto-applies to May invoice', ref:'CN-2026-0012', amount:500, pill:'Issued'},
     {date:'01 May 2026', type:'invoice-paid', title:'Invoice INV-2026-0042 paid', meta:'Bank transfer reconciled · NEFT-883120 · received ₹15,700 against ₹15,200 invoice', ref:'INV-2026-0042', amount:15700, pill:'Paid'},
-    {date:'15 Apr 2026', type:'payment', title:'Off-cycle payment · joining bonus', meta:'EMP09 · Neha Kapoor', ref:'PAY-OFF-1188', amount:900, pill:'Paid'},
-    {date:'05 Apr 2026', type:'payment', title:'Payment processed · March 2026 payroll', meta:'21 employees', ref:'PAY-MAR26', amount:13400, pill:'Paid'},
+    {date:'15 Apr 2026', type:'payment', title:'Client payment received · off-cycle top-up', meta:'Bank transfer · synced from Zoho Books', ref:'PAY-OFF-1188', amount:900, pill:'Paid'},
+    {date:'05 Apr 2026', type:'payment', title:'Client payment received · March 2026', meta:'Bank transfer · synced from Zoho Books', ref:'PAY-MAR26', amount:13400, pill:'Paid'},
     {date:'02 Apr 2026', type:'deposit-topup', title:'Deposit top-up · Priya Singh', meta:'Salary revised · EMP02', ref:'ADV-2026-007', amount:300, pill:'Due'},
     {date:'01 Apr 2026', type:'invoice-paid', title:'Invoice INV-2026-0033 paid', meta:'Wire transfer reconciled', ref:'INV-2026-0033', amount:13800, pill:'Paid'},
     {date:'15 Mar 2026', type:'deposit-adjust', title:'Deposit adjusted · Karthik Reddy onboarding', meta:'Transferred from Sneha Arora (exit) · excess credited', ref:'ADV-2026-006', amount:900, pill:'Adjusted'},
-    {date:'05 Mar 2026', type:'payment', title:'Payment processed · February 2026 payroll', meta:'21 employees', ref:'PAY-FEB26', amount:13200, pill:'Paid'},
+    {date:'05 Mar 2026', type:'payment', title:'Client payment received · February 2026', meta:'Bank transfer · synced from Zoho Books', ref:'PAY-FEB26', amount:13200, pill:'Paid'},
     {date:'01 Mar 2026', type:'invoice-paid', title:'Invoice INV-2026-0021 paid', meta:'Bank transfer reconciled', ref:'INV-2026-0021', amount:13500, pill:'Paid'},
     {date:'12 Jan 2026', type:'deposit-locked', title:'Security deposit collected', meta:'5 active employees · onboarding', ref:'ADV-2026-001…005', amount:4150, pill:'Locked', empRange:[0,4]}
   ],
   C003: [
     {date:'22 May 2026', type:'invoice-open', title:'Invoice INV-2026-0094 issued', meta:'May 2026 cycle · overdue by 10 days', ref:'INV-2026-0094', amount:22400, pill:'Due'},
-    {date:'10 May 2026', type:'payment', title:'Payment processed · April payroll (partial)', meta:'Funded via security deposit · 15 employees', ref:'PAY-APR26-B', amount:8500, pill:'Paid'},
+    {date:'10 May 2026', type:'payment', title:'Client payment received · April 2026 (partial)', meta:'Bank transfer · synced from Zoho Books · shortfall covered from deposit', ref:'PAY-APR26-B', amount:8500, pill:'Paid'},
     {date:'04 Apr 2026', type:'invoice-paid', title:'Invoice INV-2026-0067 paid', meta:'SEPA transfer reconciled', ref:'INV-2026-0067', amount:21800, pill:'Paid'},
     {date:'02 Apr 2026', type:'credit-note', title:'Credit note CN-2026-0008 issued', meta:'Refund for cancelled add-on', ref:'CN-2026-0008', amount:1200, pill:'Issued'},
-    {date:'05 Mar 2026', type:'payment', title:'Payment processed · February payroll', meta:'15 employees', ref:'PAY-FEB26', amount:20500, pill:'Paid'},
+    {date:'05 Mar 2026', type:'payment', title:'Client payment received · February 2026', meta:'Bank transfer · synced from Zoho Books', ref:'PAY-FEB26', amount:20500, pill:'Paid'},
     {date:'12 Jan 2026', type:'deposit-locked', title:'Security deposit collected', meta:'15 active employees · onboarding', ref:'ADV-2026-DE-001…015', amount:38000, pill:'Locked', empRange:[0,14]}
   ],
   C005: [
     {date:'19 May 2026', type:'invoice-open', title:'Invoice INV-2026-0091 issued', meta:'May 2026 cycle · overdue by 14 days', ref:'INV-2026-0091', amount:48750, pill:'Due'},
-    {date:'07 May 2026', type:'payment', title:'Payment processed · April payroll', meta:'Funded via security deposit · 32 employees', ref:'PAY-APR26', amount:46400, pill:'Paid'},
+    {date:'07 May 2026', type:'payment', title:'Client payment received · April 2026', meta:'Bank transfer · synced from Zoho Books · shortfall covered from deposit', ref:'PAY-APR26', amount:46400, pill:'Paid'},
     {date:'02 Apr 2026', type:'invoice-paid', title:'Invoice INV-2026-0061 paid', meta:'Faster Payments reconciled', ref:'INV-2026-0061', amount:47500, pill:'Paid'},
     {date:'18 Feb 2026', type:'deposit-locked', title:'Security deposit collected', meta:'32 active employees · onboarding', ref:'ADV-2026-UK-001…032', amount:62400, pill:'Locked', empRange:[0,15]}
   ]
@@ -942,7 +942,7 @@ const TIMELINES = {
 function defaultTimeline(c){
   return [
     {date:'10 May 2026', type:'invoice-paid', title:'Invoice paid · May cycle', meta:'Bank transfer reconciled', ref:'INV-2026-AUTO', amount: Math.round(c.deposit*0.4||5000), pill:'Paid'},
-    {date:'05 May 2026', type:'payment', title:'Payment processed · April payroll', meta:`${c.employees} employees`, ref:'PAY-APR26', amount: Math.round(c.deposit*0.35||4500), pill:'Paid'},
+    {date:'05 May 2026', type:'payment', title:'Client payment received · April 2026', meta:'Bank transfer · synced from Zoho Books', ref:'PAY-APR26', amount: Math.round(c.deposit*0.35||4500), pill:'Paid'},
     {date:'12 Jan 2026', type:'deposit-locked', title:'Security deposit collected', meta:`${c.employees} employees · onboarding`, ref:'ADV-2026-INIT', amount: c.deposit, pill:'Locked'}
   ];
 }
