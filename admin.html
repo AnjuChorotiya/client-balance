@@ -262,6 +262,24 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
 .tl-search svg{width:16px;height:16px;color:#85878D;flex-shrink:0}
 .tl-search input{flex:1;border:none;outline:none;font-family:'Satoshi',sans-serif;font-size:14px;font-weight:500;color:#222224;background:transparent;min-width:0}
 .tl-search input::placeholder{color:#85878D;font-weight:500}
+/* multiselect status dropdown */
+.ms{position:relative}
+.ms-trigger{display:inline-flex;align-items:center;gap:8px;text-align:left;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M3 5L6 8L9 5' stroke='%2385878D' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;background-size:12px}
+.ms-trigger.active{border-color:#2684FF;box-shadow:0 0 0 3px rgba(38,132,255,0.12)}
+.ms-trigger[aria-expanded="true"]{border-color:#2684FF;box-shadow:0 0 0 3px rgba(38,132,255,0.12);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M3 7L6 4L9 7' stroke='%232684FF' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")}
+.ms-label{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ms-badge{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#2684FF;color:#fff;font-size:11px;font-weight:700;line-height:1;flex-shrink:0}
+.ms-menu{position:absolute;top:calc(100% + 6px);left:0;z-index:60;min-width:230px;background:#fff;border:1px solid #ECEDEE;border-radius:12px;box-shadow:0 14px 36px rgba(16,24,40,0.14);padding:6px;opacity:0;visibility:hidden;transform:translateY(-6px) scale(0.98);transform-origin:top left;transition:opacity .15s ease,transform .15s ease,visibility .15s}
+.ms-menu.open{opacity:1;visibility:visible;transform:translateY(0) scale(1)}
+.ms-opt{display:flex;align-items:center;gap:10px;width:100%;padding:8px 10px;border:none;background:transparent;border-radius:8px;cursor:pointer;font-family:'Satoshi',sans-serif;font-size:13.5px;font-weight:500;color:#222224;text-align:left;transition:background .12s}
+.ms-opt:hover{background:#F5F8FD}
+.ms-opt .tl-pill{margin:0}
+.ms-check{width:18px;height:18px;border-radius:5px;border:1.5px solid #D4D6DA;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:background .12s,border-color .12s}
+.ms-opt.sel .ms-check{background:#2684FF;border-color:#2684FF}
+.ms-opt.sel .ms-check::after{content:'';width:10px;height:10px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M2.5 6.2L4.8 8.5L9.5 3.5' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat center/contain}
+.ms-txt{flex:1}
+.ms-all{font-weight:600;color:#222224}
+.ms-divider{height:1px;background:#F0F1F1;margin:5px 4px}
 .tlh.sortable{cursor:pointer;user-select:none;display:flex;align-items:center;gap:4px}
 .tlh.sortable:hover{color:var(--brand)}
 .tlh.right.sortable{justify-content:flex-end}
@@ -624,14 +642,21 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
               <option value="deposit">Deposits</option>
               <option value="credit">Credit notes</option>
             </select>
-            <select class="tl-time" id="tlStatus" onchange="setStatusFilter(this.value)">
-              <option value="all">All statuses</option>
-              <option value="Paid">Paid</option>
-              <option value="Partially paid">Partially paid</option>
-              <option value="Due">Due</option>
-              <option value="Locked">Locked</option>
-              <option value="Adjusted">Adjusted</option>
-            </select>
+            <div class="ms" id="tlStatusMS">
+              <button type="button" class="tl-time ms-trigger" id="tlStatusBtn" onclick="toggleStatusMenu(event)" aria-haspopup="listbox" aria-expanded="false">
+                <span class="ms-label" id="tlStatusLabel">All statuses</span>
+              </button>
+              <div class="ms-menu" id="tlStatusMenu" role="listbox" aria-multiselectable="true">
+                <button type="button" class="ms-opt ms-all sel" data-val="all" onclick="toggleStatusOpt('all')" role="option"><span class="ms-check"></span><span class="ms-txt">All statuses</span></button>
+                <div class="ms-divider"></div>
+                <button type="button" class="ms-opt" data-val="Paid" onclick="toggleStatusOpt('Paid')" role="option"><span class="ms-check"></span><span class="tl-pill paid">Paid</span></button>
+                <button type="button" class="ms-opt" data-val="Partially paid" onclick="toggleStatusOpt('Partially paid')" role="option"><span class="ms-check"></span><span class="tl-pill partial">Partially paid</span></button>
+                <button type="button" class="ms-opt" data-val="Due" onclick="toggleStatusOpt('Due')" role="option"><span class="ms-check"></span><span class="tl-pill due">Due</span></button>
+                <button type="button" class="ms-opt" data-val="Issued" onclick="toggleStatusOpt('Issued')" role="option"><span class="ms-check"></span><span class="tl-pill issued">Issued</span></button>
+                <button type="button" class="ms-opt" data-val="Locked" onclick="toggleStatusOpt('Locked')" role="option"><span class="ms-check"></span><span class="tl-pill locked">Locked</span></button>
+                <button type="button" class="ms-opt" data-val="Adjusted" onclick="toggleStatusOpt('Adjusted')" role="option"><span class="ms-check"></span><span class="tl-pill adjusted">Adjusted</span></button>
+              </div>
+            </div>
             <select class="tl-time" id="tlTime" onchange="setTimeFilter(this.value)">
               <option value="all">All time</option>
               <option value="30">Last 30 days</option>
@@ -967,8 +992,44 @@ function setKindFilter(value){
   currentTl = value;
   renderTimeline();
 }
-let currentSearch = '', currentSortKey = 'date', currentSortDir = 'desc', currentStatus = 'all';
-function setStatusFilter(value){ currentStatus = value; renderTimeline(); }
+let currentSearch = '', currentSortKey = 'date', currentSortDir = 'desc';
+const statusSel = new Set(); // empty = all statuses
+function toggleStatusMenu(ev){
+  ev.stopPropagation();
+  const menu = document.getElementById('tlStatusMenu');
+  const btn = document.getElementById('tlStatusBtn');
+  const open = menu.classList.toggle('open');
+  btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+function closeStatusMenu(){
+  document.getElementById('tlStatusMenu').classList.remove('open');
+  document.getElementById('tlStatusBtn').setAttribute('aria-expanded','false');
+}
+function toggleStatusOpt(val){
+  if(val==='all'){ statusSel.clear(); }
+  else { statusSel.has(val) ? statusSel.delete(val) : statusSel.add(val); }
+  updateStatusUI();
+  renderTimeline();
+}
+function updateStatusUI(){
+  const btn = document.getElementById('tlStatusBtn');
+  const label = document.getElementById('tlStatusLabel');
+  const n = statusSel.size;
+  // option checked states
+  document.querySelectorAll('#tlStatusMenu .ms-opt').forEach(o=>{
+    const v = o.getAttribute('data-val');
+    const on = v==='all' ? n===0 : statusSel.has(v);
+    o.classList.toggle('sel', on);
+  });
+  // trigger label + badge
+  if(n===0){ label.textContent='All statuses'; btn.classList.remove('active'); }
+  else {
+    btn.classList.add('active');
+    const only = n===1 ? [...statusSel][0] : null;
+    label.innerHTML = (only ? only : n+' statuses') + ' <span class="ms-badge">'+n+'</span>';
+  }
+}
+document.addEventListener('click', (ev)=>{ if(!ev.target.closest('#tlStatusMS')) closeStatusMenu(); });
 function setSearchFilter(v){ currentSearch = (v||'').toLowerCase(); renderTimeline(); }
 function setSort(key){
   if(currentSortKey===key){ currentSortDir = currentSortDir==='asc' ? 'desc' : 'asc'; }
@@ -1151,13 +1212,14 @@ function openClient(id){
 
   currentTl = 'all';
   currentTimeFilter = 'all';
-  currentStatus = 'all';
+  statusSel.clear();
+  if(typeof updateStatusUI==='function') updateStatusUI();
+  closeStatusMenu();
   currentSearch = '';
   currentSortKey = 'date';
   currentSortDir = 'desc';
   const tlTime = document.getElementById('tlTime'); if(tlTime) tlTime.value = 'all';
   const tlKind = document.getElementById('tlKind'); if(tlKind) tlKind.value = 'all';
-  const tlStatus = document.getElementById('tlStatus'); if(tlStatus) tlStatus.value = 'all';
   const tlSearch = document.getElementById('tlSearch'); if(tlSearch) tlSearch.value = '';
   document.querySelectorAll('.sort-ind').forEach(el => el.classList.remove('show','desc'));
   const sortDate = document.getElementById('sort-date'); if(sortDate){ sortDate.classList.add('show','desc'); }
@@ -1477,7 +1539,7 @@ function renderTimeline(){
   const items = TIMELINES[currentClient.id] || defaultTimeline(currentClient);
   const kindFiltered = currentTl==='all' ? items : items.filter(e=>eventCategory(e.type)===currentTl);
   const timeFiltered = kindFiltered.filter(e => isInTimeRange(e.date));
-  const statusFiltered = currentStatus==='all' ? timeFiltered : timeFiltered.filter(e => (e.pill||'')===currentStatus);
+  const statusFiltered = statusSel.size===0 ? timeFiltered : timeFiltered.filter(e => statusSel.has(e.pill||''));
   const searchFiltered = !currentSearch ? statusFiltered : statusFiltered.filter(e =>
     (e.title+' '+e.meta+' '+e.ref+' '+e.amount).toLowerCase().includes(currentSearch)
   );
