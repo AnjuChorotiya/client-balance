@@ -280,6 +280,21 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
 .ms-txt{flex:1}
 .ms-all{font-weight:600;color:#222224}
 .ms-divider{height:1px;background:#F0F1F1;margin:5px 4px}
+/* generic custom single-select (progressive enhancement) */
+.cs{position:relative;display:inline-block}
+.cs.cs-full{display:block;width:100%}
+.cs-trigger{display:inline-flex;align-items:center;gap:8px;text-align:left;padding-right:34px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M3 5L6 8L9 5' stroke='%2385878D' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;background-size:12px}
+.cs.cs-full .cs-trigger{width:100%}
+.cs-trigger[aria-expanded="true"]{border-color:#2684FF;box-shadow:0 0 0 3px rgba(38,132,255,0.12);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M3 7L6 4L9 7' stroke='%232684FF' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")}
+.cs-label{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cs-menu{position:absolute;top:calc(100% + 6px);left:0;z-index:120;min-width:100%;width:max-content;max-width:340px;max-height:320px;overflow-y:auto;background:#fff;border:1px solid #ECEDEE;border-radius:12px;box-shadow:0 14px 36px rgba(16,24,40,0.14);padding:6px;opacity:0;visibility:hidden;transform:translateY(-6px) scale(0.98);transform-origin:top left;transition:opacity .15s ease,transform .15s ease,visibility .15s}
+.cs-menu.open{opacity:1;visibility:visible;transform:translateY(0) scale(1)}
+.cs-opt{display:flex;align-items:center;gap:9px;width:100%;padding:9px 10px;border:none;background:transparent;border-radius:8px;cursor:pointer;font-family:'Satoshi',sans-serif;font-size:13.5px;font-weight:500;color:#222224;text-align:left;white-space:nowrap;transition:background .12s,color .12s}
+.cs-opt:hover{background:#F5F8FD}
+.cs-opt.sel{color:#2684FF;font-weight:600}
+.cs-check{width:14px;height:14px;flex-shrink:0;background-repeat:no-repeat;background-position:center;background-size:contain}
+.cs-opt.sel .cs-check{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M2.5 6.2L4.8 8.5L9.5 3.5' stroke='%232684FF' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")}
+.cs-txt{flex:1}
 .tlh.sortable{cursor:pointer;user-select:none;display:flex;align-items:center;gap:4px}
 .tlh.sortable:hover{color:var(--brand)}
 .tlh.right.sortable{justify-content:flex-end}
@@ -1218,8 +1233,8 @@ function openClient(id){
   currentSearch = '';
   currentSortKey = 'date';
   currentSortDir = 'desc';
-  const tlTime = document.getElementById('tlTime'); if(tlTime) tlTime.value = 'all';
-  const tlKind = document.getElementById('tlKind'); if(tlKind) tlKind.value = 'all';
+  const tlTime = document.getElementById('tlTime'); if(tlTime){ tlTime.value = 'all'; tlTime._csRefresh && tlTime._csRefresh(); }
+  const tlKind = document.getElementById('tlKind'); if(tlKind){ tlKind.value = 'all'; tlKind._csRefresh && tlKind._csRefresh(); }
   const tlSearch = document.getElementById('tlSearch'); if(tlSearch) tlSearch.value = '';
   document.querySelectorAll('.sort-ind').forEach(el => el.classList.remove('show','desc'));
   const sortDate = document.getElementById('sort-date'); if(sortDate){ sortDate.classList.add('show','desc'); }
@@ -1672,8 +1687,8 @@ function openAdjustModal(){
   // reset
   document.querySelectorAll('.adj-amount').forEach(i=>i.value='');
   document.getElementById('adjReason').value='';
-  document.getElementById('adjInvoice').value='';
-  document.getElementById('adjDeposit').value='';
+  const ai = document.getElementById('adjInvoice'); ai.value=''; ai._csRefresh && ai._csRefresh();
+  const ad = document.getElementById('adjDeposit'); ad.value=''; ad._csRefresh && ad._csRefresh();
   document.querySelector('input[name=adjType][value=credit]').checked = true;
   toggleAdjFields();
   document.getElementById('adjOverlay').classList.add('show');
@@ -1771,6 +1786,73 @@ function showToast(msg){
   setTimeout(()=>t.classList.remove('show'), 3500);
 }
 
+// ====== CUSTOM SELECT (progressive enhancement) ======
+// Wraps native <select>s in a styled popover while keeping the real <select>
+// in the DOM as the source of truth, so existing handlers keep working.
+function enhanceSelect(sel){
+  if(sel.dataset.csEnhanced) return;
+  sel.dataset.csEnhanced = '1';
+  const wrap = document.createElement('div');
+  wrap.className = 'cs' + (sel.classList.contains('finput') ? ' cs-full' : '');
+  sel.parentNode.insertBefore(wrap, sel);
+  wrap.appendChild(sel);
+  sel.style.display = 'none';
+  sel.setAttribute('aria-hidden','true');
+  sel.tabIndex = -1;
+
+  const trigger = document.createElement('button');
+  trigger.type = 'button';
+  trigger.className = 'cs-trigger ' + Array.from(sel.classList).join(' ');
+  trigger.setAttribute('aria-haspopup','listbox');
+  trigger.setAttribute('aria-expanded','false');
+  const label = document.createElement('span');
+  label.className = 'cs-label';
+  trigger.appendChild(label);
+  wrap.appendChild(trigger);
+
+  const menu = document.createElement('div');
+  menu.className = 'cs-menu';
+  menu.setAttribute('role','listbox');
+  wrap.appendChild(menu);
+
+  function build(){
+    menu.innerHTML = '';
+    Array.from(sel.options).forEach(opt=>{
+      const o = document.createElement('button');
+      o.type = 'button';
+      o.className = 'cs-opt' + (opt.value===sel.value ? ' sel' : '');
+      o.setAttribute('role','option');
+      o.dataset.val = opt.value;
+      const chk = document.createElement('span'); chk.className = 'cs-check';
+      const txt = document.createElement('span'); txt.className = 'cs-txt'; txt.textContent = opt.textContent;
+      o.appendChild(chk); o.appendChild(txt);
+      o.addEventListener('click', ()=>{
+        if(sel.value !== opt.value){ sel.value = opt.value; sel.dispatchEvent(new Event('change', {bubbles:true})); }
+        close();
+      });
+      menu.appendChild(o);
+    });
+  }
+  function refresh(){
+    const cur = sel.options[sel.selectedIndex];
+    label.textContent = cur ? cur.textContent : '';
+    Array.from(menu.children).forEach(o=>o.classList.toggle('sel', o.dataset.val===sel.value));
+  }
+  function open(){ closeAllCS(); menu.classList.add('open'); trigger.setAttribute('aria-expanded','true'); }
+  function close(){ menu.classList.remove('open'); trigger.setAttribute('aria-expanded','false'); }
+  trigger.addEventListener('click', e=>{ e.stopPropagation(); menu.classList.contains('open') ? close() : open(); });
+  sel.addEventListener('change', refresh);
+  sel._csRefresh = ()=>{ build(); refresh(); };
+  build(); refresh();
+}
+function closeAllCS(){
+  document.querySelectorAll('.cs-menu.open').forEach(m=>m.classList.remove('open'));
+  document.querySelectorAll('.cs-trigger[aria-expanded="true"]').forEach(t=>t.setAttribute('aria-expanded','false'));
+}
+document.addEventListener('click', e=>{ if(!e.target.closest('.cs')) closeAllCS(); });
+function enhanceAllSelects(){ document.querySelectorAll('select.tl-time, select.cl-filter, select.finput').forEach(enhanceSelect); }
+
+enhanceAllSelects();
 renderClients();
 </script>
 </body>
