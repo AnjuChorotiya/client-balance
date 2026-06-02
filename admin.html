@@ -86,7 +86,7 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
 
 /* clients table — Wisemonk wm-table chrome */
 .table{width:100%;background:#FFFFFF;border-radius:8px;overflow:hidden;padding:0}
-.thead{display:grid;grid-template-columns:minmax(200px,1.4fr) 120px 140px 140px 140px 120px 120px 32px;padding:12px 16px;background:#F9FAFB;border-bottom:1px solid #E5E7EB;gap:20px;align-items:center}
+.thead{display:grid;grid-template-columns:minmax(200px,1.4fr) 120px 140px 140px 140px 130px 120px 120px 32px;padding:12px 16px;background:#F9FAFB;border-bottom:1px solid #E5E7EB;gap:20px;align-items:center}
 .th{font-family:'Open Sans',sans-serif;font-size:13px;font-weight:600;color:#404145;text-transform:none;letter-spacing:0}
 .th.right{text-align:right}
 .th.sortable{cursor:pointer;user-select:none;display:flex;align-items:center;gap:4px}
@@ -94,7 +94,7 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
 .th.right.sortable{justify-content:flex-end}
 .th.right.sortable > span:not(.sort-ind){text-align:right;flex:1;min-width:0}
 .th.sortable > span:not(.sort-ind){line-height:1.35}
-.trow{display:grid;grid-template-columns:minmax(200px,1.4fr) 120px 140px 140px 140px 120px 120px 32px;padding:8px 16px;background:#FFFFFF;border-bottom:1px solid #F0F1F1;gap:20px;align-items:center;cursor:pointer;transition:background 0.2s ease;position:relative}
+.trow{display:grid;grid-template-columns:minmax(200px,1.4fr) 120px 140px 140px 140px 130px 120px 120px 32px;padding:8px 16px;background:#FFFFFF;border-bottom:1px solid #F0F1F1;gap:20px;align-items:center;cursor:pointer;transition:background 0.2s ease;position:relative}
 .trow:last-child,.trow.last-visible{border-bottom:none}
 .trow:hover{background:#FAFBFC}
 .trow > div{color:#626368;font-size:14px;font-family:'Open Sans',sans-serif;font-weight:500}
@@ -605,6 +605,7 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
             <div class="th right sortable" onclick="setClientSort('outstanding')"><span>Outstanding amount</span><span class="sort-ind" id="csort-outstanding"><svg viewBox="0 0 10 10" fill="none"><path d="M3 4L5 6L7 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
             <div class="th right sortable" onclick="setClientSort('monthly')"><span>Monthly exposure</span><span class="sort-ind" id="csort-monthly"><svg viewBox="0 0 10 10" fill="none"><path d="M3 4L5 6L7 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
             <div class="th right sortable" onclick="setClientSort('deposit')"><span>Deposit held</span><span class="sort-ind" id="csort-deposit"><svg viewBox="0 0 10 10" fill="none"><path d="M3 4L5 6L7 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+            <div class="th right sortable" onclick="setClientSort('agreed')"><span>Agreed (months)</span><span class="sort-ind" id="csort-agreed"><svg viewBox="0 0 10 10" fill="none"><path d="M3 4L5 6L7 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
             <div class="th right sortable" onclick="setClientSort('risk')"><span>Inventory (month)</span><span class="sort-ind" id="csort-risk"><svg viewBox="0 0 10 10" fill="none"><path d="M3 4L5 6L7 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
             <div class="th right sortable" onclick="setClientSort('status')"><span>Status</span><span class="sort-ind" id="csort-status"><svg viewBox="0 0 10 10" fill="none"><path d="M3 4L5 6L7 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
             <div class="th"></div>
@@ -870,14 +871,14 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
 <script>
 // ====== DATA ======
 const CLIENTS = [
-  {id:'C001', name:'Acme Inc', sub:'acme.com', region:'United States', flag:'🇺🇸', employees:23, wallet:10250, outstanding:16450, deposit:46500, monthly:13950, status:'active', logoBg:'#2684FF', initial:'A', contact:'contact@acme.com', csManager:'Anju Verma'},
-  {id:'C002', name:'TechFlow Labs', sub:'techflow.io', region:'India', flag:'🇮🇳', employees:8, wallet:32400, outstanding:0, deposit:24000, monthly:9400, status:'active', logoBg:'#2684FF', initial:'T', contact:'ops@techflow.io', csManager:'Rohan Mehta'},
-  {id:'C003', name:'Brightspark GmbH', sub:'brightspark.de', region:'Germany', flag:'🇩🇪', employees:15, wallet:8500, outstanding:22400, deposit:0, monthly:20500, status:'active', logoBg:'#2684FF', initial:'B', contact:'finance@brightspark.de', csManager:'Anju Verma'},
-  {id:'C004', name:'Nordic Health', sub:'nordichealth.se', region:'Sweden', flag:'🇸🇪', employees:6, wallet:14200, outstanding:0, deposit:18500, monthly:6475, status:'active', logoBg:'#2684FF', initial:'N', contact:'ops@nordichealth.se', csManager:'Priya Sharma'},
-  {id:'C005', name:'CloudVault', sub:'cloudvault.co.uk', region:'United Kingdom', flag:'🇬🇧', employees:32, wallet:0, outstanding:18000, deposit:30000, monthly:46400, status:'active', logoBg:'#2684FF', initial:'C', contact:'billing@cloudvault.co.uk', csManager:'Rohan Mehta'},
-  {id:'C006', name:'DataPipe Co', sub:'datapipe.com', region:'United States', flag:'🇺🇸', employees:18, wallet:22500, outstanding:0, deposit:34200, monthly:22800, status:'active', logoBg:'#2684FF', initial:'D', contact:'admin@datapipe.com', csManager:'Priya Sharma'},
-  {id:'C007', name:'Pixel Labs', sub:'pixellabs.ca', region:'Canada', flag:'🇨🇦', employees:11, wallet:14000, outstanding:0, deposit:22600, monthly:13200, status:'active', logoBg:'#2684FF', initial:'P', contact:'team@pixellabs.ca', csManager:'Anju Verma'},
-  {id:'C008', name:'RetailGenie', sub:'retailgenie.au', region:'Australia', flag:'🇦🇺', employees:9, wallet:0, outstanding:0, deposit:0, monthly:0, status:'inactive', logoBg:'#9AA2B2', initial:'R', contact:'paused — exited Apr 2026', csManager:'Rohan Mehta'}
+  {id:'C001', name:'Acme Inc', sub:'acme.com', region:'United States', flag:'🇺🇸', employees:23, wallet:10250, outstanding:16450, deposit:46500, monthly:13950, agreed:2, status:'active', logoBg:'#2684FF', initial:'A', contact:'contact@acme.com', csManager:'Anju Verma'},
+  {id:'C002', name:'TechFlow Labs', sub:'techflow.io', region:'India', flag:'🇮🇳', employees:8, wallet:32400, outstanding:0, deposit:24000, monthly:9400, agreed:2, status:'active', logoBg:'#2684FF', initial:'T', contact:'ops@techflow.io', csManager:'Rohan Mehta'},
+  {id:'C003', name:'Brightspark GmbH', sub:'brightspark.de', region:'Germany', flag:'🇩🇪', employees:15, wallet:8500, outstanding:22400, deposit:0, monthly:20500, agreed:2, status:'active', logoBg:'#2684FF', initial:'B', contact:'finance@brightspark.de', csManager:'Anju Verma'},
+  {id:'C004', name:'Nordic Health', sub:'nordichealth.se', region:'Sweden', flag:'🇸🇪', employees:6, wallet:14200, outstanding:0, deposit:18500, monthly:6475, agreed:3, status:'active', logoBg:'#2684FF', initial:'N', contact:'ops@nordichealth.se', csManager:'Priya Sharma'},
+  {id:'C005', name:'CloudVault', sub:'cloudvault.co.uk', region:'United Kingdom', flag:'🇬🇧', employees:32, wallet:0, outstanding:18000, deposit:30000, monthly:46400, agreed:1, status:'active', logoBg:'#2684FF', initial:'C', contact:'billing@cloudvault.co.uk', csManager:'Rohan Mehta'},
+  {id:'C006', name:'DataPipe Co', sub:'datapipe.com', region:'United States', flag:'🇺🇸', employees:18, wallet:22500, outstanding:0, deposit:34200, monthly:22800, agreed:1.5, status:'active', logoBg:'#2684FF', initial:'D', contact:'admin@datapipe.com', csManager:'Priya Sharma'},
+  {id:'C007', name:'Pixel Labs', sub:'pixellabs.ca', region:'Canada', flag:'🇨🇦', employees:11, wallet:14000, outstanding:0, deposit:22600, monthly:13200, agreed:2, status:'active', logoBg:'#2684FF', initial:'P', contact:'team@pixellabs.ca', csManager:'Anju Verma'},
+  {id:'C008', name:'RetailGenie', sub:'retailgenie.au', region:'Australia', flag:'🇦🇺', employees:9, wallet:0, outstanding:0, deposit:0, monthly:0, agreed:0, status:'inactive', logoBg:'#9AA2B2', initial:'R', contact:'paused — exited Apr 2026', csManager:'Rohan Mehta'}
 ];
 
 // Per-client employee roster
@@ -1148,6 +1149,7 @@ function clientRow(c){
     <div class="tnum tamt-out ${wal?'':'zero'}" style="text-align:right">${wal?`<span class="cur">₹</span>${fmt(wal)}`:'<span class="cur" style="color:var(--n400)">₹</span><span style="color:var(--n400)">0</span>'}</div>
     <div class="tnum" style="text-align:right;color:var(--n800)">${c.monthly?`<span class="cur">₹</span>${fmt(c.monthly)}`:'—'}</div>
     <div class="tnum muted" style="text-align:right">${c.deposit?`<span class="cur">₹</span>${fmt(c.deposit)}`:'—'}</div>
+    <div class="tnum" style="text-align:right;color:var(--n800)">${c.agreed?`${c.agreed} mo`:'—'}</div>
     <div style="text-align:right">${riskCell}</div>
     <div style="text-align:right"><span class="tstatus ${c.status}"><span class="stdot"></span>${c.status[0].toUpperCase()+c.status.slice(1)}</span></div>
     <div class="raw"><button class="rabtn" onclick="event.stopPropagation();openClient('${c.id}')"><svg viewBox="0 0 14 14" fill="none"><circle cx="2.5" cy="7" r="1.2" fill="currentColor"/><circle cx="7" cy="7" r="1.2" fill="currentColor"/><circle cx="11.5" cy="7" r="1.2" fill="currentColor"/></svg></button></div>
@@ -1157,8 +1159,8 @@ function clientRow(c){
 let clientSortKey = 'name', clientSortDir = 'asc';
 function setClientSort(key){
   if(clientSortKey===key) clientSortDir = clientSortDir==='asc' ? 'desc' : 'asc';
-  else { clientSortKey = key; clientSortDir = ['outstanding','monthly','deposit','risk','employees'].includes(key) ? 'desc' : 'asc'; }
-  ['name','employees','outstanding','monthly','deposit','risk','status'].forEach(k=>{
+  else { clientSortKey = key; clientSortDir = ['outstanding','monthly','deposit','agreed','risk','employees'].includes(key) ? 'desc' : 'asc'; }
+  ['name','employees','outstanding','monthly','deposit','agreed','risk','status'].forEach(k=>{
     const el = document.getElementById('csort-'+k);
     if(el){
       el.classList.toggle('show', k===clientSortKey);
@@ -1176,6 +1178,7 @@ function renderClients(){
     if(clientSortKey==='outstanding') return ((a.outstanding||0)-(b.outstanding||0))*dir;
     if(clientSortKey==='monthly') return ((a.monthly||0)-(b.monthly||0))*dir;
     if(clientSortKey==='deposit') return ((a.deposit||0)-(b.deposit||0))*dir;
+    if(clientSortKey==='agreed') return ((a.agreed||0)-(b.agreed||0))*dir;
     if(clientSortKey==='risk'){
       const ra = computeRisk(a).pct; const rb = computeRisk(b).pct;
       return ((ra==null?-1:ra) - (rb==null?-1:rb))*dir;
