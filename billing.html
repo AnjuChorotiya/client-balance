@@ -143,6 +143,29 @@ body{font-family:var(--font);background:var(--bg);color:var(--n800);-webkit-font
 .search-box svg{width:13px;height:13px;color:var(--n400);flex-shrink:0}
 .search-box input{border:none;outline:none;font-family:var(--font);font-size:13px;color:var(--n800);background:transparent;width:100%}
 .search-box input::placeholder{color:var(--n400)}
+/* filter dropdowns (status + date) */
+.tb-controls{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.fdrop{position:relative}
+.fdrop-btn{display:flex;align-items:center;gap:8px;height:36px;padding:0 12px;background:var(--n0);border:1px solid var(--bd-strong);border-radius:var(--rmd);font-family:var(--font);font-size:13px;font-weight:500;color:var(--n700);cursor:pointer;white-space:nowrap;transition:border-color 120ms,box-shadow 120ms}
+.fdrop-btn:hover{border-color:var(--p200)}
+.fdrop.open .fdrop-btn{border-color:var(--brand);box-shadow:0 0 0 3px rgba(38,132,255,0.12)}
+.fdrop-btn > svg{width:14px;height:14px;color:var(--n400);flex-shrink:0}
+.fdrop-btn .chev{margin-left:2px;transition:transform 150ms}
+.fdrop.open .fdrop-btn .chev{transform:rotate(180deg)}
+.fdrop-btn .fcount{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;border-radius:var(--rfull);background:var(--p50);color:var(--brand);font-size:11px;font-weight:700;margin-left:2px}
+.fdrop-menu{position:absolute;top:calc(100% + 6px);right:0;min-width:200px;background:var(--n0);border:1px solid var(--bd-strong);border-radius:10px;box-shadow:0 10px 28px rgba(16,24,40,0.14);padding:6px;z-index:40;display:none}
+.fdrop.open .fdrop-menu{display:block}
+.fdrop-opt{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500;color:#222224;user-select:none}
+.fdrop-opt:hover{background:var(--n50)}
+.fdrop-check{width:16px;height:16px;border-radius:4px;border:1.5px solid var(--n300);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 120ms}
+.fdrop-check svg{width:10px;height:10px;color:#fff;opacity:0;transition:opacity 120ms}
+.fdrop-opt.sel .fdrop-check{background:var(--brand);border-color:var(--brand)}
+.fdrop-opt.sel .fdrop-check svg{opacity:1}
+.fdrop-radio{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500;color:#222224;user-select:none}
+.fdrop-radio:hover{background:var(--n50)}
+.fdrop-radio .rcheck{width:14px;height:14px;color:var(--brand);opacity:0;flex-shrink:0}
+.fdrop-radio.sel{color:var(--brand);font-weight:600}
+.fdrop-radio.sel .rcheck{opacity:1}
 
 /* simple table — minimal style */
 .table{width:100%;background:#FFFFFF;border-radius:var(--rlg);border:none;padding:8px 20px;overflow:hidden}
@@ -470,9 +493,39 @@ body{font-family:var(--font);background:var(--bg);color:var(--n800);-webkit-font
             <span class="tab" onclick="setFilter(this,'out')">Payments <span class="tab-count" id="cntPay">0</span></span>
             <span class="tab" onclick="setFilter(this,'credit')">Credits <span class="tab-count" id="cntCN">0</span></span>
           </div>
-          <div class="search-box">
-            <svg viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.5"/><path d="M9.5 9.5L12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-            <input type="text" placeholder="Search transactions" oninput="applyFilter()"/>
+          <div class="tb-controls">
+            <!-- Status filter (multiselect) -->
+            <div class="fdrop" id="statusDrop">
+              <button class="fdrop-btn" id="statusBtn" onclick="toggleStatusDrop(event)">
+                <svg viewBox="0 0 14 14" fill="none"><path d="M2 3.5H12M4 7H10M6 10.5H8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                <span id="statusLabel">All statuses</span>
+                <svg class="chev" viewBox="0 0 12 12" fill="none"><path d="M3 5L6 8L9 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <div class="fdrop-menu" id="statusMenu">
+                <div class="fdrop-opt" data-status="paid" onclick="toggleStatusOpt('paid')"><span class="fdrop-check"><svg viewBox="0 0 12 12" fill="none"><path d="M2.5 6L5 8.5L9.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Paid</div>
+                <div class="fdrop-opt" data-status="partial" onclick="toggleStatusOpt('partial')"><span class="fdrop-check"><svg viewBox="0 0 12 12" fill="none"><path d="M2.5 6L5 8.5L9.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Partially paid</div>
+                <div class="fdrop-opt" data-status="due" onclick="toggleStatusOpt('due')"><span class="fdrop-check"><svg viewBox="0 0 12 12" fill="none"><path d="M2.5 6L5 8.5L9.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Due / Unpaid</div>
+              </div>
+            </div>
+            <!-- Date filter (single-select range) -->
+            <div class="fdrop" id="dateDrop">
+              <button class="fdrop-btn" id="dateBtn" onclick="toggleDateDrop(event)">
+                <svg viewBox="0 0 14 14" fill="none"><rect x="1.5" y="2.5" width="11" height="10" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M1.5 5.5H12.5M4.5 1.5V3.5M9.5 1.5V3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+                <span id="dateLabel">All dates</span>
+                <svg class="chev" viewBox="0 0 12 12" fill="none"><path d="M3 5L6 8L9 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <div class="fdrop-menu" id="dateMenu">
+                <div class="fdrop-radio sel" data-range="all" onclick="setDateRange('all')">All dates<svg class="rcheck" viewBox="0 0 12 12" fill="none"><path d="M2.5 6L5 8.5L9.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div class="fdrop-radio" data-range="30" onclick="setDateRange('30')">Last 30 days<svg class="rcheck" viewBox="0 0 12 12" fill="none"><path d="M2.5 6L5 8.5L9.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div class="fdrop-radio" data-range="90" onclick="setDateRange('90')">Last 3 months<svg class="rcheck" viewBox="0 0 12 12" fill="none"><path d="M2.5 6L5 8.5L9.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div class="fdrop-radio" data-range="180" onclick="setDateRange('180')">Last 6 months<svg class="rcheck" viewBox="0 0 12 12" fill="none"><path d="M2.5 6L5 8.5L9.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div class="fdrop-radio" data-range="year" onclick="setDateRange('year')">This year (2026)<svg class="rcheck" viewBox="0 0 12 12" fill="none"><path d="M2.5 6L5 8.5L9.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              </div>
+            </div>
+            <div class="search-box">
+              <svg viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.5"/><path d="M9.5 9.5L12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              <input type="text" placeholder="Search transactions" oninput="applyFilter()"/>
+            </div>
           </div>
         </div>
 
@@ -697,7 +750,7 @@ function rowHTML(t, idx){
   };
   const rowIcon = (t.docType && docIcons[t.docType]) ? docIcons[t.docType] : icons[t.kind];
   const sCls = statusClass(t);
-  return `<div class="trow" data-kind="${t.kind}" data-search="${(t.title+' '+t.meta+' '+t.ref+' '+t.id+' '+t.amount).toLowerCase()}" onclick='openDrawer(${JSON.stringify(t).replace(/'/g,"&#39;")})'>
+  return `<div class="trow" data-kind="${t.kind}" data-status="${statusGroup(t)}" data-time="${txTime(t)}" data-search="${(t.title+' '+t.meta+' '+t.ref+' '+t.id+' '+t.amount).toLowerCase()}" onclick='openDrawer(${JSON.stringify(t).replace(/'/g,"&#39;")})'>
     <div class="tdate">${t.date.split(' ').slice(0,2).join(' ')}<span class="y">${t.year}</span></div>
     <div class="tact">
       <div class="tact-dot ${t.kind}">${rowIcon}</div>
@@ -714,6 +767,60 @@ function rowHTML(t, idx){
 function renderRows(){
   document.getElementById('txBody').innerHTML = TX.map((t,i)=>rowHTML(t,i)).join('');
   applyFilter();
+}
+
+// ----- status + date filter helpers -----
+function statusGroup(t){
+  if(t.status && t.status.indexOf('Partial')===0) return 'partial';
+  if(t.isOpen || (t.status && (t.status.indexOf('Due')===0 || t.status==='Open' || t.status==='Pending'))) return 'due';
+  return 'paid';
+}
+const MONTHS = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+function txTime(t){
+  const p = (t.date||'').split(' ');
+  if(p.length<3) return 0;
+  const d = new Date(+p[2], MONTHS[p[1]]??0, +p[0]);
+  return d.getTime();
+}
+const TODAY = new Date(2026,5,2); // 02 Jun 2026
+const statusSel = new Set();
+let dateRange = 'all';
+
+function toggleStatusDrop(e){ e.stopPropagation(); const d=document.getElementById('statusDrop'); const open=d.classList.contains('open'); closeAllDrops(); if(!open) d.classList.add('open'); }
+function toggleDateDrop(e){ e.stopPropagation(); const d=document.getElementById('dateDrop'); const open=d.classList.contains('open'); closeAllDrops(); if(!open) d.classList.add('open'); }
+function closeAllDrops(){ document.querySelectorAll('.fdrop').forEach(d=>d.classList.remove('open')); }
+document.addEventListener('click', e=>{ if(!e.target.closest('.fdrop')) closeAllDrops(); });
+
+function toggleStatusOpt(s){
+  if(statusSel.has(s)) statusSel.delete(s); else statusSel.add(s);
+  updateStatusUI();
+  applyFilter();
+}
+function updateStatusUI(){
+  document.querySelectorAll('#statusMenu .fdrop-opt').forEach(o=>{
+    o.classList.toggle('sel', statusSel.has(o.dataset.status));
+  });
+  const lbl = document.getElementById('statusLabel');
+  const names = {paid:'Paid', partial:'Partially paid', due:'Due / Unpaid'};
+  if(statusSel.size===0){ lbl.textContent='All statuses'; }
+  else if(statusSel.size===1){ lbl.textContent = names[[...statusSel][0]]; }
+  else { lbl.textContent = `${statusSel.size} statuses`; }
+}
+function setDateRange(r){
+  dateRange = r;
+  document.querySelectorAll('#dateMenu .fdrop-radio').forEach(o=>o.classList.toggle('sel', o.dataset.range===r));
+  const names = {all:'All dates','30':'Last 30 days','90':'Last 3 months','180':'Last 6 months',year:'This year (2026)'};
+  document.getElementById('dateLabel').textContent = names[r]||'All dates';
+  closeAllDrops();
+  applyFilter();
+}
+function inDateRange(ms){
+  if(dateRange==='all') return true;
+  const t = +ms;
+  if(dateRange==='year') return new Date(t).getFullYear()===2026;
+  const days = parseInt(dateRange,10);
+  const cutoff = TODAY.getTime() - days*86400000;
+  return t >= cutoff;
 }
 
 function setFilter(el, kind){
@@ -733,7 +840,9 @@ function applyFilter(){
     r.classList.remove('last-visible');
     const kindMatch = currentFilter==='all' || r.dataset.kind===currentFilter;
     const searchMatch = !q || r.dataset.search.includes(q);
-    const show = kindMatch && searchMatch;
+    const statusMatch = statusSel.size===0 || statusSel.has(r.dataset.status);
+    const dateMatch = inDateRange(r.dataset.time);
+    const show = kindMatch && searchMatch && statusMatch && dateMatch;
     r.style.display = show ? 'grid' : 'none';
     if(show){ visible++; lastVisible = r; }
   });
