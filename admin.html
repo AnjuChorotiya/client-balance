@@ -651,13 +651,19 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
               <svg viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.5"/><path d="M9.5 9.5L12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
               <input id="tlSearch" type="text" placeholder="Search transactions…" oninput="setSearchFilter(this.value)"/>
             </div>
-            <select class="tl-time" id="tlKind" onchange="setKindFilter(this.value)">
-              <option value="all">All activity</option>
-              <option value="invoice">Invoices</option>
-              <option value="payment">Payments</option>
-              <option value="deposit">Deposits</option>
-              <option value="credit">Credit notes</option>
-            </select>
+            <div class="ms" id="tlKindMS">
+              <button type="button" class="tl-time ms-trigger" id="tlKindBtn" onclick="toggleKindMenu(event)" aria-haspopup="listbox" aria-expanded="false">
+                <span class="ms-label" id="tlKindLabel">All activity</span>
+              </button>
+              <div class="ms-menu" id="tlKindMenu" role="listbox" aria-multiselectable="true">
+                <button type="button" class="ms-opt ms-all sel" data-val="all" onclick="toggleKindOpt('all')" role="option"><span class="ms-check"></span><span class="ms-txt">All activity</span></button>
+                <div class="ms-divider"></div>
+                <button type="button" class="ms-opt" data-val="invoice" onclick="toggleKindOpt('invoice')" role="option"><span class="ms-check"></span><span class="ms-txt">Invoices</span></button>
+                <button type="button" class="ms-opt" data-val="payment" onclick="toggleKindOpt('payment')" role="option"><span class="ms-check"></span><span class="ms-txt">Payments</span></button>
+                <button type="button" class="ms-opt" data-val="deposit" onclick="toggleKindOpt('deposit')" role="option"><span class="ms-check"></span><span class="ms-txt">Deposits</span></button>
+                <button type="button" class="ms-opt" data-val="credit" onclick="toggleKindOpt('credit')" role="option"><span class="ms-check"></span><span class="ms-txt">Credit notes</span></button>
+              </div>
+            </div>
             <div class="ms" id="tlStatusMS">
               <button type="button" class="tl-time ms-trigger" id="tlStatusBtn" onclick="toggleStatusMenu(event)" aria-haspopup="listbox" aria-expanded="false">
                 <span class="ms-label" id="tlStatusLabel">All statuses</span>
@@ -997,15 +1003,48 @@ function defaultTimeline(c){
   ];
 }
 
-let currentTab='all', currentTl='all', currentClient=null, currentTimeFilter='all';
+let currentTab='all', currentClient=null, currentTimeFilter='all';
+const kindSel = new Set(); // empty = all activity
+const KIND_LABELS = {invoice:'Invoices', payment:'Payments', deposit:'Deposits', credit:'Credit notes'};
+function toggleKindMenu(ev){
+  ev.stopPropagation();
+  const menu = document.getElementById('tlKindMenu');
+  const btn = document.getElementById('tlKindBtn');
+  const open = menu.classList.toggle('open');
+  btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+function closeKindMenu(){
+  document.getElementById('tlKindMenu').classList.remove('open');
+  document.getElementById('tlKindBtn').setAttribute('aria-expanded','false');
+}
+function toggleKindOpt(val){
+  if(val==='all'){ kindSel.clear(); }
+  else { kindSel.has(val) ? kindSel.delete(val) : kindSel.add(val); }
+  updateKindUI();
+  renderTimeline();
+}
+function updateKindUI(){
+  const btn = document.getElementById('tlKindBtn');
+  const label = document.getElementById('tlKindLabel');
+  if(!btn) return;
+  const n = kindSel.size;
+  document.querySelectorAll('#tlKindMenu .ms-opt').forEach(o=>{
+    const v = o.getAttribute('data-val');
+    const on = v==='all' ? n===0 : kindSel.has(v);
+    o.classList.toggle('sel', on);
+  });
+  if(n===0){ label.textContent='All activity'; btn.classList.remove('active'); }
+  else {
+    btn.classList.add('active');
+    const only = n===1 ? KIND_LABELS[[...kindSel][0]] : null;
+    label.innerHTML = (only ? only : n+' types') + ' <span class="ms-badge">'+n+'</span>';
+  }
+}
+document.addEventListener('click', (ev)=>{ if(!ev.target.closest('#tlKindMS')) closeKindMenu(); });
 const NOW = new Date('2026-05-28');
 
 function setTimeFilter(value){
   currentTimeFilter = value;
-  renderTimeline();
-}
-function setKindFilter(value){
-  currentTl = value;
   renderTimeline();
 }
 let currentSearch = '', currentSortKey = 'date', currentSortDir = 'desc';
@@ -1226,16 +1265,17 @@ function openClient(id){
     </div>
   `;
 
-  currentTl = 'all';
   currentTimeFilter = 'all';
   statusSel.clear();
   if(typeof updateStatusUI==='function') updateStatusUI();
   closeStatusMenu();
+  kindSel.clear();
+  if(typeof updateKindUI==='function') updateKindUI();
+  closeKindMenu();
   currentSearch = '';
   currentSortKey = 'date';
   currentSortDir = 'desc';
   const tlTime = document.getElementById('tlTime'); if(tlTime){ tlTime.value = 'all'; tlTime._csRefresh && tlTime._csRefresh(); }
-  const tlKind = document.getElementById('tlKind'); if(tlKind){ tlKind.value = 'all'; tlKind._csRefresh && tlKind._csRefresh(); }
   const tlSearch = document.getElementById('tlSearch'); if(tlSearch) tlSearch.value = '';
   document.querySelectorAll('.sort-ind').forEach(el => el.classList.remove('show','desc'));
   const sortDate = document.getElementById('sort-date'); if(sortDate){ sortDate.classList.add('show','desc'); }
@@ -1354,7 +1394,9 @@ function closeDrawer(){ backToList(); } // back-compat alias
 function setTlFilter(el, kind){
   document.querySelectorAll('.tlf').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');
-  currentTl = kind;
+  kindSel.clear();
+  if(kind && kind!=='all') kindSel.add(kind);
+  updateKindUI();
   renderTimeline();
 }
 
@@ -1539,7 +1581,7 @@ function eventDetail(e){
 
 function renderTimeline(){
   const items = TIMELINES[currentClient.id] || defaultTimeline(currentClient);
-  const kindFiltered = currentTl==='all' ? items : items.filter(e=>eventCategory(e.type)===currentTl);
+  const kindFiltered = kindSel.size===0 ? items : items.filter(e=>kindSel.has(eventCategory(e.type)));
   const timeFiltered = kindFiltered.filter(e => isInTimeRange(e.date));
   const statusFiltered = statusSel.size===0 ? timeFiltered : timeFiltered.filter(e => statusSel.has(e.pill||''));
   const searchFiltered = !currentSearch ? statusFiltered : statusFiltered.filter(e =>
