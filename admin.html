@@ -566,12 +566,12 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
           </div>
           <div class="stat-card">
             <div class="stat-label">Outstanding invoices</div>
-            <div class="stat-val"><span class="cur">$</span>184,500</div>
+            <div class="stat-val"><span class="cur">₹</span>184,500</div>
             <div class="stat-meta"><span>across 11 clients</span></div>
           </div>
           <div class="stat-card">
             <div class="stat-label">Deposits held</div>
-            <div class="stat-val"><span class="cur">$</span>246,200</div>
+            <div class="stat-val"><span class="cur">₹</span>246,200</div>
             <div class="stat-meta"><span>across 89 employees</span></div>
           </div>
         </div>
@@ -1145,9 +1145,9 @@ function clientRow(c){
       <div class="tinfo"><div class="tname">${c.name}</div><div class="tsub">${c.sub}</div></div>
     </div>
     <div class="tnum muted" style="text-align:right">${c.employees}</div>
-    <div class="tnum tamt-out ${wal?'':'zero'}" style="text-align:right">${wal?`<span class="cur">$</span>${fmt(wal)}`:'<span class="cur" style="color:var(--n400)">$</span><span style="color:var(--n400)">0</span>'}</div>
-    <div class="tnum" style="text-align:right;color:var(--n800)">${c.monthly?`<span class="cur">$</span>${fmt(c.monthly)}`:'—'}</div>
-    <div class="tnum muted" style="text-align:right">${c.deposit?`<span class="cur">$</span>${fmt(c.deposit)}`:'—'}</div>
+    <div class="tnum tamt-out ${wal?'':'zero'}" style="text-align:right">${wal?`<span class="cur">₹</span>${fmt(wal)}`:'<span class="cur" style="color:var(--n400)">₹</span><span style="color:var(--n400)">0</span>'}</div>
+    <div class="tnum" style="text-align:right;color:var(--n800)">${c.monthly?`<span class="cur">₹</span>${fmt(c.monthly)}`:'—'}</div>
+    <div class="tnum muted" style="text-align:right">${c.deposit?`<span class="cur">₹</span>${fmt(c.deposit)}`:'—'}</div>
     <div style="text-align:right">${riskCell}</div>
     <div style="text-align:right"><span class="tstatus ${c.status}"><span class="stdot"></span>${c.status[0].toUpperCase()+c.status.slice(1)}</span></div>
     <div class="raw"><button class="rabtn" onclick="event.stopPropagation();openClient('${c.id}')"><svg viewBox="0 0 14 14" fill="none"><circle cx="2.5" cy="7" r="1.2" fill="currentColor"/><circle cx="7" cy="7" r="1.2" fill="currentColor"/><circle cx="11.5" cy="7" r="1.2" fill="currentColor"/></svg></button></div>
