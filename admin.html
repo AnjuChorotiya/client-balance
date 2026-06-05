@@ -382,10 +382,10 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
 .txn-panel-title{font-size:16px;font-weight:700;color:var(--n900);letter-spacing:-0.2px}
 .txn-panel-body{flex:1;overflow-y:auto;padding:22px 24px;display:flex;flex-direction:column;gap:20px}
 /* internal notes column + timeline */
-.notes-chip{display:inline-flex;align-items:center;gap:5px;height:26px;padding:0 10px;border-radius:9999px;border:1px solid var(--bd-strong);background:#fff;color:var(--n600);font-family:'Open Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all 120ms;white-space:nowrap}
-.notes-chip:hover{border-color:var(--brand);color:var(--brand);background:#F4F9FF}
-.notes-chip svg{width:13px;height:13px;flex-shrink:0}
-.notes-chip.empty{color:var(--n400);border-style:dashed}
+.notes-chip{display:inline-flex;align-items:center;gap:5px;height:26px;padding:0 6px;border-radius:6px;border:none;background:transparent;color:var(--n600);font-family:'Open Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:color 120ms,background 120ms;white-space:nowrap}
+.notes-chip:hover{color:var(--brand);background:#F4F9FF}
+.notes-chip svg{width:14px;height:14px;flex-shrink:0}
+.notes-chip.empty{color:var(--n400)}
 .note-composer{display:flex;flex-direction:column;gap:8px;padding-bottom:18px;border-bottom:1px solid var(--bd)}
 .note-composer-label{font-size:12px;font-weight:700;color:var(--n500);text-transform:uppercase;letter-spacing:.4px;font-family:var(--font-tag)}
 .note-composer textarea{width:100%;min-height:64px;resize:vertical;border:1px solid var(--bd-strong);border-radius:8px;padding:10px 12px;font-family:var(--font);font-size:13px;color:var(--n800);outline:none;transition:border-color 120ms,box-shadow 120ms}
@@ -1195,8 +1195,8 @@ function computeRisk(c){
 function notesCell(c){
   const n = (c.notes||[]).length;
   const icon = `<svg viewBox="0 0 14 14" fill="none"><path d="M2 3.5C2 2.95 2.45 2.5 3 2.5H11C11.55 2.5 12 2.95 12 3.5V9C12 9.55 11.55 10 11 10H5L2.5 12V3.5Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>`;
-  if(n===0) return `<button class="notes-chip empty" onclick="event.stopPropagation();openNotes('${c.id}')">${icon}Add note</button>`;
-  return `<button class="notes-chip" onclick="event.stopPropagation();openNotes('${c.id}')">${icon}${n} note${n>1?'s':''}</button>`;
+  if(n===0) return `<button class="notes-chip empty" title="Add note" onclick="event.stopPropagation();openNotes('${c.id}')">${icon}</button>`;
+  return `<button class="notes-chip" title="${n} note${n>1?'s':''}" onclick="event.stopPropagation();openNotes('${c.id}')">${icon}${n}</button>`;
 }
 function clientRow(c){
   // Wallet displays the open invoice amount (or 0 if nothing due)
