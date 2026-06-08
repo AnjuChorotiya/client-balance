@@ -641,6 +641,9 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
 .lit-muted{color:var(--n300);font-size:13px}
 .lit-exit-note{font-size:11px;color:var(--n500)}
 .lit-exit-note b{color:var(--n700);font-weight:600}
+.settle-pill{display:inline-flex;align-items:center;font-family:'Open Sans',sans-serif;font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:var(--rfull)}
+.settle-pill.ok{background:var(--s50);color:var(--s700)}
+.settle-pill.wait{background:var(--w50);color:var(--w700)}
 .lit-detail{padding:0 18px 16px;display:flex;flex-direction:column;gap:12px}
 .lit-detail-inner{background:var(--n50);border-radius:var(--rmd);padding:14px 16px;display:flex;align-items:flex-end;gap:20px;flex-wrap:wrap}
 .lit-check{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--n700);cursor:pointer;user-select:none;padding-bottom:8px}
@@ -1211,12 +1214,12 @@ const INVOICES = [
   ]},
   {id:'INV-2026-0035', clientId:'C005', date:'18 Apr 2026', items:[
     {id:'LI-3501', d1:'Payroll — CTO Office', d2:'Gross salary + statutory', amount:6200, type:'deposit', exited:false, emp:{name:'Oliver Hughes', start:'', end:''}},
-    {id:'LI-3502', d1:'Payroll — VP Engineering', d2:'Gross salary + statutory', amount:7100, type:'deposit', exited:true, emp:{name:'Emily Watson', start:'2026-02-18', end:'2026-04-30'}},
+    {id:'LI-3502', d1:'Payroll — VP Engineering', d2:'Gross salary + statutory', amount:7100, type:'deposit', exited:true, settlement:'settled', emp:{name:'Emily Watson', start:'2026-02-18', end:'2026-04-30'}},
     {id:'LI-3503', d1:'Payroll — Engineering Lead', d2:'Gross salary + statutory', amount:5800, type:'normal'}
   ]},
   {id:'INV-2026-0031', clientId:'C001', date:'01 Apr 2026', items:[
     {id:'LI-3101', d1:'EOR Management Fee', d2:'Monthly platform & compliance', amount:1200, type:'normal'},
-    {id:'LI-3102', d1:'Payroll — Senior Designer', d2:'Gross salary + statutory', amount:8400, type:'deposit', exited:true, emp:{name:'Sneha Arora', start:'2026-01-12', end:'2026-03-31'}},
+    {id:'LI-3102', d1:'Payroll — Senior Designer', d2:'Gross salary + statutory', amount:8400, type:'deposit', exited:true, settlement:'pending', emp:{name:'Sneha Arora', start:'2026-01-12', end:'2026-03-31'}},
     {id:'LI-3103', d1:'Payroll — Backend Engineer', d2:'Gross salary + statutory', amount:8800, type:'deposit', exited:false, emp:{name:'Vikram Iyer', start:'', end:''}}
   ]},
   {id:'INV-2026-0028', clientId:'C006', date:'28 Mar 2026', items:[
@@ -2347,7 +2350,10 @@ function renderLineItem(it){
       ? `<span class="map-badge dep"><span class="dot"></span>Deposit</span>`
       : `<span class="map-badge partial"><span class="dot"></span>Needs employee</span>`;
     let note = '';
-    if(named) note = `<div class="lit-exit-note"><b>${it.emp.name}</b>${it.exited?' · Exited':''}</div>`;
+    if(named){
+      const settle = it.exited ? `<span class="settle-pill ${it.settlement==='settled'?'ok':'wait'}">${it.settlement==='settled'?'Settled':'Pending settlement'}</span>` : '';
+      note = `<div class="lit-exit-note"><b>${it.emp.name}</b>${it.exited?' · Exited':''}</div>${settle}`;
+    }
     status = `<div class="lit-status">${badge}${note}</div>`;
   }
   const row = `<div class="lit-row">
@@ -2374,6 +2380,13 @@ function renderDepositDetail(it){
     <div class="wm-field-float lit-wm-field" style="margin-bottom:0">
       <input class="wm-input" type="date" value="${emp.end||''}" onchange="invSetEmp('${it.id}','end',this.value)">
       <label>End date</label>
+    </div>
+    <div class="wm-field-float lit-wm-field" style="margin-bottom:0">
+      <select class="wm-select" onchange="invSetSettlement('${it.id}',this.value)">
+        <option value="pending" ${it.settlement==='settled'?'':'selected'}>Pending</option>
+        <option value="settled" ${it.settlement==='settled'?'selected':''}>Settled</option>
+      </select>
+      <label>Settlement</label>
     </div>` : '';
   return `<div class="lit-detail">
     <div class="lit-detail-inner">
@@ -2393,16 +2406,18 @@ function invSetType(itemId, type){
   const it = invFindItem(itemId); if(!it) return;
   it.type = type;
   if(type==='deposit'){ if(!it.emp) it.emp={name:'',start:'',end:''}; if(it.exited===undefined) it.exited=false; }
-  else { it.emp=null; it.exited=false; }
+  else { it.emp=null; it.exited=false; it.settlement=undefined; }
   renderInvoiceDetail();
 }
 function invToggleExited(itemId, v){
   const it=invFindItem(itemId); if(!it) return;
   it.exited = v;
   if(!it.emp) it.emp = {name:'', start:'', end:''};
-  if(!v){ it.emp.start=''; it.emp.end=''; }
+  if(v){ if(!it.settlement) it.settlement='pending'; }
+  else { it.emp.start=''; it.emp.end=''; it.settlement=undefined; }
   renderInvoiceDetail();
 }
+function invSetSettlement(itemId, val){ const it=invFindItem(itemId); if(it){ it.settlement=val; renderInvoiceDetail(); } }
 function invSetEmp(itemId, field, val){ const it=invFindItem(itemId); if(it){ if(!it.emp) it.emp={name:'',start:'',end:''}; it.emp[field]=val; } }
 // live name edit — patch only the status cell + progress so the text input keeps focus
 function invSetEmpName(itemId, val){
@@ -2411,8 +2426,9 @@ function invSetEmpName(itemId, val){
   it.emp.name = val;
   const host = document.querySelector(`.lit-item[data-li="${itemId}"] .lit-status`);
   if(host){
+    const settle = it.exited ? `<span class="settle-pill ${it.settlement==='settled'?'ok':'wait'}">${it.settlement==='settled'?'Settled':'Pending settlement'}</span>` : '';
     host.innerHTML = invNamed(it)
-      ? `<span class="map-badge dep"><span class="dot"></span>Deposit</span><div class="lit-exit-note"><b>${escHtml(val)}</b>${it.exited?' · Exited':''}</div>`
+      ? `<span class="map-badge dep"><span class="dot"></span>Deposit</span><div class="lit-exit-note"><b>${escHtml(val)}</b>${it.exited?' · Exited':''}</div>${settle}`
       : `<span class="map-badge partial"><span class="dot"></span>Needs employee</span>`;
   }
 }
