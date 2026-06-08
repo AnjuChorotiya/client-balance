@@ -641,9 +641,6 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
 .lit-muted{color:var(--n300);font-size:13px}
 .lit-exit-note{font-size:11px;color:var(--n500)}
 .lit-exit-note b{color:var(--n700);font-weight:600}
-.settle-pill{display:inline-flex;align-items:center;font-family:'Open Sans',sans-serif;font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:var(--rfull)}
-.settle-pill.ok{background:var(--s50);color:var(--s700)}
-.settle-pill.wait{background:var(--w50);color:var(--w700)}
 .lit-detail{padding:0 18px 16px;display:flex;flex-direction:column;gap:12px}
 .lit-detail-inner{background:var(--n50);border-radius:var(--rmd);padding:14px 16px;display:flex;align-items:flex-end;gap:20px;flex-wrap:wrap}
 .lit-check{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--n700);cursor:pointer;user-select:none;padding-bottom:8px}
@@ -2351,7 +2348,7 @@ function renderLineItem(it){
       : `<span class="map-badge partial"><span class="dot"></span>Needs employee</span>`;
     let note = '';
     if(named){
-      const settle = it.exited ? `<span class="settle-pill ${it.settlement==='settled'?'ok':'wait'}">${it.settlement==='settled'?'Settled':'Pending settlement'}</span>` : '';
+      const settle = it.exited ? `<span class="wm-pill ${it.settlement==='settled'?'wm-pill--success':'wm-pill--warning'}">${it.settlement==='settled'?'Settled':'Pending settlement'}</span>` : '';
       note = `<div class="lit-exit-note"><b>${it.emp.name}</b>${it.exited?' · Exited':''}</div>${settle}`;
     }
     status = `<div class="lit-status">${badge}${note}</div>`;
@@ -2381,13 +2378,7 @@ function renderDepositDetail(it){
       <input class="wm-input" type="date" value="${emp.end||''}" onchange="invSetEmp('${it.id}','end',this.value)">
       <label>End date</label>
     </div>
-    <div class="wm-field-float lit-wm-field" style="margin-bottom:0">
-      <select class="wm-select" onchange="invSetSettlement('${it.id}',this.value)">
-        <option value="pending" ${it.settlement==='settled'?'':'selected'}>Pending</option>
-        <option value="settled" ${it.settlement==='settled'?'selected':''}>Settled</option>
-      </select>
-      <label>Settlement</label>
-    </div>` : '';
+    <label class="lit-check"><input type="checkbox" ${it.settlement==='settled'?'checked':''} onchange="invSetSettlement('${it.id}', this.checked ? 'settled' : 'pending')">Settled</label>` : '';
   return `<div class="lit-detail">
     <div class="lit-detail-inner">
       <div class="wm-field-float lit-wm-field lit-wm-name" style="margin-bottom:0">
@@ -2426,7 +2417,7 @@ function invSetEmpName(itemId, val){
   it.emp.name = val;
   const host = document.querySelector(`.lit-item[data-li="${itemId}"] .lit-status`);
   if(host){
-    const settle = it.exited ? `<span class="settle-pill ${it.settlement==='settled'?'ok':'wait'}">${it.settlement==='settled'?'Settled':'Pending settlement'}</span>` : '';
+    const settle = it.exited ? `<span class="wm-pill ${it.settlement==='settled'?'wm-pill--success':'wm-pill--warning'}">${it.settlement==='settled'?'Settled':'Pending settlement'}</span>` : '';
     host.innerHTML = invNamed(it)
       ? `<span class="map-badge dep"><span class="dot"></span>Deposit</span><div class="lit-exit-note"><b>${escHtml(val)}</b>${it.exited?' · Exited':''}</div>${settle}`
       : `<span class="map-badge partial"><span class="dot"></span>Needs employee</span>`;
