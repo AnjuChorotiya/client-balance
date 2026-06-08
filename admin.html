@@ -627,12 +627,12 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
 
 /* line items table */
 .lit-table{background:#fff;border:1px solid var(--bd);border-radius:var(--rlg)}
-.lit-thead{display:grid;grid-template-columns:minmax(240px,2fr) 120px 210px minmax(160px,1fr);gap:16px;padding:11px 18px;background:#F9FAFB;border-bottom:1px solid #E5E7EB;border-radius:var(--rlg) var(--rlg) 0 0;font-family:'Open Sans',sans-serif;font-size:12.5px;font-weight:600;color:#404145}
+.lit-thead{display:grid;grid-template-columns:minmax(200px,2fr) 110px 150px minmax(150px,1.3fr) minmax(140px,1fr);gap:16px;padding:11px 18px;background:#F9FAFB;border-bottom:1px solid #E5E7EB;border-radius:var(--rlg) var(--rlg) 0 0;font-family:'Open Sans',sans-serif;font-size:12.5px;font-weight:600;color:#404145}
 .lit-thead .right{text-align:right}
 .lit-item{border-bottom:1px solid #F0F1F1}
 .lit-item:last-child{border-bottom:none;border-radius:0 0 var(--rlg) var(--rlg)}
 .lit-item.is-dep{background:#FCFDFF}
-.lit-row{display:grid;grid-template-columns:minmax(240px,2fr) 120px 210px minmax(160px,1fr);gap:16px;align-items:center;padding:14px 18px}
+.lit-row{display:grid;grid-template-columns:minmax(200px,2fr) 110px 150px minmax(150px,1.3fr) minmax(140px,1fr);gap:16px;align-items:center;padding:14px 18px}
 .lit-row .d1{font-size:14px;font-weight:600;color:var(--n900)}
 .lit-row .d2{font-size:12px;color:var(--n500);margin-top:2px}
 .lit-row .amt{font-size:14px;font-weight:700;color:var(--n900);text-align:right;white-space:nowrap}
@@ -641,6 +641,9 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
 .lit-muted{color:var(--n300);font-size:13px}
 .lit-exit-note{font-size:11px;color:var(--n500)}
 .lit-exit-note b{color:var(--n700);font-weight:600}
+.lit-emp{display:flex;flex-direction:column;gap:2px}
+.lit-emp .nm{font-size:13.5px;font-weight:600;color:var(--n900)}
+.lit-emp .ex{font-size:11px;color:var(--n500)}
 .lit-detail{padding:0 18px 16px;display:flex;flex-direction:column;gap:12px}
 .lit-detail-inner{background:var(--n50);border-radius:var(--rmd);padding:14px 16px;display:flex;align-items:flex-end;gap:20px;flex-wrap:wrap}
 .lit-check{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--n700);cursor:pointer;user-select:none;padding-bottom:8px}
@@ -2329,7 +2332,7 @@ function renderInvoiceDetail(){
   document.getElementById('invItemList').innerHTML =
     `<div class="lit-table">
       <div class="lit-thead">
-        <div>Line item</div><div class="right">Amount</div><div>Type</div><div>Deposit status</div>
+        <div>Line item</div><div class="right">Amount</div><div>Type</div><div>Employee</div><div>Deposit status</div>
       </div>
       ${inv.items.map(renderLineItem).join('')}
     </div>`;
@@ -2338,20 +2341,20 @@ function renderInvoiceDetail(){
 
 function renderLineItem(it){
   const dep = it.type==='deposit';
-  let status;
+  let empCell, status;
   if(!dep){
+    empCell = `<span class="lit-muted">—</span>`;
     status = `<span class="lit-muted">—</span>`;
   } else {
     const named = invNamed(it);
+    empCell = named
+      ? `<div class="lit-emp"><span class="nm">${escHtml(it.emp.name)}</span>${it.exited?`<span class="ex">Exited</span>`:''}</div>`
+      : `<span class="lit-muted">—</span>`;
     const badge = named
       ? `<span class="map-badge dep"><span class="dot"></span>Deposit</span>`
       : `<span class="map-badge partial"><span class="dot"></span>Needs employee</span>`;
-    let note = '';
-    if(named){
-      const settle = (it.exited && it.settlement==='settled') ? `<span class="wm-pill wm-pill--success">Settled</span>` : '';
-      note = `<div class="lit-exit-note"><b>${it.emp.name}</b>${it.exited?' · Exited':''}</div>${settle}`;
-    }
-    status = `<div class="lit-status">${badge}${note}</div>`;
+    const settle = (named && it.exited && it.settlement==='settled') ? `<span class="wm-pill wm-pill--success">Settled</span>` : '';
+    status = `<div class="lit-status">${badge}${settle}</div>`;
   }
   const row = `<div class="lit-row">
     <div><div class="d1">${it.d1}</div><div class="d2">${it.d2}</div></div>
@@ -2362,6 +2365,7 @@ function renderLineItem(it){
         <option value="deposit" ${dep?'selected':''}>Deposit</option>
       </select>
     </div>
+    <div class="lit-emp-cell">${empCell}</div>
     <div>${status}</div>
   </div>`;
   return `<div class="lit-item ${dep?'is-dep':''}" data-li="${it.id}">${row}${dep?renderDepositDetail(it):''}</div>`;
@@ -2415,11 +2419,20 @@ function invSetEmpName(itemId, val){
   const it=invFindItem(itemId); if(!it) return;
   if(!it.emp) it.emp={name:'',start:'',end:''};
   it.emp.name = val;
-  const host = document.querySelector(`.lit-item[data-li="${itemId}"] .lit-status`);
-  if(host){
-    const settle = (it.exited && it.settlement==='settled') ? `<span class="wm-pill wm-pill--success">Settled</span>` : '';
-    host.innerHTML = invNamed(it)
-      ? `<span class="map-badge dep"><span class="dot"></span>Deposit</span><div class="lit-exit-note"><b>${escHtml(val)}</b>${it.exited?' · Exited':''}</div>${settle}`
+  const named = invNamed(it);
+  const item = document.querySelector(`.lit-item[data-li="${itemId}"]`);
+  if(!item) return;
+  const empHost = item.querySelector('.lit-emp-cell');
+  if(empHost){
+    empHost.innerHTML = named
+      ? `<div class="lit-emp"><span class="nm">${escHtml(val)}</span>${it.exited?`<span class="ex">Exited</span>`:''}</div>`
+      : `<span class="lit-muted">—</span>`;
+  }
+  const statusHost = item.querySelector('.lit-status');
+  if(statusHost){
+    const settle = (named && it.exited && it.settlement==='settled') ? `<span class="wm-pill wm-pill--success">Settled</span>` : '';
+    statusHost.innerHTML = named
+      ? `<span class="map-badge dep"><span class="dot"></span>Deposit</span>${settle}`
       : `<span class="map-badge partial"><span class="dot"></span>Needs employee</span>`;
   }
 }
