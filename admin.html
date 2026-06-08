@@ -2361,7 +2361,7 @@ function renderLineItem(it){
     <div class="amt"><span class="cur">$</span>${fmt(it.amount)}</div>
     <div class="wm-field-float lit-type-field" style="margin-bottom:0">
       <select class="wm-select" onchange="invSetType('${it.id}',this.value)">
-        <option value="normal" ${!dep?'selected':''}>Normal</option>
+        <option value="normal" ${!dep?'selected':''}>Regular</option>
         <option value="deposit" ${dep?'selected':''}>Deposit</option>
       </select>
     </div>
