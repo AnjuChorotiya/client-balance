@@ -633,6 +633,11 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
 .lit-item:last-child{border-bottom:none;border-radius:0 0 var(--rlg) var(--rlg)}
 .lit-item.is-dep{background:#FCFDFF}
 .lit-row{display:grid;grid-template-columns:minmax(200px,2fr) 110px 150px minmax(150px,1.3fr) minmax(140px,1fr);gap:32px;align-items:center;padding:14px 24px}
+.lit-item.is-dep .lit-row{cursor:pointer}
+.lit-item.is-dep .lit-row:hover{background:#F6FAFF}
+.lit-namecell{display:flex;align-items:center;gap:10px}
+.lit-chev{width:16px;height:16px;flex:0 0 auto;color:var(--n400);transition:transform .18s ease}
+.lit-item.is-open .lit-chev{transform:rotate(90deg)}
 .lit-row .d1{font-size:14px;font-weight:600;color:var(--n900)}
 .lit-row .d2{font-size:12px;color:var(--n500);margin-top:2px}
 .lit-row .amt{font-size:14px;font-weight:700;color:var(--n900);text-align:right;white-space:nowrap}
@@ -644,7 +649,8 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
 .lit-emp{display:flex;flex-direction:column;gap:2px}
 .lit-emp .nm{font-size:13.5px;font-weight:600;color:var(--n900)}
 .lit-emp .ex{font-size:11px;color:var(--n500)}
-.lit-detail{padding:0 24px 16px;display:flex;flex-direction:column;gap:12px}
+.lit-detail{padding:0 24px 16px;display:none;flex-direction:column;gap:12px}
+.lit-item.is-open .lit-detail{display:flex}
 .lit-detail-inner{background:var(--n50);border-radius:var(--rmd);padding:14px 16px;display:flex;align-items:flex-end;gap:20px;flex-wrap:wrap}
 .lit-check{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--n700);cursor:pointer;user-select:none;padding-bottom:8px}
 .lit-check input{width:16px;height:16px;accent-color:var(--brand);cursor:pointer}
@@ -2346,8 +2352,9 @@ function renderLineItem(it){
     const settle = (named && it.exited && it.settlement==='settled') ? `<span class="wm-pill wm-pill--success">Settled</span>` : '';
     status = `<div class="lit-status">${badge}${settle}</div>`;
   }
-  const row = `<div class="lit-row">
-    <div><div class="d1">${it.d1}</div><div class="d2">${it.d2}</div></div>
+  const chev = dep ? `<svg class="lit-chev" viewBox="0 0 16 16" fill="none"><path d="M6 4L10 8L6 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>` : '';
+  const row = `<div class="lit-row"${dep?` onclick="invToggleRow(event,'${it.id}')"`:''}>
+    <div class="lit-namecell">${chev}<div><div class="d1">${it.d1}</div><div class="d2">${it.d2}</div></div></div>
     <div class="amt"><span class="cur">$</span>${fmt(it.amount)}</div>
     <div class="wm-field-float lit-type-field" style="margin-bottom:0">
       <select class="wm-select" onchange="invSetType('${it.id}',this.value)">
@@ -2358,7 +2365,7 @@ function renderLineItem(it){
     <div class="lit-emp-cell">${empCell}</div>
     <div>${status}</div>
   </div>`;
-  return `<div class="lit-item ${dep?'is-dep':''}" data-li="${it.id}">${row}${dep?renderDepositDetail(it):''}</div>`;
+  return `<div class="lit-item ${dep?'is-dep':''}${dep&&it._open?' is-open':''}" data-li="${it.id}">${row}${dep?renderDepositDetail(it):''}</div>`;
 }
 
 function renderDepositDetail(it){
@@ -2390,9 +2397,17 @@ function invFindItem(itemId){ return currentInvoice && currentInvoice.items.find
 function invSetType(itemId, type){
   const it = invFindItem(itemId); if(!it) return;
   it.type = type;
-  if(type==='deposit'){ if(!it.emp) it.emp={name:'',start:'',end:''}; if(it.exited===undefined) it.exited=false; }
-  else { it.emp=null; it.exited=false; it.settlement=undefined; }
+  if(type==='deposit'){ if(!it.emp) it.emp={name:'',start:'',end:''}; if(it.exited===undefined) it.exited=false; it._open=true; }
+  else { it.emp=null; it.exited=false; it.settlement=undefined; it._open=false; }
   renderInvoiceDetail();
+}
+// expand / collapse a deposit row (ignore clicks on the Type select)
+function invToggleRow(ev, itemId){
+  if(ev.target.closest('.wm-field-float')) return;
+  const it=invFindItem(itemId); if(!it) return;
+  it._open = !it._open;
+  const item = document.querySelector(`.lit-item[data-li="${itemId}"]`);
+  if(item) item.classList.toggle('is-open', it._open);
 }
 function invToggleExited(itemId, v){
   const it=invFindItem(itemId); if(!it) return;
