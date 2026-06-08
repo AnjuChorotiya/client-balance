@@ -2348,7 +2348,7 @@ function renderLineItem(it){
       : `<span class="map-badge partial"><span class="dot"></span>Needs employee</span>`;
     let note = '';
     if(named){
-      const settle = it.exited ? `<span class="wm-pill ${it.settlement==='settled'?'wm-pill--success':'wm-pill--warning'}">${it.settlement==='settled'?'Settled':'Pending settlement'}</span>` : '';
+      const settle = (it.exited && it.settlement==='settled') ? `<span class="wm-pill wm-pill--success">Settled</span>` : '';
       note = `<div class="lit-exit-note"><b>${it.emp.name}</b>${it.exited?' · Exited':''}</div>${settle}`;
     }
     status = `<div class="lit-status">${badge}${note}</div>`;
@@ -2417,7 +2417,7 @@ function invSetEmpName(itemId, val){
   it.emp.name = val;
   const host = document.querySelector(`.lit-item[data-li="${itemId}"] .lit-status`);
   if(host){
-    const settle = it.exited ? `<span class="wm-pill ${it.settlement==='settled'?'wm-pill--success':'wm-pill--warning'}">${it.settlement==='settled'?'Settled':'Pending settlement'}</span>` : '';
+    const settle = (it.exited && it.settlement==='settled') ? `<span class="wm-pill wm-pill--success">Settled</span>` : '';
     host.innerHTML = invNamed(it)
       ? `<span class="map-badge dep"><span class="dot"></span>Deposit</span><div class="lit-exit-note"><b>${escHtml(val)}</b>${it.exited?' · Exited':''}</div>${settle}`
       : `<span class="map-badge partial"><span class="dot"></span>Needs employee</span>`;
