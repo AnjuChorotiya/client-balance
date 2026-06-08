@@ -6,6 +6,8 @@
 <title>Admin · Clients — Wisemonk Ops</title>
 <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,600,700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="wisemonk-signup-portal/wisemonk-ui/wisemonk-ui.css">
+<script src="wisemonk-signup-portal/wisemonk-ui/wisemonk-ui.js" defer></script>
 <style>
 :root{--p50:#E8F2FF;--p100:#C5DCFF;--p500:#2684FF;--p600:#1A6FE0;--p700:#1059BD;--n0:#FFFFFF;--n50:#F7F8FA;--n100:#EEF0F4;--n200:#DDE1E9;--n300:#C4CAD6;--n400:#9AA2B2;--n500:#6B7588;--n600:#4E5768;--n700:#363D4D;--n800:#222733;--n900:#121620;--bg:#F1F8FF;--bd:#EEF0F4;--bd-strong:#DDE1E9;--brand:#2684FF;--s50:#E6F9F0;--s500:#12B76A;--s700:#027A48;--w50:#FFFAEB;--w500:#F79009;--w700:#B54708;--d50:#FFF1F0;--d500:#F04438;--d700:#B42318;--purple50:#F4F1FF;--purple500:#7C5CFF;--purple700:#5638CC;--font:'Satoshi',sans-serif;--font-tag:'Open Sans',sans-serif;--rmd:8px;--rlg:10px;--rfull:9999px}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -526,6 +528,129 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
   .stats-grid{grid-template-columns:repeat(2,1fr)}
   .summ-grid{grid-template-columns:repeat(2,1fr)}
 }
+
+/* ===== invoice → employee mapping view ===== */
+.inv-view{display:flex;flex-direction:column;gap:20px}
+.inv-table{width:100%;background:#fff;border-radius:8px;overflow-x:auto;overflow-y:visible}
+.inv-thead,.inv-row{display:grid;grid-template-columns:minmax(150px,1fr) minmax(190px,1.5fr) 120px 130px 110px 160px 28px;gap:18px;align-items:center;min-width:1080px}
+.inv-thead{padding:12px 16px;background:#F9FAFB;border-bottom:1px solid #E5E7EB;font-family:'Open Sans',sans-serif;font-size:13px;font-weight:600;color:#404145}
+.inv-thead .right,.inv-row .right{text-align:right;justify-self:end}
+.inv-row{padding:12px 16px;border-bottom:1px solid #F0F1F1;cursor:pointer;transition:background .15s}
+.inv-row:last-child{border-bottom:none}
+.inv-row:hover{background:#FAFBFC}
+.inv-no{font-family:'SF Mono','Menlo',monospace;font-size:13px;font-weight:600;color:#222224}
+.inv-cli{display:flex;align-items:center;gap:10px;min-width:0}
+.inv-cli .lg{width:30px;height:30px;border-radius:50%;color:#fff;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.inv-cli .nm{font-size:13.5px;font-weight:500;color:#222224;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'Satoshi',sans-serif}
+.inv-cell{font-size:13.5px;color:#626368;font-family:'Open Sans',sans-serif;font-weight:500}
+.inv-amt{font-size:14px;font-weight:600;color:#222224;font-family:'Satoshi',sans-serif}
+.inv-amt .cur{color:var(--n400);font-size:11px;margin-right:1px}
+.inv-chev{display:flex;justify-content:flex-end;color:var(--n300)}
+.inv-chev svg{width:14px;height:14px}
+.map-badge{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:var(--rfull);font-size:11.5px;font-weight:600;white-space:nowrap;width:fit-content}
+.map-badge .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.map-badge.mapped{background:var(--s50);color:var(--s700)}
+.map-badge.mapped .dot{background:var(--s500)}
+.map-badge.partial{background:var(--w50);color:var(--w700)}
+.map-badge.partial .dot{background:var(--w500,#F79009)}
+.map-badge.unmapped{background:var(--d50,#FEF3F2);color:var(--d700)}
+.map-badge.unmapped .dot{background:var(--d500)}
+.map-badge.none{background:var(--n100);color:var(--n500)}
+.map-badge.none .dot{background:var(--n400)}
+.map-badge.dep{background:var(--p50);color:var(--brand)}
+.map-badge.dep .dot{background:var(--brand)}
+
+/* invoice detail */
+.inv-meta-card{background:#fff;border:1px solid var(--bd);border-radius:var(--rlg);padding:18px 22px;display:flex;align-items:center;gap:24px;flex-wrap:wrap}
+.inv-meta-card .lg{width:46px;height:46px;border-radius:10px;color:#fff;font-size:18px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.inv-meta-main{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1}
+.inv-meta-title{font-size:20px;font-weight:700;color:var(--n900);letter-spacing:-.3px}
+.inv-meta-sub{font-size:13px;color:var(--n500);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.inv-meta-sub .sep{color:var(--n300)}
+.inv-meta-stat{display:flex;flex-direction:column;gap:2px;text-align:right}
+.inv-meta-stat .lbl{font-size:11px;color:var(--n400);text-transform:uppercase;letter-spacing:.4px;font-family:var(--font-tag);font-weight:300}
+.inv-meta-stat .val{font-size:18px;font-weight:700;color:var(--n900)}
+.inv-meta-stat .val .cur{color:var(--n400);font-size:13px;font-weight:500;margin-right:1px}
+.inv-progress-wrap{min-width:160px}
+.inv-progress{height:6px;border-radius:var(--rfull);background:var(--n100);overflow:hidden;margin-top:6px}
+.inv-progress span{display:block;height:100%;background:var(--brand);border-radius:var(--rfull);transition:width .3s}
+
+.li-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:4px}
+.li-head .tl{font-size:15px;font-weight:700;color:var(--n900)}
+.li-head .hint{font-size:12px;color:var(--n500)}
+.li-list{display:flex;flex-direction:column;gap:12px}
+.li-card{background:#fff;border:1px solid var(--bd);border-radius:var(--rlg);padding:16px 18px;display:flex;flex-direction:column;gap:14px;transition:border-color .15s}
+.li-card.is-mapped{border-color:#D6E7FF}
+.li-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.li-desc{display:flex;flex-direction:column;gap:3px;min-width:0}
+.li-desc .d1{font-size:14px;font-weight:600;color:var(--n900)}
+.li-desc .d2{font-size:12px;color:var(--n500)}
+.li-amt{font-size:15px;font-weight:700;color:var(--n900);white-space:nowrap}
+.li-amt .cur{color:var(--n400);font-size:12px;font-weight:500;margin-right:1px}
+.li-map{border-top:1px dashed var(--bd);padding-top:14px}
+.li-map-label{font-size:11px;color:var(--n400);text-transform:uppercase;letter-spacing:.4px;font-family:var(--font-tag);font-weight:300;margin-bottom:8px}
+.li-picker{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.li-select{height:40px;padding:0 12px;border:1px solid var(--bd-strong);border-radius:var(--rmd);font-family:var(--font);font-size:13.5px;color:var(--n800);background:var(--n0);outline:none;min-width:260px;cursor:pointer}
+.li-select:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(38,132,255,.15)}
+.li-newfields{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.li-input{height:40px;padding:0 12px;border:1px solid var(--bd-strong);border-radius:var(--rmd);font-family:var(--font);font-size:13.5px;color:var(--n800);background:var(--n0);outline:none}
+.li-input:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(38,132,255,.15)}
+.li-btn{height:40px;padding:0 16px;border:none;border-radius:var(--rmd);background:var(--brand);color:#fff;font-family:var(--font);font-size:13.5px;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .12s}
+.li-btn:hover{background:var(--p600)}
+.li-btn.ghost{background:transparent;color:var(--n600);border:1px solid var(--bd-strong)}
+.li-btn.ghost:hover{background:var(--n50);color:var(--n900)}
+
+/* mapped employee chip + employment controls */
+.li-mapped{display:flex;flex-direction:column;gap:14px}
+.li-emp{display:flex;align-items:center;gap:12px;min-width:0}
+.li-emp .av{width:34px;height:34px;border-radius:8px;color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.li-emp .meta{display:flex;flex-direction:column;gap:1px;min-width:0}
+.li-emp .nm{font-size:14px;font-weight:600;color:var(--n900);display:flex;align-items:center;gap:8px}
+.li-emp .rl{font-size:12px;color:var(--n500)}
+.li-emp .tag{font-size:10px;font-weight:600;padding:1px 7px;border-radius:var(--rfull);background:var(--p50);color:var(--brand);text-transform:uppercase;letter-spacing:.3px}
+.li-emp .tag.new{background:var(--s50);color:var(--s700)}
+.li-emp-actions{margin-left:auto;display:flex;align-items:center;gap:8px;flex-shrink:0}
+.li-unmap{border:none;background:transparent;color:var(--n400);font-size:12px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:5px;padding:6px 8px;border-radius:6px}
+.li-unmap:hover{background:var(--d50,#FEF3F2);color:var(--d700)}
+.li-unmap svg{width:12px;height:12px}
+.li-employment{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap;background:var(--n50);border-radius:var(--rmd);padding:12px 14px}
+.li-field{display:flex;flex-direction:column;gap:5px}
+.li-field .fl{font-size:11px;color:var(--n500);font-weight:600}
+.li-seg{display:inline-flex;background:var(--n100);border-radius:var(--rmd);padding:3px}
+.li-seg button{border:none;background:transparent;font-family:var(--font);font-size:12.5px;font-weight:600;color:var(--n500);padding:6px 14px;border-radius:6px;cursor:pointer;transition:all .12s}
+.li-seg button.on{background:#fff;color:var(--n900);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.li-seg button.on.inactive-on{color:var(--d700)}
+.li-date{height:38px;padding:0 10px;border:1px solid var(--bd-strong);border-radius:var(--rmd);font-family:var(--font);font-size:13px;color:var(--n800);background:var(--n0);outline:none}
+.li-date:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(38,132,255,.15)}
+.li-date:disabled{background:var(--n50);color:var(--n300);cursor:not-allowed}
+.li-seg button.on.warn-on{color:var(--w700)}
+
+/* line items table */
+.lit-table{background:#fff;border:1px solid var(--bd);border-radius:var(--rlg)}
+.lit-thead{display:grid;grid-template-columns:minmax(240px,2fr) 120px 210px minmax(160px,1fr);gap:16px;padding:11px 18px;background:#F9FAFB;border-bottom:1px solid #E5E7EB;border-radius:var(--rlg) var(--rlg) 0 0;font-family:'Open Sans',sans-serif;font-size:12.5px;font-weight:600;color:#404145}
+.lit-thead .right{text-align:right}
+.lit-item{border-bottom:1px solid #F0F1F1}
+.lit-item:last-child{border-bottom:none;border-radius:0 0 var(--rlg) var(--rlg)}
+.lit-item.is-dep{background:#FCFDFF}
+.lit-row{display:grid;grid-template-columns:minmax(240px,2fr) 120px 210px minmax(160px,1fr);gap:16px;align-items:center;padding:14px 18px}
+.lit-row .d1{font-size:14px;font-weight:600;color:var(--n900)}
+.lit-row .d2{font-size:12px;color:var(--n500);margin-top:2px}
+.lit-row .amt{font-size:14px;font-weight:700;color:var(--n900);text-align:right;white-space:nowrap}
+.lit-row .amt .cur{color:var(--n400);font-size:11px;font-weight:500;margin-right:1px}
+.lit-status{display:flex;flex-direction:column;gap:4px;align-items:flex-start}
+.lit-muted{color:var(--n300);font-size:13px}
+.lit-exit-note{font-size:11px;color:var(--n500)}
+.lit-exit-note b{color:var(--n700);font-weight:600}
+.lit-detail{padding:0 18px 16px;display:flex;flex-direction:column;gap:12px}
+.lit-detail-inner{background:var(--n50);border-radius:var(--rmd);padding:14px 16px;display:flex;align-items:flex-end;gap:20px;flex-wrap:wrap}
+.lit-check{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--n700);cursor:pointer;user-select:none;padding-bottom:8px}
+.lit-check input{width:16px;height:16px;accent-color:var(--brand);cursor:pointer}
+.lit-exit-fields{background:#FFF7ED;border:1px solid #FEDF89}
+.lit-type-field{width:150px}
+.lit-type-field > .wm-select{padding:11px 40px 11px 14px;font-size:14px}
+.lit-wm-field{width:170px}
+.lit-wm-name{width:240px}
+.lit-detail-inner .lit-check{padding-bottom:13px}
 </style>
 </head>
 <body>
@@ -542,8 +667,8 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
       <div class="nav-section">
         <div class="slab">OPERATIONS</div>
         <div class="nav-list">
-          <a class="nav active" href="#"><svg viewBox="0 0 20 20" fill="none"><path d="M6.67 9.5C8.32 9.5 9.67 8.15 9.67 6.5C9.67 4.85 8.32 3.5 6.67 3.5C5.02 3.5 3.67 4.85 3.67 6.5C3.67 8.15 5.02 9.5 6.67 9.5Z" stroke="currentColor" stroke-width="1.5"/><path d="M13.33 9.5C14.71 9.5 15.83 8.38 15.83 7C15.83 5.62 14.71 4.5 13.33 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M2 16.5C2 13.74 4.24 11.5 7 11.5H7.33C9.81 11.5 11.83 13.52 11.83 16V16.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M13.33 11.5C15.36 11.5 17 13.14 17 15.17V16.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Deposits</a>
-          <a class="nav" href="#"><svg viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="14" height="14" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M3 7H17M7 3V7M13 3V7" stroke="currentColor" stroke-width="1.5"/></svg>All invoices</a>
+          <a class="nav active" id="navDeposits" href="#" onclick="showDepositsView(event)"><svg viewBox="0 0 20 20" fill="none"><path d="M6.67 9.5C8.32 9.5 9.67 8.15 9.67 6.5C9.67 4.85 8.32 3.5 6.67 3.5C5.02 3.5 3.67 4.85 3.67 6.5C3.67 8.15 5.02 9.5 6.67 9.5Z" stroke="currentColor" stroke-width="1.5"/><path d="M13.33 9.5C14.71 9.5 15.83 8.38 15.83 7C15.83 5.62 14.71 4.5 13.33 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M2 16.5C2 13.74 4.24 11.5 7 11.5H7.33C9.81 11.5 11.83 13.52 11.83 16V16.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M13.33 11.5C15.36 11.5 17 13.14 17 15.17V16.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Deposits</a>
+          <a class="nav" id="navInvoices" href="#" onclick="openInvoiceView(event)"><svg viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="14" height="14" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M3 7H17M7 3V7M13 3V7" stroke="currentColor" stroke-width="1.5"/></svg>All invoices</a>
           <a class="nav" href="#"><svg viewBox="0 0 20 20" fill="none"><path d="M10 2.5V17.5M6.5 5.5H11.5C12.6 5.5 13.5 6.4 13.5 7.5C13.5 8.6 12.6 9.5 11.5 9.5H8.5C7.4 9.5 6.5 10.4 6.5 11.5C6.5 12.6 7.4 13.5 8.5 13.5H13.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>All payments</a>
           <a class="nav" href="#"><svg viewBox="0 0 20 20" fill="none"><rect x="4" y="9" width="12" height="8" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M7 9V6.5C7 4.84 8.34 3.5 10 3.5C11.66 3.5 13 4.84 13 6.5V9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Deposits</a>
           <a class="nav" href="#"><svg viewBox="0 0 20 20" fill="none"><path d="M3 16V8M8 16V5M13 16V11M3 16H17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Reports</a>
@@ -729,6 +854,79 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
           </div>
           <div id="timelineBody"></div>
         </div>
+      </div>
+
+      <!-- invoice → employee mapping view -->
+      <div class="container inv-view hidden" id="invoiceView">
+
+        <!-- invoice list sub-view -->
+        <div id="invListSub">
+          <div class="ph">
+            <div>
+              <div class="pt">All invoices</div>
+              <div class="ps">Review past Zoho invoices and classify each line item as a normal charge or a deposit, then track deposit settlement.</div>
+            </div>
+          </div>
+
+          <div class="toolbar">
+            <div class="cl-search">
+              <svg viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.5"/><path d="M11 11L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              <input id="invSearch" type="text" placeholder="Search invoice or client" oninput="applyInvFilter()"/>
+            </div>
+            <div class="toolbar-right">
+              <select class="cl-filter" id="invFilterStatus" onchange="applyInvFilter()">
+                <option value="all">All invoices</option>
+                <option value="partial">Has unsettled deposits</option>
+                <option value="mapped">All deposits settled</option>
+                <option value="none">No deposits</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="inv-table">
+            <div class="inv-thead">
+              <div>Invoice #</div>
+              <div>Client</div>
+              <div>Invoice date</div>
+              <div class="right">Amount</div>
+              <div class="right">Deposits</div>
+              <div>Deposit status</div>
+              <div></div>
+            </div>
+            <div id="invListBody"></div>
+          </div>
+        </div>
+
+        <!-- invoice detail sub-view -->
+        <div id="invDetailSub" class="hidden">
+          <div class="cp-crumbs">
+            <span class="cp-link" onclick="backToInvoices()">
+              <svg viewBox="0 0 14 14" fill="none"><path d="M9 3L5 7L9 11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              All invoices
+            </span>
+            <span class="cp-sep">/</span>
+            <span class="cp-here" id="invCrumb">Invoice</span>
+          </div>
+
+          <div class="inv-meta-card" style="margin-top:16px">
+            <div class="lg" id="invMetaLogo">A</div>
+            <div class="inv-meta-main">
+              <div class="inv-meta-title" id="invMetaTitle">INV-0000</div>
+              <div class="inv-meta-sub" id="invMetaSub"></div>
+            </div>
+            <div class="inv-meta-stat">
+              <div class="lbl">Invoice total</div>
+              <div class="val" id="invMetaTotal"><span class="cur">$</span>0</div>
+            </div>
+          </div>
+
+          <div class="li-head" style="margin-top:20px;margin-bottom:12px">
+            <div class="tl">Line items</div>
+            <div class="hint">Classify each line item as normal or a deposit. For deposits, capture the employee name — and if they've exited, add their start and end dates.</div>
+          </div>
+          <div class="li-list" id="invItemList"></div>
+        </div>
+
       </div>
 
     </div>
@@ -994,6 +1192,39 @@ const EMPLOYEES = {
   ]
 };
 
+// Past Zoho invoices + line items.
+// Each line item is classified: type 'normal' | 'deposit'.
+// Deposit → emp:{name, start, end}; exited:true|false (start/end captured only when exited).
+const INVOICES = [
+  {id:'INV-2026-0042', clientId:'C001', date:'01 May 2026', items:[
+    {id:'LI-4201', d1:'EOR Management Fee', d2:'Monthly platform & compliance', amount:1200, type:'normal'},
+    {id:'LI-4202', d1:'Payroll — Senior Backend Engineer', d2:'Gross salary + statutory', amount:9500, type:'deposit', exited:false, emp:{name:'Aditya Sharma', start:'', end:''}},
+    {id:'LI-4203', d1:'Payroll — Product Manager', d2:'Gross salary + statutory', amount:11200, type:'deposit', exited:false, emp:{name:'Priya Singh', start:'', end:''}},
+    {id:'LI-4204', d1:'Payroll — Engineering Lead', d2:'Gross salary + statutory', amount:10800, type:'normal'},
+    {id:'LI-4205', d1:'Advance — Consultant Fee', d2:'Security deposit / advance', amount:5000, type:'normal'}
+  ]},
+  {id:'INV-2026-0039', clientId:'C003', date:'01 May 2026', items:[
+    {id:'LI-3901', d1:'EOR Management Fee', d2:'Monthly platform & compliance', amount:1500, type:'normal'},
+    {id:'LI-3902', d1:'Payroll — Senior Engineer', d2:'Gross salary + statutory', amount:4800, type:'deposit', exited:false, emp:{name:'Lukas Becker', start:'', end:''}},
+    {id:'LI-3903', d1:'Payroll — Product Lead', d2:'Gross salary + statutory', amount:5600, type:'deposit', exited:false, emp:{name:'Anna Schmidt', start:'', end:''}},
+    {id:'LI-3904', d1:'Payroll — Backend Engineer', d2:'Gross salary + statutory', amount:4400, type:'normal'}
+  ]},
+  {id:'INV-2026-0035', clientId:'C005', date:'18 Apr 2026', items:[
+    {id:'LI-3501', d1:'Payroll — CTO Office', d2:'Gross salary + statutory', amount:6200, type:'deposit', exited:false, emp:{name:'Oliver Hughes', start:'', end:''}},
+    {id:'LI-3502', d1:'Payroll — VP Engineering', d2:'Gross salary + statutory', amount:7100, type:'deposit', exited:true, emp:{name:'Emily Watson', start:'2026-02-18', end:'2026-04-30'}},
+    {id:'LI-3503', d1:'Payroll — Engineering Lead', d2:'Gross salary + statutory', amount:5800, type:'normal'}
+  ]},
+  {id:'INV-2026-0031', clientId:'C001', date:'01 Apr 2026', items:[
+    {id:'LI-3101', d1:'EOR Management Fee', d2:'Monthly platform & compliance', amount:1200, type:'normal'},
+    {id:'LI-3102', d1:'Payroll — Senior Designer', d2:'Gross salary + statutory', amount:8400, type:'deposit', exited:true, emp:{name:'Sneha Arora', start:'2026-01-12', end:'2026-03-31'}},
+    {id:'LI-3103', d1:'Payroll — Backend Engineer', d2:'Gross salary + statutory', amount:8800, type:'deposit', exited:false, emp:{name:'Vikram Iyer', start:'', end:''}}
+  ]},
+  {id:'INV-2026-0028', clientId:'C006', date:'28 Mar 2026', items:[
+    {id:'LI-2801', d1:'EOR Management Fee', d2:'Monthly platform & compliance', amount:1400, type:'normal'},
+    {id:'LI-2802', d1:'Payroll — Data Engineer', d2:'Gross salary + statutory', amount:9300, type:'deposit', exited:false, emp:{name:'', start:'', end:''}}
+  ]}
+];
+
 const NAME_POOL = [
   ['Aarav Gupta','Frontend Engineer'],['Ishaan Khanna','Backend Engineer'],['Ria Nair','Product Manager'],
   ['Saanvi Pillai','Designer'],['Kabir Bose','Data Engineer'],['Tara Menon','QA Engineer'],
@@ -1214,7 +1445,7 @@ function clientRow(c){
     <div class="tnum tamt-out ${wal?'':'zero'}" style="text-align:right">${wal?`<span class="cur">₹</span>${fmt(wal)}`:'<span class="cur" style="color:var(--n400)">₹</span><span style="color:var(--n400)">0</span>'}</div>
     <div class="tnum" style="text-align:right;color:var(--n800)">${c.monthly?`<span class="cur">₹</span>${fmt(c.monthly)}`:'—'}</div>
     <div class="tnum muted" style="text-align:right">${c.deposit?`<span class="cur">₹</span>${fmt(c.deposit)}`:'—'}</div>
-    <div class="tnum" style="text-align:right;color:var(--n800)">${c.agreed?`${c.agreed} mo`:'—'}</div>
+    <div class="tnum" style="text-align:right;color:var(--n800)">${c.agreed?`${c.agreed}`:'—'}</div>
     <div style="text-align:right">${riskCell}</div>
     <div style="text-align:right"><span class="tstatus ${c.status}"><span class="stdot"></span>${c.status[0].toUpperCase()+c.status.slice(1)}</span></div>
     <div>${notesCell(c)}</div>
@@ -1767,6 +1998,7 @@ function closeTxnPanel(){ document.getElementById('txnPanel').classList.remove('
 // ===== INTERNAL NOTES =====
 let notesClientId = null;
 function escHtml(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escAttr(s){ return escHtml(s).replace(/"/g,'&quot;'); }
 function roleClass(r){ const x=(r||'').toLowerCase(); if(x==='risk') return 'risk'; if(x==='finance') return 'finance'; return ''; }
 function noteInitials(name){ return (name||'?').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase(); }
 function renderNotesBody(c){
@@ -2002,6 +2234,188 @@ function closeAllCS(){
 }
 document.addEventListener('click', e=>{ if(!e.target.closest('.cs')) closeAllCS(); });
 function enhanceAllSelects(){ document.querySelectorAll('select.tl-time, select.cl-filter, select.finput').forEach(enhanceSelect); }
+
+/* ===== invoice line-item classification (normal / deposit) ===== */
+let currentInvoice = null;
+function invClient(inv){ return CLIENTS.find(c=>c.id===inv.clientId) || {name:inv.clientId, logoBg:'#9AA2B2', initial:'?', region:'', contact:''}; }
+function invTotal(inv){ return inv.items.reduce((s,it)=>s+it.amount,0); }
+function invDeposits(inv){ return inv.items.filter(it=>it.type==='deposit'); }
+function invNamed(d){ return !!(d.emp && d.emp.name && d.emp.name.trim()); }
+function invMappedCount(inv){ return invDeposits(inv).filter(invNamed).length; }
+function invMapStatus(inv){
+  const deps = invDeposits(inv);
+  if(deps.length===0) return {key:'none', label:'No deposits'};
+  const incomplete = deps.length - invMappedCount(inv);
+  if(incomplete===0) return {key:'mapped', label:'All mapped'};
+  return {key:'partial', label:`${incomplete} incomplete`};
+}
+
+function openInvoiceView(ev){
+  if(ev) ev.preventDefault();
+  document.getElementById('navDeposits').classList.remove('active');
+  document.getElementById('navInvoices').classList.add('active');
+  document.getElementById('listView').classList.add('hidden');
+  document.getElementById('clientPage').classList.add('hidden');
+  document.getElementById('invoiceView').classList.remove('hidden');
+  document.getElementById('invDetailSub').classList.add('hidden');
+  document.getElementById('invListSub').classList.remove('hidden');
+  document.querySelector('.topbar-title').textContent = 'All invoices';
+  renderInvoiceList();
+  document.querySelector('.page-body').scrollTop = 0;
+}
+function showDepositsView(ev){
+  if(ev) ev.preventDefault();
+  document.getElementById('navInvoices').classList.remove('active');
+  document.getElementById('navDeposits').classList.add('active');
+  document.getElementById('invoiceView').classList.add('hidden');
+  document.getElementById('clientPage').classList.add('hidden');
+  document.getElementById('listView').classList.remove('hidden');
+  document.querySelector('.topbar-title').textContent = '';
+  document.querySelector('.page-body').scrollTop = 0;
+}
+
+function renderInvoiceList(){
+  const body = document.getElementById('invListBody');
+  body.innerHTML = INVOICES.map(inv=>{
+    const c = invClient(inv);
+    const st = invMapStatus(inv);
+    const search = (inv.id+' '+c.name).toLowerCase();
+    return `<div class="inv-row" data-status="${st.key}" data-search="${search}" onclick="openInvoice('${inv.id}')">
+      <div class="inv-no">${inv.id}</div>
+      <div class="inv-cli"><div class="lg" style="background:${c.logoBg}">${c.initial}</div><span class="nm">${c.name}</span></div>
+      <div class="inv-cell">${inv.date}</div>
+      <div class="inv-amt right"><span class="cur">$</span>${fmt(invTotal(inv))}</div>
+      <div class="inv-cell right">${invDeposits(inv).length} of ${inv.items.length}</div>
+      <div><span class="map-badge ${st.key}"><span class="dot"></span>${st.label}</span></div>
+      <div class="inv-chev"><svg viewBox="0 0 14 14" fill="none"><path d="M5 3L9 7L5 11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    </div>`;
+  }).join('');
+  applyInvFilter();
+}
+function applyInvFilter(){
+  const q = (document.getElementById('invSearch').value||'').toLowerCase();
+  const st = document.getElementById('invFilterStatus').value;
+  document.querySelectorAll('#invListBody .inv-row').forEach(r=>{
+    const show = (!q || r.dataset.search.includes(q)) && (st==='all' || r.dataset.status===st);
+    r.style.display = show ? 'grid' : 'none';
+  });
+}
+
+function openInvoice(id){
+  currentInvoice = INVOICES.find(x=>x.id===id);
+  if(!currentInvoice) return;
+  document.getElementById('invListSub').classList.add('hidden');
+  document.getElementById('invDetailSub').classList.remove('hidden');
+  document.getElementById('invCrumb').textContent = id;
+  renderInvoiceDetail();
+  document.querySelector('.page-body').scrollTop = 0;
+}
+function backToInvoices(){
+  document.getElementById('invDetailSub').classList.add('hidden');
+  document.getElementById('invListSub').classList.remove('hidden');
+  currentInvoice = null;
+  renderInvoiceList();
+  document.querySelector('.page-body').scrollTop = 0;
+}
+
+function renderInvoiceDetail(){
+  const inv = currentInvoice; if(!inv) return;
+  const c = invClient(inv);
+  document.getElementById('invMetaLogo').style.background = c.logoBg;
+  document.getElementById('invMetaLogo').textContent = c.initial;
+  document.getElementById('invMetaTitle').textContent = inv.id;
+  document.getElementById('invMetaSub').innerHTML = `${c.name} <span class="sep">·</span> ${c.region||''} <span class="sep">·</span> Invoiced ${inv.date}`;
+  document.getElementById('invMetaTotal').innerHTML = `<span class="cur">$</span>${fmt(invTotal(inv))}`;
+  document.getElementById('invItemList').innerHTML =
+    `<div class="lit-table">
+      <div class="lit-thead">
+        <div>Line item</div><div class="right">Amount</div><div>Type</div><div>Deposit status</div>
+      </div>
+      ${inv.items.map(renderLineItem).join('')}
+    </div>`;
+  if(window.WMUI) WMUI.refresh();
+}
+
+function renderLineItem(it){
+  const dep = it.type==='deposit';
+  let status;
+  if(!dep){
+    status = `<span class="lit-muted">—</span>`;
+  } else {
+    const named = invNamed(it);
+    const badge = named
+      ? `<span class="map-badge dep"><span class="dot"></span>Deposit</span>`
+      : `<span class="map-badge partial"><span class="dot"></span>Needs employee</span>`;
+    let note = '';
+    if(named) note = `<div class="lit-exit-note"><b>${it.emp.name}</b>${it.exited?' · Exited':''}</div>`;
+    status = `<div class="lit-status">${badge}${note}</div>`;
+  }
+  const row = `<div class="lit-row">
+    <div><div class="d1">${it.d1}</div><div class="d2">${it.d2}</div></div>
+    <div class="amt"><span class="cur">$</span>${fmt(it.amount)}</div>
+    <div class="wm-field-float lit-type-field" style="margin-bottom:0">
+      <select class="wm-select" onchange="invSetType('${it.id}',this.value)">
+        <option value="normal" ${!dep?'selected':''}>Normal</option>
+        <option value="deposit" ${dep?'selected':''}>Deposit</option>
+      </select>
+    </div>
+    <div>${status}</div>
+  </div>`;
+  return `<div class="lit-item ${dep?'is-dep':''}" data-li="${it.id}">${row}${dep?renderDepositDetail(it):''}</div>`;
+}
+
+function renderDepositDetail(it){
+  const emp = it.emp || {name:'',start:'',end:''};
+  const exitFields = it.exited ? `
+    <div class="wm-field-float lit-wm-field" style="margin-bottom:0">
+      <input class="wm-input" type="date" value="${emp.start||''}" onchange="invSetEmp('${it.id}','start',this.value)">
+      <label>Start date</label>
+    </div>
+    <div class="wm-field-float lit-wm-field" style="margin-bottom:0">
+      <input class="wm-input" type="date" value="${emp.end||''}" onchange="invSetEmp('${it.id}','end',this.value)">
+      <label>End date</label>
+    </div>` : '';
+  return `<div class="lit-detail">
+    <div class="lit-detail-inner">
+      <div class="wm-field-float lit-wm-field lit-wm-name" style="margin-bottom:0">
+        <input class="wm-input" type="text" value="${escAttr(emp.name||'')}" placeholder=" " oninput="invSetEmpName('${it.id}',this.value)">
+        <label>Employee name</label>
+      </div>
+      <label class="lit-check"><input type="checkbox" ${it.exited?'checked':''} onchange="invToggleExited('${it.id}',this.checked)">Employee has exited</label>
+      ${exitFields}
+    </div>
+  </div>`;
+}
+
+function invFindItem(itemId){ return currentInvoice && currentInvoice.items.find(x=>x.id===itemId); }
+
+function invSetType(itemId, type){
+  const it = invFindItem(itemId); if(!it) return;
+  it.type = type;
+  if(type==='deposit'){ if(!it.emp) it.emp={name:'',start:'',end:''}; if(it.exited===undefined) it.exited=false; }
+  else { it.emp=null; it.exited=false; }
+  renderInvoiceDetail();
+}
+function invToggleExited(itemId, v){
+  const it=invFindItem(itemId); if(!it) return;
+  it.exited = v;
+  if(!it.emp) it.emp = {name:'', start:'', end:''};
+  if(!v){ it.emp.start=''; it.emp.end=''; }
+  renderInvoiceDetail();
+}
+function invSetEmp(itemId, field, val){ const it=invFindItem(itemId); if(it){ if(!it.emp) it.emp={name:'',start:'',end:''}; it.emp[field]=val; } }
+// live name edit — patch only the status cell + progress so the text input keeps focus
+function invSetEmpName(itemId, val){
+  const it=invFindItem(itemId); if(!it) return;
+  if(!it.emp) it.emp={name:'',start:'',end:''};
+  it.emp.name = val;
+  const host = document.querySelector(`.lit-item[data-li="${itemId}"] .lit-status`);
+  if(host){
+    host.innerHTML = invNamed(it)
+      ? `<span class="map-badge dep"><span class="dot"></span>Deposit</span><div class="lit-exit-note"><b>${escHtml(val)}</b>${it.exited?' · Exited':''}</div>`
+      : `<span class="map-badge partial"><span class="dot"></span>Needs employee</span>`;
+  }
+}
 
 enhanceAllSelects();
 renderClients();
