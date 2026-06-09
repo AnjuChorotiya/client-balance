@@ -2449,7 +2449,7 @@ function renderDepositDetail(it){
         <label>Employee name</label>
         <div class="emp-ac-menu" id="empac-${it.id}"></div>
       </div>
-      <label class="lit-check"><input type="checkbox" ${it.exited?'checked':''} onchange="invToggleExited('${it.id}',this.checked)">Employee has exited</label>
+      ${it._manual ? '' : `<label class="lit-check"><input type="checkbox" ${it.exited?'checked':''} onchange="invToggleExited('${it.id}',this.checked)">Employee has exited</label>`}
       ${exitFields}
     </div>
   </div>`;
