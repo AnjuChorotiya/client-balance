@@ -676,6 +676,9 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
 .emp-ac-nm{font-size:13px;font-weight:600;color:var(--n900)}
 .emp-ac-role{font-size:11px;color:var(--n500);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .emp-ac-empty{padding:10px 12px;font-size:12.5px;color:var(--n400)}
+.emp-ac-create{color:var(--brand);font-weight:600}
+.emp-ac-create .emp-ac-nm{color:var(--brand)}
+.emp-ac-create-ic{width:18px;height:18px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;border-radius:50%;background:var(--brand);color:#fff;font-size:14px;line-height:1;font-weight:700}
 </style>
 </head>
 <body>
@@ -2429,7 +2432,7 @@ function renderLineItem(it){
 
 function renderDepositDetail(it){
   const emp = it.emp || {name:'',start:'',end:''};
-  const exitFields = it.exited ? `
+  const exitFields = (it.exited || it._manual) ? `
     <div class="wm-field-float lit-wm-field" style="margin-bottom:0">
       <input class="wm-input" type="date" value="${emp.start||''}" onchange="invSetEmp('${it.id}','start',this.value)">
       <label>Start date</label>
@@ -2499,15 +2502,16 @@ function invEmpInput(itemId, inputEl){
   const emps = invEmployeesFor(itemId);
   const matches = emps.filter(e=> !q || e.name.toLowerCase().includes(q)).slice(0,8);
   if(matches.length===0){
-    menu.innerHTML = `<div class="emp-ac-empty">No matching employee for this client</div>`;
+    menu.innerHTML = `<button type="button" class="emp-ac-item emp-ac-create" onmousedown="event.preventDefault()" onclick="invEmpCreateNew('${itemId}')">
+      <span class="emp-ac-create-ic">+</span>
+      <span class="emp-ac-nm">Create new employee${q?` &ldquo;${escHtml(inputEl.value.trim())}&rdquo;`:''}</span>
+    </button>`;
     menu.classList.add('open');
     return;
   }
   menu.innerHTML = matches.map(e=>{
-    const initial = e.initial || e.name.split(' ').map(p=>p[0]).join('').slice(0,2);
     return `<button type="button" class="emp-ac-item" onmousedown="event.preventDefault()" onclick="invEmpPick('${itemId}','${escAttr(e.name)}')">
-      <span class="emp-ac-av" style="background:${e.bg||'#2684FF'}">${escHtml(initial)}</span>
-      <span class="emp-ac-meta"><span class="emp-ac-nm">${escHtml(e.name)}</span><span class="emp-ac-role">${escHtml(e.role||'')}</span></span>
+      <span class="emp-ac-nm">${escHtml(e.name)}</span>
     </button>`;
   }).join('');
   menu.classList.add('open');
@@ -2518,6 +2522,19 @@ function invEmpPick(itemId, name){
   if(input) input.value = name;
   invSetEmpName(itemId, name);
   if(menu){ menu.classList.remove('open'); menu.innerHTML=''; }
+}
+// "Create new" picked — keep the typed name and reveal start/end date + settlement fields
+function invEmpCreateNew(itemId){
+  const it = invFindItem(itemId); if(!it) return;
+  const menu = document.getElementById('empac-'+itemId);
+  const input = menu && menu.closest('.emp-ac').querySelector('input');
+  const name = input ? input.value.trim() : (it.emp&&it.emp.name)||'';
+  if(!it.emp) it.emp = {name:'', start:'', end:''};
+  it.emp.name = name;
+  it._manual = true;
+  if(!it.settlement) it.settlement = 'pending';
+  if(menu){ menu.classList.remove('open'); menu.innerHTML=''; }
+  renderAllItems();
 }
 function invEmpBlur(itemId){
   setTimeout(()=>{ const menu=document.getElementById('empac-'+itemId); if(menu) menu.classList.remove('open'); }, 150);
