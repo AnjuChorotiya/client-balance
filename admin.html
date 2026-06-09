@@ -627,12 +627,18 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
 
 /* line items table */
 .lit-table{background:#fff;border:1px solid var(--bd);border-radius:var(--rlg)}
-.lit-thead{display:grid;grid-template-columns:minmax(200px,2fr) 110px 150px minmax(150px,1.3fr) minmax(140px,1fr);gap:32px;padding:11px 24px;background:#F9FAFB;border-bottom:1px solid #E5E7EB;border-radius:var(--rlg) var(--rlg) 0 0;font-family:'Open Sans',sans-serif;font-size:12.5px;font-weight:600;color:#404145}
+.lit-thead{display:grid;grid-template-columns:minmax(200px,2fr) minmax(140px,1.2fr) 110px 84px minmax(150px,1.3fr) minmax(150px,1fr);gap:24px;padding:11px 24px;background:#F9FAFB;border-bottom:1px solid #E5E7EB;border-radius:var(--rlg) var(--rlg) 0 0;font-family:'Open Sans',sans-serif;font-size:12.5px;font-weight:600;color:#404145}
 .lit-thead .right{text-align:right}
+.lit-thead .center{text-align:center}
 .lit-item{border-bottom:1px solid #F0F1F1}
 .lit-item:last-child{border-bottom:none;border-radius:0 0 var(--rlg) var(--rlg)}
 .lit-item.is-dep{background:#FCFDFF}
-.lit-row{display:grid;grid-template-columns:minmax(200px,2fr) 110px 150px minmax(150px,1.3fr) minmax(140px,1fr);gap:32px;align-items:center;padding:14px 24px}
+.lit-row{display:grid;grid-template-columns:minmax(200px,2fr) minmax(140px,1.2fr) 110px 84px minmax(150px,1.3fr) minmax(150px,1fr);gap:24px;align-items:center;padding:14px 24px}
+.lit-inv .ino{font-size:13px;font-weight:600;color:var(--n800)}
+.lit-inv .icl{font-size:12px;color:var(--n500);margin-top:2px}
+.lit-dep-cell{display:flex;justify-content:center}
+.lit-dep-box{display:inline-flex;cursor:pointer}
+.lit-dep-box input{width:18px;height:18px;accent-color:var(--brand);cursor:pointer}
 .lit-item.is-dep .lit-row{cursor:pointer}
 .lit-item.is-dep .lit-row:hover{background:#F6FAFF}
 .lit-row .d1{font-size:14px;font-weight:600;color:var(--n900)}
@@ -859,37 +865,38 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
         <div id="invListSub">
           <div class="ph">
             <div>
-              <div class="pt">All invoices</div>
-              <div class="ps">Review past Zoho invoices and classify each line item as a normal charge or a deposit, then track deposit settlement.</div>
+              <div class="pt">All line items</div>
+              <div class="ps">Every line item across all Zoho invoices. Tick <b>Deposit</b> to classify a line as a security deposit, then capture the employee and track settlement.</div>
             </div>
           </div>
 
           <div class="toolbar">
             <div class="cl-search">
               <svg viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.5"/><path d="M11 11L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-              <input id="invSearch" type="text" placeholder="Search invoice or client" oninput="applyInvFilter()"/>
+              <input id="invSearch" type="text" placeholder="Search line item, invoice, client or employee" oninput="applyItemFilter()"/>
             </div>
             <div class="toolbar-right">
-              <select class="cl-filter" id="invFilterStatus" onchange="applyInvFilter()">
-                <option value="all">All invoices</option>
-                <option value="partial">Has unsettled deposits</option>
-                <option value="mapped">All deposits settled</option>
-                <option value="none">No deposits</option>
+              <select class="cl-filter" id="invFilterStatus" onchange="applyItemFilter()">
+                <option value="all">All line items</option>
+                <option value="deposit">Deposits only</option>
+                <option value="normal">Regular charges</option>
+                <option value="attention">Needs attention</option>
+                <option value="settled">Settled deposits</option>
               </select>
+              <button class="wm-btn wm-btn--primary" type="button" onclick="invSaveAll()">Save changes</button>
             </div>
           </div>
 
-          <div class="inv-table">
-            <div class="inv-thead">
-              <div>Invoice #</div>
-              <div>Client</div>
-              <div>Invoice date</div>
+          <div class="lit-table">
+            <div class="lit-thead">
+              <div>Line item</div>
+              <div>Invoice / client</div>
               <div class="right">Amount</div>
-              <div class="right">Deposits</div>
+              <div class="center">Deposit</div>
+              <div>Employee</div>
               <div>Deposit status</div>
-              <div></div>
             </div>
-            <div id="invListBody"></div>
+            <div id="invItemsBody"></div>
           </div>
         </div>
 
@@ -2257,7 +2264,7 @@ function openInvoiceView(ev){
   document.getElementById('invDetailSub').classList.add('hidden');
   document.getElementById('invListSub').classList.remove('hidden');
   document.querySelector('.topbar-title').textContent = 'All invoices';
-  renderInvoiceList();
+  renderAllItems();
   document.querySelector('.page-body').scrollTop = 0;
 }
 function showDepositsView(ev){
@@ -2271,31 +2278,73 @@ function showDepositsView(ev){
   document.querySelector('.page-body').scrollTop = 0;
 }
 
-function renderInvoiceList(){
-  const body = document.getElementById('invListBody');
-  body.innerHTML = INVOICES.map(inv=>{
-    const c = invClient(inv);
-    const st = invMapStatus(inv);
-    const search = (inv.id+' '+c.name).toLowerCase();
-    return `<div class="inv-row" data-status="${st.key}" data-search="${search}" onclick="openInvoice('${inv.id}')">
-      <div class="inv-no">${inv.id}</div>
-      <div class="inv-cli"><div class="lg" style="background:${c.logoBg}">${c.initial}</div><span class="nm">${c.name}</span></div>
-      <div class="inv-cell">${inv.date}</div>
-      <div class="inv-amt right"><span class="cur">$</span>${fmt(invTotal(inv))}</div>
-      <div class="inv-cell right">${invDeposits(inv).length} of ${inv.items.length}</div>
-      <div><span class="map-badge ${st.key}"><span class="dot"></span>${st.label}</span></div>
-      <div class="inv-chev"><svg viewBox="0 0 14 14" fill="none"><path d="M5 3L9 7L5 11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-    </div>`;
-  }).join('');
-  applyInvFilter();
+// ===== flat "all line items" view =====
+function renderAllItems(){
+  const body = document.getElementById('invItemsBody');
+  if(!body) return;
+  const rows = [];
+  INVOICES.forEach(inv => inv.items.forEach(it => rows.push(renderItemRow(it, inv))));
+  body.innerHTML = rows.join('');
+  if(window.WMUI) WMUI.refresh();
+  applyItemFilter();
 }
-function applyInvFilter(){
+
+function renderItemRow(it, inv){
+  const dep = it.type==='deposit';
+  const c = invClient(inv);
+  let empCell, status;
+  if(!dep){
+    empCell = `<span class="lit-muted">—</span>`;
+    status = `<span class="lit-muted">—</span>`;
+  } else {
+    const named = invNamed(it);
+    empCell = named
+      ? `<div class="lit-emp"><span class="nm">${escHtml(it.emp.name)}</span>${it.exited?`<span class="ex">Exited${it.emp&&it.emp.end?` · ${fmtExitDate(it.emp.end)}`:''}</span>`:''}</div>`
+      : `<span class="lit-muted">—</span>`;
+    const badge = named
+      ? `<span class="map-badge dep"><span class="dot"></span>Deposit</span>`
+      : `<span class="map-badge partial"><span class="dot"></span>Needs employee</span>`;
+    const settle = (named && it.exited && it.settlement==='settled') ? `<span class="wm-pill wm-pill--success">Settled</span>` : '';
+    status = `<div class="lit-status">${badge}${settle}</div>`;
+  }
+  const row = `<div class="lit-row"${dep?` onclick="invToggleRow(event,'${it.id}')"`:''}>
+    <div class="lit-namecell"><div><div class="d1">${it.d1}</div><div class="d2">${it.d2}</div></div></div>
+    <div class="lit-inv"><div class="ino">${inv.id}</div><div class="icl">${escHtml(c.name)}</div></div>
+    <div class="amt"><span class="cur">$</span>${fmt(it.amount)}</div>
+    <div class="lit-dep-cell"><label class="lit-dep-box" onclick="event.stopPropagation()"><input type="checkbox" ${dep?'checked':''} onchange="invSetDeposit('${it.id}',this.checked)"></label></div>
+    <div class="lit-emp-cell">${empCell}</div>
+    <div>${status}</div>
+  </div>`;
+  const attention = dep && (!invNamed(it) || (it.exited && it.settlement!=='settled')) ? 1 : 0;
+  const settled = (dep && it.exited && it.settlement==='settled') ? 1 : 0;
+  const search = (it.d1+' '+it.d2+' '+inv.id+' '+c.name+' '+((it.emp&&it.emp.name)||'')).toLowerCase();
+  return `<div class="lit-item ${dep?'is-dep':''}${dep&&it._open?' is-open':''}" data-li="${it.id}" data-type="${it.type}" data-attention="${attention}" data-settled="${settled}" data-search="${escAttr(search)}">${row}${dep?renderDepositDetail(it):''}</div>`;
+}
+
+function applyItemFilter(){
   const q = (document.getElementById('invSearch').value||'').toLowerCase();
-  const st = document.getElementById('invFilterStatus').value;
-  document.querySelectorAll('#invListBody .inv-row').forEach(r=>{
-    const show = (!q || r.dataset.search.includes(q)) && (st==='all' || r.dataset.status===st);
-    r.style.display = show ? 'grid' : 'none';
+  const f = document.getElementById('invFilterStatus').value;
+  document.querySelectorAll('#invItemsBody .lit-item').forEach(r=>{
+    const matchSearch = !q || (r.dataset.search||'').includes(q);
+    let matchF = true;
+    if(f==='deposit') matchF = r.dataset.type==='deposit';
+    else if(f==='normal') matchF = r.dataset.type==='normal';
+    else if(f==='attention') matchF = r.dataset.attention==='1';
+    else if(f==='settled') matchF = r.dataset.settled==='1';
+    r.style.display = (matchSearch && matchF) ? '' : 'none';
   });
+}
+
+function invSetDeposit(itemId, checked){
+  const it = invFindItem(itemId); if(!it) return;
+  it.type = checked ? 'deposit' : 'normal';
+  if(checked){ if(!it.emp) it.emp={name:'',start:'',end:''}; if(it.exited===undefined) it.exited=false; it._open=true; }
+  else { it.emp=null; it.exited=false; it.settlement=undefined; it._open=false; }
+  renderAllItems();
+}
+
+function invSaveAll(){
+  if(window.WMUI && WMUI.toast) WMUI.toast('All changes saved', { type:'success' });
 }
 
 function openInvoice(id){
@@ -2389,14 +2438,17 @@ function renderDepositDetail(it){
   </div>`;
 }
 
-function invFindItem(itemId){ return currentInvoice && currentInvoice.items.find(x=>x.id===itemId); }
+function invFindItem(itemId){
+  for(const inv of INVOICES){ const it = inv.items.find(x=>x.id===itemId); if(it) return it; }
+  return null;
+}
 
 function invSetType(itemId, type){
   const it = invFindItem(itemId); if(!it) return;
   it.type = type;
   if(type==='deposit'){ if(!it.emp) it.emp={name:'',start:'',end:''}; if(it.exited===undefined) it.exited=false; it._open=true; }
   else { it.emp=null; it.exited=false; it.settlement=undefined; it._open=false; }
-  renderInvoiceDetail();
+  renderAllItems();
 }
 // expand / collapse a deposit row (ignore clicks on the Type select)
 function invToggleRow(ev, itemId){
@@ -2412,10 +2464,10 @@ function invToggleExited(itemId, v){
   if(!it.emp) it.emp = {name:'', start:'', end:''};
   if(v){ if(!it.settlement) it.settlement='pending'; }
   else { it.emp.start=''; it.emp.end=''; it.settlement=undefined; }
-  renderInvoiceDetail();
+  renderAllItems();
 }
-function invSetSettlement(itemId, val){ const it=invFindItem(itemId); if(it){ it.settlement=val; renderInvoiceDetail(); } }
-function invSetEmp(itemId, field, val){ const it=invFindItem(itemId); if(it){ if(!it.emp) it.emp={name:'',start:'',end:''}; it.emp[field]=val; if(field==='end') renderInvoiceDetail(); } }
+function invSetSettlement(itemId, val){ const it=invFindItem(itemId); if(it){ it.settlement=val; renderAllItems(); } }
+function invSetEmp(itemId, field, val){ const it=invFindItem(itemId); if(it){ if(!it.emp) it.emp={name:'',start:'',end:''}; it.emp[field]=val; if(field==='end') renderAllItems(); } }
 // live name edit — patch only the status cell + progress so the text input keeps focus
 function invSetEmpName(itemId, val){
   const it=invFindItem(itemId); if(!it) return;
