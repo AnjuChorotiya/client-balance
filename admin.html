@@ -2517,11 +2517,20 @@ function invEmpInput(itemId, inputEl){
   menu.classList.add('open');
 }
 function invEmpPick(itemId, name){
+  const it = invFindItem(itemId);
   const menu = document.getElementById('empac-'+itemId);
   const input = menu && menu.closest('.emp-ac').querySelector('input');
   if(input) input.value = name;
-  invSetEmpName(itemId, name);
   if(menu){ menu.classList.remove('open'); menu.innerHTML=''; }
+  // picking an existing (active) employee resets the manual/exit state and hides the extra fields
+  if(it){
+    if(!it.emp) it.emp={name:'',start:'',end:''};
+    it.emp.name = name; it.emp.start=''; it.emp.end='';
+    it._manual = false; it.exited = false; it.settlement = undefined;
+    renderAllItems();
+  } else {
+    invSetEmpName(itemId, name);
+  }
 }
 // "Create new" picked — keep the typed name and reveal start/end date + settlement fields
 function invEmpCreateNew(itemId){
