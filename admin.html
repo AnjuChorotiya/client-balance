@@ -675,6 +675,7 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
 .emp-ac-meta{display:flex;flex-direction:column;min-width:0}
 .emp-ac-nm{font-size:13px;font-weight:600;color:var(--n900)}
 .emp-ac-role{font-size:11px;color:var(--n500);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.emp-ac-email{font-size:11px;color:var(--n500);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .emp-ac-empty{padding:10px 12px;font-size:12.5px;color:var(--n400)}
 .emp-ac-create{color:var(--brand);font-weight:600}
 .emp-ac-create .emp-ac-nm{color:var(--brand)}
@@ -2494,13 +2495,20 @@ function invEmployeesFor(itemId){
   const inv = invForItem(itemId); if(!inv) return [];
   return clientEmployees(invClient(inv)) || [];
 }
+function invEmpEmail(e, inv){
+  if(e.email) return e.email;
+  const domain = (inv && invClient(inv) && invClient(inv).sub) || 'company.com';
+  const handle = (e.name||'').toLowerCase().replace(/[^a-z\s]/g,'').trim().split(/\s+/).filter(Boolean).join('.');
+  return handle ? `${handle}@${domain}` : '';
+}
 function invEmpInput(itemId, inputEl){
   invSetEmpName(itemId, inputEl.value);
   const menu = document.getElementById('empac-'+itemId);
   if(!menu) return;
   const q = (inputEl.value||'').trim().toLowerCase();
+  const inv = invForItem(itemId);
   const emps = invEmployeesFor(itemId);
-  const matches = emps.filter(e=> !q || e.name.toLowerCase().includes(q)).slice(0,8);
+  const matches = emps.filter(e=> !q || e.name.toLowerCase().includes(q) || invEmpEmail(e,inv).toLowerCase().includes(q)).slice(0,8);
   if(matches.length===0){
     menu.innerHTML = `<button type="button" class="emp-ac-item emp-ac-create" onmousedown="event.preventDefault()" onclick="invEmpCreateNew('${itemId}')">
       <span class="emp-ac-create-ic">+</span>
@@ -2510,8 +2518,9 @@ function invEmpInput(itemId, inputEl){
     return;
   }
   menu.innerHTML = matches.map(e=>{
+    const email = invEmpEmail(e, inv);
     return `<button type="button" class="emp-ac-item" onmousedown="event.preventDefault()" onclick="invEmpPick('${itemId}','${escAttr(e.name)}')">
-      <span class="emp-ac-nm">${escHtml(e.name)}</span>
+      <span class="emp-ac-meta"><span class="emp-ac-nm">${escHtml(e.name)}</span>${email?`<span class="emp-ac-email">${escHtml(email)}</span>`:''}</span>
     </button>`;
   }).join('');
   menu.classList.add('open');
