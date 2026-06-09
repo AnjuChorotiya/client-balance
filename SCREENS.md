@@ -30,6 +30,16 @@ Purpose and flow for each screen in this repo. Live pages:
 5. The line-items table has columns: Line item, Invoice / client, Amount, Deposit (checkbox), Employee, Deposit status. A status filter offers All line items / Deposits only / Regular charges / Needs attention / Settled deposits, and a **Save** button commits changes.
 6. Drilling into a single invoice opens a detail sub-view (breadcrumb back to "All invoices") with invoice meta and a per-line classification list — for deposits the employee is captured, and exited employees can have start/end dates added.
 
+**Validations:**
+- Issue credit-note modal — Amount (`#cnAmount`, `type=number`): required, must be a positive number (`>0`); blocks submit and refocuses the field otherwise.
+- Issue credit-note modal — Reason (`#cnReason`): required (non-empty after trim); blocks submit and refocuses otherwise.
+- Adjustment modal — Reason (`#adjReason`): required (non-empty after trim) for every adjustment type before the confirm panel shows.
+- Adjustment modal (Add credit / Deduct credit) — Amount (`.adj-amount`, `type=number`): required, must be `>0`.
+- Adjustment modal (Mark invoice as paid) — Invoice (`#adjInvoice`): a selection is required.
+- Adjustment modal (Release / refund deposit) — Deposit (`#adjDeposit`): a selection is required; amount falls back to the deposit's value if left blank.
+- Line item → Deposit checkbox: ticking Deposit makes Employee a required follow-up — a deposit line with no employee name (`invNamed` false) is flagged "Needs attention" (`data-attention="1"`), as is an exited employee whose settlement is not `settled`.
+- Exited-employee start/end (`type=date` inputs): only surfaced once the employee is captured / marked as exited.
+
 **Notes:** Top bar identifies the user as "Ops Admin". Deposit rows use a distinct purple accent.
 
 ---
@@ -45,6 +55,10 @@ Purpose and flow for each screen in this repo. Live pages:
 4. A tab bar switches the ledger between **Invoices**, **Payments**, and **Credits** (each with a live count); a search box plus a multi-select Status filter (Paid / Partially paid / Due-Unpaid) and a single-select date-range filter refine the table.
 5. The table columns adapt per tab — Invoices show Date / Activity / Paid on / Amount / Status; Payments show Date / Activity / Invoice / Amount; Credits show Date / Activity / Amount.
 6. Clicking a row opens a detail drawer: invoices show line items (payroll funding with per-employee breakdown, EOR service fee, applied credit notes) and bank-transfer details (Local / SWIFT tabs with copy buttons); payments show a downloadable receipt.
+
+**Validations:**
+- The deposit-notify modal (`#addOverlay`) marks Amount transferred (`#amtInput`, `type=number`) and UTR / Reference number (`#utrInput`) as required via a visual `*`; Transfer date (`#utrDate`) is `type=date` and optional. Note: these are markup-level constraints only — no JS currently enforces them and the modal's open trigger / step submit are unwired, so there is no active validating form.
+- The transactions search box and the multi-select Status / single-select date-range filters are non-validating refinement inputs.
 
 **Notes:** Invoice data is described as synced from Zoho Books. An "Overdue advance" / security-deposit info modal explains how the locked deposit is used (auto-drawn when wallet runs short, applied to overdue invoices past the 7-day grace, refunded at offboarding).
 
