@@ -635,9 +635,6 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
 .lit-row{display:grid;grid-template-columns:minmax(200px,2fr) 110px 150px minmax(150px,1.3fr) minmax(140px,1fr);gap:32px;align-items:center;padding:14px 24px}
 .lit-item.is-dep .lit-row{cursor:pointer}
 .lit-item.is-dep .lit-row:hover{background:#F6FAFF}
-.lit-namecell{display:flex;align-items:center;gap:10px}
-.lit-chev{width:16px;height:16px;flex:0 0 auto;color:var(--n400);transition:transform .18s ease}
-.lit-item.is-open .lit-chev{transform:rotate(90deg)}
 .lit-row .d1{font-size:14px;font-weight:600;color:var(--n900)}
 .lit-row .d2{font-size:12px;color:var(--n500);margin-top:2px}
 .lit-row .amt{font-size:14px;font-weight:700;color:var(--n900);text-align:right;white-space:nowrap}
@@ -1998,6 +1995,7 @@ function closeTxnPanel(){ document.getElementById('txnPanel').classList.remove('
 let notesClientId = null;
 function escHtml(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function escAttr(s){ return escHtml(s).replace(/"/g,'&quot;'); }
+function fmtExitDate(iso){ if(!iso) return ''; const d=new Date(iso); if(isNaN(d)) return ''; return d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}); }
 function roleClass(r){ const x=(r||'').toLowerCase(); if(x==='risk') return 'risk'; if(x==='finance') return 'finance'; return ''; }
 function noteInitials(name){ return (name||'?').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase(); }
 function renderNotesBody(c){
@@ -2344,7 +2342,7 @@ function renderLineItem(it){
   } else {
     const named = invNamed(it);
     empCell = named
-      ? `<div class="lit-emp"><span class="nm">${escHtml(it.emp.name)}</span>${it.exited?`<span class="ex">Exited</span>`:''}</div>`
+      ? `<div class="lit-emp"><span class="nm">${escHtml(it.emp.name)}</span>${it.exited?`<span class="ex">Exited${it.emp&&it.emp.end?` · ${fmtExitDate(it.emp.end)}`:''}</span>`:''}</div>`
       : `<span class="lit-muted">—</span>`;
     const badge = named
       ? `<span class="map-badge dep"><span class="dot"></span>Deposit</span>`
@@ -2352,9 +2350,8 @@ function renderLineItem(it){
     const settle = (named && it.exited && it.settlement==='settled') ? `<span class="wm-pill wm-pill--success">Settled</span>` : '';
     status = `<div class="lit-status">${badge}${settle}</div>`;
   }
-  const chev = dep ? `<svg class="lit-chev" viewBox="0 0 16 16" fill="none"><path d="M6 4L10 8L6 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>` : '';
   const row = `<div class="lit-row"${dep?` onclick="invToggleRow(event,'${it.id}')"`:''}>
-    <div class="lit-namecell">${chev}<div><div class="d1">${it.d1}</div><div class="d2">${it.d2}</div></div></div>
+    <div class="lit-namecell"><div><div class="d1">${it.d1}</div><div class="d2">${it.d2}</div></div></div>
     <div class="amt"><span class="cur">$</span>${fmt(it.amount)}</div>
     <div class="wm-field-float lit-type-field" style="margin-bottom:0">
       <select class="wm-select" onchange="invSetType('${it.id}',this.value)">
@@ -2418,7 +2415,7 @@ function invToggleExited(itemId, v){
   renderInvoiceDetail();
 }
 function invSetSettlement(itemId, val){ const it=invFindItem(itemId); if(it){ it.settlement=val; renderInvoiceDetail(); } }
-function invSetEmp(itemId, field, val){ const it=invFindItem(itemId); if(it){ if(!it.emp) it.emp={name:'',start:'',end:''}; it.emp[field]=val; } }
+function invSetEmp(itemId, field, val){ const it=invFindItem(itemId); if(it){ if(!it.emp) it.emp={name:'',start:'',end:''}; it.emp[field]=val; if(field==='end') renderInvoiceDetail(); } }
 // live name edit — patch only the status cell + progress so the text input keeps focus
 function invSetEmpName(itemId, val){
   const it=invFindItem(itemId); if(!it) return;
@@ -2430,7 +2427,7 @@ function invSetEmpName(itemId, val){
   const empHost = item.querySelector('.lit-emp-cell');
   if(empHost){
     empHost.innerHTML = named
-      ? `<div class="lit-emp"><span class="nm">${escHtml(val)}</span>${it.exited?`<span class="ex">Exited</span>`:''}</div>`
+      ? `<div class="lit-emp"><span class="nm">${escHtml(val)}</span>${it.exited?`<span class="ex">Exited${it.emp&&it.emp.end?` · ${fmtExitDate(it.emp.end)}`:''}</span>`:''}</div>`
       : `<span class="lit-muted">—</span>`;
   }
   const statusHost = item.querySelector('.lit-status');
