@@ -2038,7 +2038,6 @@ function renderNotesBody(c){
           <div class="note-main">
             <div class="note-metarow">
               <span class="note-author">${escHtml(n.author)}</span>
-              ${n.role?`<span class="note-role ${roleClass(n.role)}">${escHtml(n.role)}</span>`:''}
               <span class="note-date">${escHtml(n.date)}</span>
             </div>
             <div class="note-text">${escHtml(n.text)}</div>
