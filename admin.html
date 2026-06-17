@@ -211,11 +211,11 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
 .cn-li-amt .cur{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--n500);pointer-events:none}
 .cn-li-amt input{width:100%;height:32px;padding:0 8px 0 22px;font-size:13px;font-weight:600;border:1px solid var(--bd);border-radius:8px;font-family:inherit}
 .cn-li-amt input:focus{outline:none;border-color:var(--brand)}
-.cn-li-del{grid-column:3;grid-row:1 / span 2;align-self:center;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:1px solid var(--bd);border-radius:8px;background:#fff;color:var(--n500);cursor:pointer;flex-shrink:0}
-.cn-li-del:hover{border-color:var(--danger);color:var(--danger);background:#FEF3F2}
+.cn-li-del{grid-column:3;grid-row:2;align-self:center;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:none;border-radius:8px;background:none;color:var(--n400);cursor:pointer;flex-shrink:0}
+.cn-li-del:hover{color:var(--danger);background:#FEF3F2}
 .cn-li-del svg{width:13px;height:13px}
-.cn-add-line{display:inline-flex;align-items:center;gap:6px;margin-top:4px;padding:7px 12px;border:1px dashed var(--bd);border-radius:8px;background:#fff;color:var(--brand);font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit}
-.cn-add-line:hover{background:var(--p50);border-color:var(--brand)}
+.cn-add-line{display:inline-flex;align-items:center;gap:6px;margin-top:4px;padding:7px 10px;border:none;border-radius:8px;background:none;color:var(--brand);font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit}
+.cn-add-line:hover{background:var(--p50)}
 .cn-add-line svg{width:13px;height:13px}
 .cn-total-row{display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:12px;border-top:1px solid var(--bd)}
 .cn-total-row .lbl{font-size:13px;font-weight:600;color:var(--n700)}
@@ -2018,9 +2018,15 @@ function releaseCreditNote(idx){
   document.getElementById('cnCtxMeta').textContent = `${e.date} · ${e.ref}`;
   document.getElementById('cnCtxAmt').textContent = '$'+fmt(e.amount);
   // Build editable line items: from the invoice's lines, or a single line from the event total
+  const my = (e.date||'').split(' ').slice(1).join(' '); // "May 2026"
+  const total = +e.amount||0;
+  const eorFee = Math.round(total*0.15);
   window._cnLines = (e.lines && e.lines.length)
     ? e.lines.map(l => ({title:l.label||'', desc:l.sub||'', amount:+l.amount||0, locked:true}))
-    : [{title:e.title||'Invoice amount', desc:'', amount:+e.amount||0, locked:true}];
+    : [
+        {title: my ? `Salary — ${my}` : 'Salary', desc: `Gross salary · ${my||'monthly payroll'}`, amount: total-eorFee, locked:true},
+        {title: 'EOR management fee', desc: `Monthly EOR service charge${my?` · ${my}`:''}`, amount: eorFee, locked:true}
+      ];
   cnRenderLines();
   document.getElementById('cnReason').value = '';
   document.getElementById('cnAutoApply').checked = true;
