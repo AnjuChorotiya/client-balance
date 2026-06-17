@@ -93,7 +93,9 @@ body{font-family:var(--font);background:var(--bg);color:var(--n800);-webkit-font
 .oa-info svg{width:16px;height:16px}
 .oa-pop{position:absolute;top:calc(100% + 8px);left:-12px;width:320px;background:var(--n0);border:1px solid var(--bd);border-radius:var(--rlg);box-shadow:0 8px 28px rgba(0,0,0,0.10);padding:14px 16px;display:none;z-index:50}
 .oa-pop.show{display:block}
+.oa-wrap:hover .oa-pop{display:block}
 .oa-pop::before{content:'';position:absolute;top:-6px;left:20px;width:10px;height:10px;background:var(--n0);border-top:1px solid var(--bd);border-left:1px solid var(--bd);transform:rotate(45deg)}
+.oa-pop::after{content:'';position:absolute;top:-10px;left:0;right:0;height:10px}
 .oa-title{font-family:var(--font-tag);font-size:11px;font-weight:300;color:var(--n400);letter-spacing:.6px;text-transform:uppercase;margin-bottom:6px}
 .oa-text{font-size:13px;color:var(--n600);line-height:1.55}
 .oa-text strong{color:var(--n900);font-weight:700}
@@ -827,6 +829,9 @@ function setFilter(el, kind){
   currentFilter = kind;
   const tbl = document.getElementById('txTable');
   if(tbl) tbl.setAttribute('data-filter', kind);
+  // status filter applies to invoices only — hide it on Payments & Credits
+  const statusDrop = document.getElementById('statusDrop');
+  if(statusDrop) statusDrop.style.display = (kind==='invoice') ? '' : 'none';
   applyFilter();
 }
 
@@ -838,7 +843,7 @@ function applyFilter(){
     r.classList.remove('last-visible');
     const kindMatch = currentFilter==='all' || r.dataset.kind===currentFilter;
     const searchMatch = !q || r.dataset.search.includes(q);
-    const statusMatch = statusSel.size===0 || statusSel.has(r.dataset.status);
+    const statusMatch = currentFilter!=='invoice' || statusSel.size===0 || statusSel.has(r.dataset.status);
     const dateMatch = inDateRange(r.dataset.time);
     const show = kindMatch && searchMatch && statusMatch && dateMatch;
     r.style.display = show ? 'grid' : 'none';
@@ -1044,6 +1049,5 @@ function showToast(msg){ document.getElementById('toastText').textContent = msg;
 
 renderRows();
 </script>
-  <script defer src="https://anjuchorotiya.github.io/Client-freelancer/wisemonk-ui/dev-notes.js"></script>
 </body>
 </html>
