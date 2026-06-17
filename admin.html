@@ -198,6 +198,30 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
 .cn-ctx-title{font-size:14px;font-weight:700;color:var(--n900)}
 .cn-ctx-meta{font-size:12px;color:var(--n500)}
 .cn-ctx-amt{font-size:16px;font-weight:700;color:var(--n900);white-space:nowrap}
+/* credit-note line items editor */
+.cn-lines{display:flex;flex-direction:column;gap:12px}
+.cn-li-row{display:grid;grid-template-columns:1fr 130px 32px;column-gap:12px;row-gap:6px;align-items:center}
+.cn-li-title{grid-column:1;grid-row:1;font-size:13.5px;font-weight:600;color:var(--n900);border:none;background:none;padding:0;width:100%;font-family:inherit;height:32px}
+.cn-li-title[readonly]{cursor:default}
+.cn-li-title::placeholder{color:var(--n400);font-weight:500}
+.cn-li-desc{grid-column:1;grid-row:2;font-size:12px;color:var(--n600);border:1px solid var(--bd);border-radius:8px;padding:7px 10px;width:100%;font-family:inherit;background:#fff}
+.cn-li-desc:focus,.cn-li-title:focus{outline:none}
+.cn-li-desc:focus{border-color:var(--brand)}
+.cn-li-amt{grid-column:2;grid-row:1;position:relative}
+.cn-li-amt .cur{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--n500);pointer-events:none}
+.cn-li-amt input{width:100%;height:32px;padding:0 8px 0 22px;font-size:13px;font-weight:600;border:1px solid var(--bd);border-radius:8px;font-family:inherit}
+.cn-li-amt input:focus{outline:none;border-color:var(--brand)}
+.cn-li-del{grid-column:3;grid-row:1;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:1px solid var(--bd);border-radius:8px;background:#fff;color:var(--n500);cursor:pointer;flex-shrink:0}
+.cn-li-del:hover{border-color:var(--danger);color:var(--danger);background:#FEF3F2}
+.cn-li-del svg{width:13px;height:13px}
+.cn-add-line{display:inline-flex;align-items:center;gap:6px;margin-top:4px;padding:7px 12px;border:1px dashed var(--bd);border-radius:8px;background:#fff;color:var(--brand);font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit}
+.cn-add-line:hover{background:var(--p50);border-color:var(--brand)}
+.cn-add-line svg{width:13px;height:13px}
+.cn-total-row{display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:12px;border-top:1px solid var(--bd)}
+.cn-total-row .lbl{font-size:13px;font-weight:600;color:var(--n700)}
+.cn-total-row .val{font-size:18px;font-weight:700;color:var(--n900)}
+#cnOverlay .m-body{scrollbar-width:none;-ms-overflow-style:none}
+#cnOverlay .m-body::-webkit-scrollbar{display:none}
 
 /* in-modal confirmation panel */
 .adj-confirm{display:none;position:absolute;inset:0;background:var(--n0);padding:32px 28px;flex-direction:column;align-items:center;justify-content:flex-start;gap:12px;z-index:5;text-align:center;overflow-y:auto}
@@ -981,7 +1005,7 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
 
 <!-- RELEASE CREDIT NOTE MODAL -->
 <div class="modal-overlay" id="cnOverlay" onclick="if(event.target===this)closeCnModal()">
-  <div class="modal" style="width:520px">
+  <div class="modal" style="width:640px">
     <div class="m-header">
       <div class="m-title">Release credit note</div>
       <button class="m-close" onclick="closeCnModal()" aria-label="Close"><svg viewBox="0 0 12 12" fill="none"><path d="M1 1L11 11M11 1L1 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
@@ -1001,12 +1025,15 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
         </div>
       </div>
       <div class="fg">
-        <div class="flabel">Amount to credit <span class="req">*</span></div>
-        <div class="amount-input">
-          <span class="cur">$</span>
-          <input type="number" id="cnAmount" class="finput" placeholder="0.00"/>
+        <div class="flabel">Line items to credit <span class="req">*</span></div>
+        <div class="cn-lines" id="cnLinesBody"></div>
+        <button type="button" class="cn-add-line" onclick="cnAddLine()"><svg viewBox="0 0 12 12" fill="none"><path d="M6 1.5V10.5M1.5 6H10.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Add line item</button>
+        <div class="adj-helper" id="cnHelper">Edit descriptions or amounts, remove lines, or add new ones. Title is locked for existing lines.</div>
+        <div class="cn-total-row">
+          <span class="lbl">Amount to credit</span>
+          <span class="val" id="cnTotal">$0</span>
         </div>
-        <div class="adj-helper" id="cnHelper">Pre-filled with the full invoice amount. Edit for partial credit.</div>
+        <input type="hidden" id="cnAmount"/>
       </div>
       <div class="fg">
         <div class="flabel">Reason / audit note <span class="req">*</span></div>
@@ -1991,24 +2018,62 @@ function releaseCreditNote(idx){
   document.getElementById('cnCtxTitle').textContent = e.title;
   document.getElementById('cnCtxMeta').textContent = `${e.date} · ${e.ref}`;
   document.getElementById('cnCtxAmt').textContent = '$'+fmt(e.amount);
-  document.getElementById('cnAmount').value = e.amount;
+  // Build editable line items: from the invoice's lines, or a single line from the event total
+  window._cnLines = (e.lines && e.lines.length)
+    ? e.lines.map(l => ({title:l.label||'', desc:l.sub||'', amount:+l.amount||0, locked:true}))
+    : [{title:e.title||'Invoice amount', desc:'', amount:+e.amount||0, locked:true}];
+  cnRenderLines();
   document.getElementById('cnReason').value = '';
   document.getElementById('cnAutoApply').checked = true;
   window._cnContext = e;
   document.getElementById('cnOverlay').classList.add('show');
 }
+function cnRenderLines(){
+  const lines = window._cnLines || [];
+  const body = document.getElementById('cnLinesBody');
+  body.innerHTML = lines.map((l,i)=>`
+    <div class="cn-li-row" data-i="${i}">
+      <input class="cn-li-title" value="${escAttr(l.title)}" ${l.locked?'readonly':''} placeholder="Line item title" oninput="cnSetLine(${i},'title',this.value)">
+      <div class="cn-li-amt"><span class="cur">$</span><input type="number" value="${l.amount}" oninput="cnSetLine(${i},'amount',this.value);cnRecalcTotal()"></div>
+      <button type="button" class="cn-li-del" title="Remove line" onclick="cnRemoveLine(${i})"><svg viewBox="0 0 12 12" fill="none"><path d="M1 1L11 11M11 1L1 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+      <input class="cn-li-desc" value="${escAttr(l.desc)}" placeholder="Description" oninput="cnSetLine(${i},'desc',this.value)">
+    </div>`).join('');
+  cnRecalcTotal();
+}
+function cnSetLine(i, field, val){
+  const l = (window._cnLines||[])[i]; if(!l) return;
+  l[field] = field==='amount' ? (+val||0) : val;
+}
+function cnRecalcTotal(){
+  const total = (window._cnLines||[]).reduce((s,l)=> s + (+l.amount||0), 0);
+  document.getElementById('cnTotal').textContent = '$'+fmt(total);
+  document.getElementById('cnAmount').value = total;
+}
+function cnRemoveLine(i){
+  const lines = window._cnLines||[];
+  lines.splice(i,1);
+  cnRenderLines();
+}
+function cnAddLine(){
+  (window._cnLines = window._cnLines||[]).push({title:'', desc:'', amount:0, locked:false});
+  cnRenderLines();
+  const rows = document.querySelectorAll('#cnLinesBody .cn-li-row');
+  const last = rows[rows.length-1]; if(last) last.querySelector('.cn-li-title').focus();
+}
 function closeCnModal(){ document.getElementById('cnOverlay').classList.remove('show'); }
 function submitCreditNote(){
-  const amt = +document.getElementById('cnAmount').value;
+  const lines = window._cnLines || [];
+  const amt = lines.reduce((s,l)=> s + (+l.amount||0), 0);
   const reason = document.getElementById('cnReason').value.trim();
   const autoApply = document.getElementById('cnAutoApply').checked;
   const e = window._cnContext;
-  if(!amt||amt<=0){ document.getElementById('cnAmount').focus(); return; }
+  if(!lines.length || amt<=0){ const add=document.querySelector('.cn-add-line'); if(add)add.focus(); return; }
   if(!reason){ document.getElementById('cnReason').focus(); return; }
   const cn = 'CN-2026-'+String(20+Math.floor(Math.random()*40)).padStart(4,'0');
   closeCnModal();
   const dest = autoApply ? 'auto-applies to next invoice' : 'held as credit';
-  showToast(`Credit note ${cn} issued · $${fmt(amt)} against ${e?.ref||'invoice'} · ${dest} · logged to audit trail`);
+  const lineNote = lines.length>1 ? ` · ${lines.length} line items` : '';
+  showToast(`Credit note ${cn} issued · $${fmt(amt)} against ${e?.ref||'invoice'}${lineNote} · ${dest} · logged to audit trail`);
 }
 function refundToBank(idx){
   const items = window._timelineCache || [];
@@ -2600,6 +2665,5 @@ function invSetEmpName(itemId, val){
 enhanceAllSelects();
 renderClients();
 </script>
-  <script defer src="https://anjuchorotiya.github.io/Client-freelancer/wisemonk-ui/dev-notes.js"></script>
 </body>
 </html>
