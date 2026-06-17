@@ -201,17 +201,17 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
 /* credit-note line items editor */
 .cn-lines{display:flex;flex-direction:column;gap:12px}
 .cn-li-row{display:grid;grid-template-columns:1fr 130px 32px;column-gap:12px;row-gap:6px;align-items:center}
-.cn-li-title{grid-column:1;grid-row:1;font-size:13.5px;font-weight:600;color:var(--n900);border:none;background:none;padding:0;width:100%;font-family:inherit;height:32px}
+.cn-li-title{grid-column:1 / span 2;grid-row:1;font-size:13.5px;font-weight:600;color:var(--n900);border:none;background:none;padding:0;width:100%;font-family:inherit;height:32px}
 .cn-li-title[readonly]{cursor:default}
 .cn-li-title::placeholder{color:var(--n400);font-weight:500}
 .cn-li-desc{grid-column:1;grid-row:2;font-size:12px;color:var(--n600);border:1px solid var(--bd);border-radius:8px;padding:7px 10px;width:100%;font-family:inherit;background:#fff}
 .cn-li-desc:focus,.cn-li-title:focus{outline:none}
 .cn-li-desc:focus{border-color:var(--brand)}
-.cn-li-amt{grid-column:2;grid-row:1;position:relative}
+.cn-li-amt{grid-column:2;grid-row:2;align-self:center;position:relative}
 .cn-li-amt .cur{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--n500);pointer-events:none}
 .cn-li-amt input{width:100%;height:32px;padding:0 8px 0 22px;font-size:13px;font-weight:600;border:1px solid var(--bd);border-radius:8px;font-family:inherit}
 .cn-li-amt input:focus{outline:none;border-color:var(--brand)}
-.cn-li-del{grid-column:3;grid-row:1;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:1px solid var(--bd);border-radius:8px;background:#fff;color:var(--n500);cursor:pointer;flex-shrink:0}
+.cn-li-del{grid-column:3;grid-row:1 / span 2;align-self:center;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:1px solid var(--bd);border-radius:8px;background:#fff;color:var(--n500);cursor:pointer;flex-shrink:0}
 .cn-li-del:hover{border-color:var(--danger);color:var(--danger);background:#FEF3F2}
 .cn-li-del svg{width:13px;height:13px}
 .cn-add-line{display:inline-flex;align-items:center;gap:6px;margin-top:4px;padding:7px 12px;border:1px dashed var(--bd);border-radius:8px;background:#fff;color:var(--brand);font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit}
@@ -1028,7 +1028,6 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
         <div class="flabel">Line items to credit <span class="req">*</span></div>
         <div class="cn-lines" id="cnLinesBody"></div>
         <button type="button" class="cn-add-line" onclick="cnAddLine()"><svg viewBox="0 0 12 12" fill="none"><path d="M6 1.5V10.5M1.5 6H10.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Add line item</button>
-        <div class="adj-helper" id="cnHelper">Edit descriptions or amounts, remove lines, or add new ones. Title is locked for existing lines.</div>
         <div class="cn-total-row">
           <span class="lbl">Amount to credit</span>
           <span class="val" id="cnTotal">$0</span>
@@ -1303,7 +1302,7 @@ function defaultEmployees(c){
 const TIMELINES = {
   C001: [
     {date:'10 May 2026', type:'invoice-open', title:'Invoice INV-2026-0050 issued', meta:'May 2026 cycle · payroll + EOR', ref:'INV-2026-0050', amount:15200, pill:'Due'},
-    {date:'06 May 2026', type:'invoice-paid', title:'Invoice INV-2026-0048 paid · equipment', meta:'Onboarding equipment · laptops, monitors & peripherals', ref:'INV-2026-0048', amount:2545, pill:'Paid', lines:[{label:'MacBook Pro 14" · M4', sub:'2 units · new hires', amount:1850},{label:'External monitor · 27"', sub:'2 units', amount:420},{label:'Peripherals & accessories', sub:'Keyboard, mouse, dock', amount:180},{label:'Shipping & handling', sub:'Bengaluru → remote', amount:95}]},
+    {date:'06 May 2026', type:'invoice-paid', title:'Invoice INV-2026-0048 paid · equipment', meta:'Onboarding equipment · laptops, monitors & peripherals', ref:'INV-2026-0048', amount:2545, pill:'Paid', lines:[{label:'April salary', sub:'Gross salary · April 2026', amount:2200},{label:'EOR salary', sub:'EOR management fee · April 2026', amount:345}]},
     {date:'06 May 2026', type:'payment', title:'Client payment received · equipment invoice', meta:'Bank transfer · settles INV-2026-0048', ref:'PAY-EQ-0048', amount:2545, pill:'Paid'},
     {date:'05 May 2026', type:'payment', title:'Client payment received · April 2026', meta:'Bank transfer · synced from Zoho Books', ref:'PAY-APR26', amount:13950, pill:'Paid'},
     {date:'04 May 2026', type:'invoice-paid', title:'Invoice INV-2026-0045 paid · Q1 bonus', meta:'Q1 2026 performance bonus · 8 employees', ref:'INV-2026-0045', amount:3360, pill:'Paid', lines:[{label:'Performance bonus payout', sub:'8 employees · Q1 2026', amount:3200},{label:'Bonus processing fee', sub:'Tax & disbursement', amount:160}]},
