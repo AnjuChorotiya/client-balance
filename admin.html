@@ -2153,6 +2153,12 @@ function depDetailHtml(r){
   if(r.released) evts.push({cls:'released', t:'Deposit released', s:`on exit · refunded at live FX (${fx} INR/${ccy})`, amt:`${sym}${fmt2(r.inr/fx)}`});
   return evts.map(v=>`<div class="dep-evt"><span class="dep-evt-dot ${v.cls}"></span><div class="dep-evt-main"><span class="dep-evt-t">${escHtml(v.t)}</span><span class="dep-evt-s">${escHtml(v.s)}</span></div><span class="dep-evt-amt">${v.amt}</span></div>`).join('');
 }
+// derive a work email from the employee name + client domain
+function empEmail(e, c){
+  const domain = (c && c.sub) || 'company.com';
+  const handle = (e.name||'').toLowerCase().replace(/[^a-z\s]/g,'').trim().split(/\s+/).filter(Boolean).join('.');
+  return handle ? `${handle}@${domain}` : '';
+}
 function renderDeposits(){
   const c = currentClient; if(!c) return;
   const rows = depLedger(c);
@@ -2163,7 +2169,7 @@ function renderDeposits(){
     const statusPill = r.released ? `<span class="tl-pill issued">Released</span>` : `<span class="tl-pill locked">Locked</span>`;
     return `
     <div class="dep-row" data-i="${i}" onclick="openDepPanel(${i})">
-      <div class="dep-emp"><span class="dep-av" style="background:var(--brand)">${escHtml(initial)}</span><span class="dep-emp-meta"><span class="dep-emp-nm">${escHtml(e.name)}</span><span class="dep-emp-role">${escHtml(e.role||'')}</span></span></div>
+      <div class="dep-emp"><span class="dep-av" style="background:var(--brand)">${escHtml(initial)}</span><span class="dep-emp-meta"><span class="dep-emp-nm">${escHtml(e.name)}</span><span class="dep-emp-role">${escHtml(empEmail(e,c))}</span></span></div>
       <div class="dep-inr right">₹${fmt(r.held)}</div>
       <div class="dep-date">${escHtml(e.doj||'—')}</div>
       <div class="dep-ref">${escHtml(e.adv||'—')}</div>
