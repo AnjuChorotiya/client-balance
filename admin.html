@@ -337,6 +337,25 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
 .dep-evt-t{font-weight:600;color:var(--n900)}
 .dep-evt-s{font-size:12px;color:var(--n500)}
 .dep-evt-amt{font-size:13px;font-weight:600;color:var(--n800);font-variant-numeric:tabular-nums;white-space:nowrap}
+/* deposit / join-invoice right panel */
+.dpv-emp{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.dpv-emp .dep-av{width:44px;height:44px;font-size:15px}
+.dpv-nm{font-size:16px;font-weight:700;color:var(--n900)}
+.dpv-role{font-size:13px;color:var(--n500)}
+.dpv-meta{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--n600);padding:12px 14px;background:var(--n50);border-radius:10px;margin-bottom:18px}
+.dpv-meta b{color:var(--n900);font-weight:700}
+.dpv-sec{margin-bottom:18px}
+.dpv-sec-h{display:flex;align-items:center;gap:7px;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--n500);margin-bottom:8px}
+.dpv-sec-h.adv{color:var(--purple500)}
+.dpv-sec-h .tag{font-size:10px;font-weight:700;padding:1px 7px;border-radius:999px;background:var(--purple50);color:var(--purple500);text-transform:none;letter-spacing:0}
+.dpv-line{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--bd);font-size:14px;color:var(--n700)}
+.dpv-line b{font-weight:600;color:var(--n900);font-variant-numeric:tabular-nums}
+.dpv-line.total{border-bottom:none;font-weight:700}
+.dpv-line.total span{font-weight:700;color:var(--n900)}
+.dpv-line .sub{font-size:11.5px;color:var(--n500);font-weight:500}
+.dpv-grand{display:flex;align-items:center;justify-content:space-between;margin-top:6px;padding-top:14px;border-top:2px solid var(--n900)}
+.dpv-grand .lbl{font-size:14px;font-weight:700;color:var(--n900)}
+.dpv-grand .val{font-size:20px;font-weight:700;color:var(--n900);font-variant-numeric:tabular-nums}
 .tl-filter{display:flex;gap:6px}
 .tl-controls{display:flex;align-items:center;gap:14px}
 .tl-time{height:42px;padding:0 36px 0 16px;font-family:'Satoshi',sans-serif;font-size:14px;font-weight:500;color:#222224;background:#FFFFFF;border:1px solid #F0F1F1;border-radius:10px;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M3 5L6 8L9 5' stroke='%2385878D' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;background-size:12px;min-width:140px}
@@ -1063,6 +1082,17 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
       <button class="m-close" onclick="closeTxnPanel()" aria-label="Close"><svg viewBox="0 0 12 12" fill="none"><path d="M1 1L11 11M11 1L1 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
     </header>
     <div class="txn-panel-body" id="txnPanelBody"></div>
+  </aside>
+</div>
+
+<!-- DEPOSIT / JOIN-INVOICE right-side panel -->
+<div class="txn-overlay" id="depPanel" onclick="if(event.target===this)closeDepPanel()">
+  <aside class="txn-panel">
+    <header class="txn-panel-head">
+      <div class="txn-panel-title" id="depPanelTitle">Join invoice</div>
+      <button class="m-close" onclick="closeDepPanel()" aria-label="Close"><svg viewBox="0 0 12 12" fill="none"><path d="M1 1L11 11M11 1L1 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+    </header>
+    <div class="txn-panel-body" id="depPanelBody"></div>
   </aside>
 </div>
 
@@ -2126,29 +2156,91 @@ function depDetailHtml(r){
 function renderDeposits(){
   const c = currentClient; if(!c) return;
   const rows = depLedger(c);
+  window._depRows = rows;
   document.getElementById('depBody').innerHTML = rows.map((r,i)=>{
     const e=r.e;
     const initial = e.initial || e.name.split(' ').map(p=>p[0]).join('').slice(0,2);
     const statusPill = r.released ? `<span class="tl-pill issued">Released</span>` : `<span class="tl-pill locked">Locked</span>`;
     return `
-    <div class="dep-row" data-i="${i}" onclick="depToggle(${i})">
+    <div class="dep-row" data-i="${i}" onclick="openDepPanel(${i})">
       <div class="dep-emp"><span class="dep-av" style="background:var(--brand)">${escHtml(initial)}</span><span class="dep-emp-meta"><span class="dep-emp-nm">${escHtml(e.name)}</span><span class="dep-emp-role">${escHtml(e.role||'')}</span></span></div>
       <div class="dep-inr right">₹${fmt(r.held)}</div>
       <div class="dep-date">${escHtml(e.doj||'—')}</div>
       <div class="dep-ref">${escHtml(e.adv||'—')}</div>
       <div>${statusPill}</div>
-      <div class="dep-chev"><svg viewBox="0 0 12 12" fill="none"><path d="M3 5L6 8L9 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-    </div>
-    <div class="dep-detail" data-i="${i}">${depDetailHtml(r)}</div>`;
+      <div class="tl-row-actions" onclick="event.stopPropagation()">
+        <button class="rabtn" title="Actions" onclick="event.stopPropagation();toggleDepMenu(${i})"><svg viewBox="0 0 14 14" fill="none"><circle cx="2.5" cy="7" r="1.2" fill="currentColor"/><circle cx="7" cy="7" r="1.2" fill="currentColor"/><circle cx="11.5" cy="7" r="1.2" fill="currentColor"/></svg></button>
+        <div class="tl-row-menu" id="depmenu-${i}">
+          <button onclick="event.stopPropagation();openDepPanel(${i});closeAllRowMenus()"><svg viewBox="0 0 16 16" fill="none"><path d="M2 4H14M2 8H14M2 12H10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>View join invoice</button>
+          <button onclick="event.stopPropagation();releaseDepositCN(${i});closeAllRowMenus()"><svg viewBox="0 0 16 16" fill="none"><path d="M2.5 6C3 4 5 3 7 3C10 3 12.5 5.5 12.5 8.5C12.5 11.5 10 14 7 14C4.5 14 2.5 12.5 2 10.5M2.5 6V3M2.5 6H5.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Release credit note</button>
+        </div>
+      </div>
+    </div>`;
   }).join('');
 }
-function depToggle(i){
-  const row=document.querySelector(`.dep-row[data-i="${i}"]`);
-  const det=document.querySelector(`.dep-detail[data-i="${i}"]`);
-  if(!row||!det) return;
-  const open=row.classList.toggle('open');
-  det.classList.toggle('open', open);
+function toggleDepMenu(i){
+  const m=document.getElementById('depmenu-'+i); if(!m) return;
+  const isOpen=m.classList.contains('show');
+  closeAllRowMenus();
+  if(!isOpen) m.classList.add('show');
 }
+// open the credit-note modal pre-filled with this employee's security deposit (INR → live FX)
+function releaseDepositCN(i){
+  const r=(window._depRows||[])[i]; if(!r) return;
+  const e=r.e;
+  window._cnCcy=clientCcy(currentClient); window._cnSym=ccySym(window._cnCcy); window._cnFx=getLiveFx(window._cnCcy);
+  const inr = Math.round((+e.salary||0)*window._cnFx);
+  const ref = e.adv || 'ADV';
+  document.getElementById('cnCtxTitle').textContent = `Security deposit · ${e.name}`;
+  document.getElementById('cnCtxMeta').textContent = `${e.doj||''} · ${ref}`;
+  document.getElementById('cnCtxAmt').textContent = window._cnSym+fmt2(inr/window._cnFx);
+  window._cnLines = [{ isDeposit:true, employee:e.name, taken:e.doj||'', inrAmount:inr, locked:false }];
+  cnRenderLines();
+  document.getElementById('cnReason').value='';
+  document.getElementById('cnAutoApply').checked=true;
+  window._cnContext = { ref, date:e.doj, title:`Security deposit · ${e.name}` };
+  document.getElementById('cnOverlay').classList.add('show');
+}
+// Right panel: the employee's join invoice — advance salary + advance EOR fee (held in INR)
+// and that month's salary + EOR fee (billed in client currency).
+function openDepPanel(i){
+  const r = (window._depRows||[])[i]; if(!r) return;
+  const e = r.e;
+  const ccy = clientCcy(currentClient), sym = ccySym(ccy), fx = getLiveFx(ccy);
+  const my = (e.doj||'').split(' ').slice(1).join(' ');         // "Jan 2026"
+  const salaryCcy = +e.salary||0;
+  const eorCcy = Math.round(salaryCcy*0.15);
+  const advSalInr = Math.round(salaryCcy*fx);
+  const advEorInr = Math.round(eorCcy*fx);
+  const advTotalInr = advSalInr + advEorInr;
+  const monthTotal = salaryCcy + eorCcy;
+  const initial = e.initial || e.name.split(' ').map(p=>p[0]).join('').slice(0,2);
+  document.getElementById('depPanelTitle').textContent = `Join invoice · ${e.adv||''}`;
+  document.getElementById('depPanelBody').innerHTML = `
+    <div class="dpv-emp">
+      <span class="dep-av" style="background:var(--brand)">${escHtml(initial)}</span>
+      <div><div class="dpv-nm">${escHtml(e.name)}</div><div class="dpv-role">${escHtml(e.role||'')} · joined ${escHtml(e.doj||'—')}</div></div>
+    </div>
+    <div class="dpv-meta">Invoice ref <b>${escHtml(e.adv||'—')}</b><span>Date <b>${escHtml(e.doj||'—')}</b></span><span>FX <b>${fx} INR/${ccy}</b> live</span></div>
+
+    <div class="dpv-sec">
+      <div class="dpv-sec-h adv">Advance (security) <span class="tag">held in INR</span></div>
+      <div class="dpv-line"><span>Advance salary</span><b>₹${fmt(advSalInr)}</b></div>
+      <div class="dpv-line"><span>Advance EOR fee</span><b>₹${fmt(advEorInr)}</b></div>
+      <div class="dpv-line total"><span>Subtotal advance</span><b>₹${fmt(advTotalInr)} <span class="sub">≈ ${sym}${fmt2(advTotalInr/fx)}</span></b></div>
+    </div>
+
+    <div class="dpv-sec">
+      <div class="dpv-sec-h">${my||'First month'} charges <span class="tag" style="background:var(--p50);color:var(--brand)">billed in ${ccy}</span></div>
+      <div class="dpv-line"><span>${my||'Month'} salary</span><b>${sym}${fmt(salaryCcy)}</b></div>
+      <div class="dpv-line"><span>${my||'Month'} EOR fee</span><b>${sym}${fmt(eorCcy)}</b></div>
+      <div class="dpv-line total"><span>Subtotal charges</span><b>${sym}${fmt(monthTotal)}</b></div>
+    </div>
+
+    <div class="dpv-grand"><span class="lbl">Invoice total</span><span class="val">${sym}${fmt2(advTotalInr/fx + monthTotal)}</span></div>`;
+  document.getElementById('depPanel').classList.add('show');
+}
+function closeDepPanel(){ document.getElementById('depPanel').classList.remove('show'); }
 
 function releaseCreditNote(idx){
   const items = window._timelineCache || [];
