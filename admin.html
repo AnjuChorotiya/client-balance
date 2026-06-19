@@ -356,6 +356,29 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
 .dpv-grand{display:flex;align-items:center;justify-content:space-between;margin-top:6px;padding-top:14px;border-top:2px solid var(--n900)}
 .dpv-grand .lbl{font-size:14px;font-weight:700;color:var(--n900)}
 .dpv-grand .val{font-size:20px;font-weight:700;color:var(--n900);font-variant-numeric:tabular-nums}
+/* join invoice — formal document layout */
+.inv-doc{font-size:14px;color:var(--n800)}
+.inv-doc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding-bottom:16px;border-bottom:1px solid var(--bd);margin-bottom:18px}
+.inv-doc-no{font-size:18px;font-weight:700;color:var(--n900)}
+.inv-doc-subt{font-size:12.5px;color:var(--n500);margin-top:2px}
+.inv-doc-status{font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;text-transform:uppercase;letter-spacing:.03em;background:#ECFDF3;color:var(--success);white-space:nowrap}
+.inv-doc-parties{display:flex;flex-wrap:wrap;gap:18px 32px;margin-bottom:20px}
+.inv-doc-party{display:flex;flex-direction:column;gap:2px;min-width:0}
+.inv-doc-party .lbl{font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--n400)}
+.inv-doc-party .val{font-size:14px;font-weight:600;color:var(--n900)}
+.inv-doc-party .sub{font-size:12px;color:var(--n500)}
+.inv-doc-table{width:100%;border-collapse:collapse;margin-bottom:6px}
+.inv-doc-table th{text-align:left;font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--n400);padding:8px 0;border-bottom:1px solid var(--bd)}
+.inv-doc-table th.right,.inv-doc-table td.right{text-align:right}
+.inv-doc-table td{padding:12px 0;border-bottom:1px solid var(--n100);vertical-align:top}
+.inv-doc-table .td-nm{font-size:14px;font-weight:600;color:var(--n900)}
+.inv-doc-table .td-sub{display:block;font-size:12px;color:var(--n500);margin-top:2px}
+.inv-doc-table td.right{font-size:14px;font-weight:600;color:var(--n900);font-variant-numeric:tabular-nums;white-space:nowrap}
+.inv-doc-totals{margin-top:14px;margin-left:auto;width:260px}
+.inv-doc-trow{display:flex;align-items:center;justify-content:space-between;padding:7px 0;font-size:14px;color:var(--n600)}
+.inv-doc-trow span:last-child{font-weight:600;color:var(--n900);font-variant-numeric:tabular-nums}
+.inv-doc-trow.grand{border-top:2px solid var(--n900);margin-top:6px;padding-top:12px}
+.inv-doc-trow.grand span{font-size:18px;font-weight:700;color:var(--n900)}
 .tl-filter{display:flex;gap:6px}
 .tl-controls{display:flex;align-items:center;gap:14px}
 .tl-time{height:42px;padding:0 36px 0 16px;font-family:'Satoshi',sans-serif;font-size:14px;font-weight:500;color:#222224;background:#FFFFFF;border:1px solid #F0F1F1;border-radius:10px;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M3 5L6 8L9 5' stroke='%2385878D' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;background-size:12px;min-width:140px}
@@ -469,6 +492,7 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
 .tl-kebab:hover{background:#F0F1F1;color:#222224}
 .tl-kebab svg{width:16px;height:16px}
 .tl-row-menu{position:absolute;top:calc(100% + 4px);right:0;min-width:200px;background:#FFFFFF;border:1px solid #F0F1F1;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.1);padding:6px;z-index:100;display:none;flex-direction:column;gap:2px}
+.tl-row-menu.up{top:auto;bottom:calc(100% + 4px)}
 .tl-row-menu.show{display:flex}
 .tl-row-menu button{display:inline-flex;align-items:center;gap:10px;padding:8px 12px;background:transparent;border:none;cursor:pointer;font-family:'Satoshi',sans-serif;font-size:13px;font-weight:500;color:#222224;text-align:left;border-radius:6px;width:100%}
 .tl-row-menu button:hover{background:#F9FAFB}
@@ -2108,7 +2132,12 @@ function toggleRowMenu(idx){
   const menu = document.getElementById('rowmenu-'+idx);
   const wasOpen = menu.classList.contains('show');
   closeAllRowMenus();
-  if(!wasOpen) menu.classList.add('show');
+  if(!wasOpen){ menu.classList.remove('up'); menu.classList.add('show'); flipMenuIfNeeded(menu); }
+}
+// flip a row menu above its trigger if it would overflow the viewport bottom
+function flipMenuIfNeeded(menu){
+  const r = menu.getBoundingClientRect();
+  if(r.bottom > window.innerHeight - 8) menu.classList.add('up');
 }
 function closeAllRowMenus(){
   document.querySelectorAll('.tl-row-menu.show').forEach(m=>m.classList.remove('show'));
@@ -2178,7 +2207,6 @@ function renderDeposits(){
         <button class="rabtn" title="Actions" onclick="event.stopPropagation();toggleDepMenu(${i})"><svg viewBox="0 0 14 14" fill="none"><circle cx="2.5" cy="7" r="1.2" fill="currentColor"/><circle cx="7" cy="7" r="1.2" fill="currentColor"/><circle cx="11.5" cy="7" r="1.2" fill="currentColor"/></svg></button>
         <div class="tl-row-menu" id="depmenu-${i}">
           <button onclick="event.stopPropagation();openDepPanel(${i});closeAllRowMenus()"><svg viewBox="0 0 16 16" fill="none"><path d="M2 4H14M2 8H14M2 12H10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>View join invoice</button>
-          <button onclick="event.stopPropagation();releaseDepositCN(${i});closeAllRowMenus()"><svg viewBox="0 0 16 16" fill="none"><path d="M2.5 6C3 4 5 3 7 3C10 3 12.5 5.5 12.5 8.5C12.5 11.5 10 14 7 14C4.5 14 2.5 12.5 2 10.5M2.5 6V3M2.5 6H5.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Release credit note</button>
         </div>
       </div>
     </div>`;
@@ -2188,7 +2216,7 @@ function toggleDepMenu(i){
   const m=document.getElementById('depmenu-'+i); if(!m) return;
   const isOpen=m.classList.contains('show');
   closeAllRowMenus();
-  if(!isOpen) m.classList.add('show');
+  if(!isOpen){ m.classList.remove('up'); m.classList.add('show'); flipMenuIfNeeded(m); }
 }
 // open the credit-note modal pre-filled with this employee's security deposit (INR → live FX)
 function releaseDepositCN(i){
@@ -2212,38 +2240,40 @@ function releaseDepositCN(i){
 function openDepPanel(i){
   const r = (window._depRows||[])[i]; if(!r) return;
   const e = r.e;
-  const ccy = clientCcy(currentClient), sym = ccySym(ccy), fx = getLiveFx(ccy);
+  const ccy = clientCcy(currentClient), sym = ccySym(ccy);
   const my = (e.doj||'').split(' ').slice(1).join(' ');         // "Jan 2026"
   const salaryCcy = +e.salary||0;
   const eorCcy = Math.round(salaryCcy*0.15);
-  const advSalInr = Math.round(salaryCcy*fx);
-  const advEorInr = Math.round(eorCcy*fx);
-  const advTotalInr = advSalInr + advEorInr;
-  const monthTotal = salaryCcy + eorCcy;
+  const total = salaryCcy*2 + eorCcy*2;
   const initial = e.initial || e.name.split(' ').map(p=>p[0]).join('').slice(0,2);
+  const cName = (currentClient&&currentClient.name)||'Client';
+  const cSub = (currentClient&&currentClient.sub)||'';
   document.getElementById('depPanelTitle').textContent = `Join invoice · ${e.adv||''}`;
   document.getElementById('depPanelBody').innerHTML = `
-    <div class="dpv-emp">
-      <span class="dep-av" style="background:var(--brand)">${escHtml(initial)}</span>
-      <div><div class="dpv-nm">${escHtml(e.name)}</div><div class="dpv-role">${escHtml(e.role||'')} · joined ${escHtml(e.doj||'—')}</div></div>
-    </div>
-    <div class="dpv-meta">Invoice ref <b>${escHtml(e.adv||'—')}</b><span>Date <b>${escHtml(e.doj||'—')}</b></span><span>FX <b>${fx} INR/${ccy}</b> live</span></div>
-
-    <div class="dpv-sec">
-      <div class="dpv-sec-h adv">Advance (security) <span class="tag">held in INR</span></div>
-      <div class="dpv-line"><span>Advance salary</span><b>₹${fmt(advSalInr)}</b></div>
-      <div class="dpv-line"><span>Advance EOR fee</span><b>₹${fmt(advEorInr)}</b></div>
-      <div class="dpv-line total"><span>Subtotal advance</span><b>₹${fmt(advTotalInr)} <span class="sub">≈ ${sym}${fmt2(advTotalInr/fx)}</span></b></div>
-    </div>
-
-    <div class="dpv-sec">
-      <div class="dpv-sec-h">${my||'First month'} charges <span class="tag" style="background:var(--p50);color:var(--brand)">billed in ${ccy}</span></div>
-      <div class="dpv-line"><span>${my||'Month'} salary</span><b>${sym}${fmt(salaryCcy)}</b></div>
-      <div class="dpv-line"><span>${my||'Month'} EOR fee</span><b>${sym}${fmt(eorCcy)}</b></div>
-      <div class="dpv-line total"><span>Subtotal charges</span><b>${sym}${fmt(monthTotal)}</b></div>
-    </div>
-
-    <div class="dpv-grand"><span class="lbl">Invoice total</span><span class="val">${sym}${fmt2(advTotalInr/fx + monthTotal)}</span></div>`;
+    <div class="inv-doc">
+      <div class="inv-doc-top">
+        <div><div class="inv-doc-no">${escHtml(e.adv||'—')}</div><div class="inv-doc-subt">Join invoice · ${escHtml(my||'')}</div></div>
+        <span class="inv-doc-status">Paid</span>
+      </div>
+      <div class="inv-doc-parties">
+        <div class="inv-doc-party"><span class="lbl">Billed to</span><span class="val">${escHtml(cName)}</span><span class="sub">${escHtml(cSub)}</span></div>
+        <div class="inv-doc-party"><span class="lbl">Employee</span><span class="val">${escHtml(e.name)}</span><span class="sub">${escHtml(empEmail(e,currentClient))}</span></div>
+        <div class="inv-doc-party"><span class="lbl">Issue date</span><span class="val">${escHtml(e.doj||'—')}</span></div>
+      </div>
+      <table class="inv-doc-table">
+        <thead><tr><th>Description</th><th class="right">Amount</th></tr></thead>
+        <tbody>
+          <tr><td><span class="td-nm">Advance salary</span><span class="td-sub">Security · refundable</span></td><td class="right">${sym}${fmt(salaryCcy)}</td></tr>
+          <tr><td><span class="td-nm">Advance EOR fee</span><span class="td-sub">Security · refundable</span></td><td class="right">${sym}${fmt(eorCcy)}</td></tr>
+          <tr><td><span class="td-nm">${escHtml(my||'Month')} salary</span><span class="td-sub">Monthly payroll</span></td><td class="right">${sym}${fmt(salaryCcy)}</td></tr>
+          <tr><td><span class="td-nm">${escHtml(my||'Month')} EOR fee</span><span class="td-sub">EOR management</span></td><td class="right">${sym}${fmt(eorCcy)}</td></tr>
+        </tbody>
+      </table>
+      <div class="inv-doc-totals">
+        <div class="inv-doc-trow"><span>Subtotal</span><span>${sym}${fmt(total)}</span></div>
+        <div class="inv-doc-trow grand"><span>Invoice total</span><span>${sym}${fmt(total)}</span></div>
+      </div>
+    </div>`;
   document.getElementById('depPanel').classList.add('show');
 }
 function closeDepPanel(){ document.getElementById('depPanel').classList.remove('show'); }
