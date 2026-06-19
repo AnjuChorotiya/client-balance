@@ -220,6 +220,22 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
 .cn-total-row{display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:12px;border-top:1px solid var(--bd)}
 .cn-total-row .lbl{font-size:13px;font-weight:600;color:var(--n700)}
 .cn-total-row .val{font-size:18px;font-weight:700;color:var(--n900)}
+.cn-add-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.cn-add-dep{color:var(--purple500)}
+.cn-add-dep:hover{background:var(--purple50)}
+/* security-deposit line (INR held, converted to client currency at live FX) */
+.cn-dep-row{display:grid;grid-template-columns:1fr 140px 32px;column-gap:12px;row-gap:8px;align-items:center;padding:12px;background:var(--purple50);border:1px solid color-mix(in srgb,var(--purple500) 22%,transparent);border-radius:10px}
+.cn-dep-head{grid-column:1;grid-row:1;display:flex;flex-direction:column;gap:6px;min-width:0}
+.cn-dep-tag{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700;color:var(--purple500);text-transform:uppercase;letter-spacing:.04em}
+.cn-dep-tag svg{width:12px;height:12px}
+.cn-dep-emp{font-size:13px;font-weight:600;color:var(--n900);border:1px solid var(--bd);border-radius:8px;padding:6px 10px;background:#fff;font-family:inherit;width:100%;cursor:pointer}
+.cn-dep-emp:focus{outline:none;border-color:var(--purple500)}
+.cn-dep-inr{grid-column:2;grid-row:1;align-self:center}
+.cn-dep-inr input{background:#fff}
+.cn-dep-row .cn-li-del{grid-column:3;grid-row:1;align-self:center}
+.cn-dep-conv{grid-column:1 / -1;grid-row:2;font-size:12px;color:var(--n600);display:flex;align-items:center;gap:6px;flex-wrap:wrap;line-height:1.5}
+.cn-dep-conv b{color:var(--n900);font-weight:700}
+.cn-dep-conv .live{font-size:10px;font-weight:700;color:var(--success);background:#ECFDF3;padding:1px 7px;border-radius:999px;text-transform:uppercase;letter-spacing:.03em}
 #cnOverlay .m-body{scrollbar-width:none;-ms-overflow-style:none}
 #cnOverlay .m-body::-webkit-scrollbar{display:none}
 
@@ -2011,12 +2027,26 @@ document.addEventListener('click', (e)=>{
   if(!e.target.closest('.tl-row-actions')) closeAllRowMenus();
 });
 
+// ===== FX & currency (security deposits are held in INR; client is billed in their currency) =====
+// Live INR per 1 unit of client currency. In production this comes from getLiveFx(ccy).
+const FX_LIVE = { USD:83.40, EUR:90.20, GBP:105.60, SEK:7.95, CAD:60.80, AUD:55.10, INR:1 };
+const CCY_BY_REGION = {'United States':'USD','Germany':'EUR','United Kingdom':'GBP','Sweden':'SEK','Canada':'CAD','Australia':'AUD','India':'INR'};
+function clientCcy(c){ return (c && CCY_BY_REGION[c.region]) || 'USD'; }
+function ccySym(ccy){ return ({USD:'$',EUR:'€',GBP:'£',SEK:'kr ',CAD:'C$',AUD:'A$',INR:'₹'})[ccy] || '$'; }
+function getLiveFx(ccy){ return FX_LIVE[ccy] || 83.40; } // INR per 1 unit of client currency
+function fmt2(n){ return (+n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function cnToday(){ const d=new Date(); const m=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; return d.getDate()+' '+m[d.getMonth()]+' '+d.getFullYear(); }
+
 function releaseCreditNote(idx){
   const items = window._timelineCache || [];
   const e = items[idx]; if(!e) return;
+  // client currency context for this credit note
+  window._cnCcy = clientCcy(currentClient);
+  window._cnSym = ccySym(window._cnCcy);
+  window._cnFx  = getLiveFx(window._cnCcy);
   document.getElementById('cnCtxTitle').textContent = e.title;
   document.getElementById('cnCtxMeta').textContent = `${e.date} · ${e.ref}`;
-  document.getElementById('cnCtxAmt').textContent = '$'+fmt(e.amount);
+  document.getElementById('cnCtxAmt').textContent = window._cnSym+fmt(e.amount);
   // Build editable line items: from the invoice's lines, or a single line from the event total
   const my = (e.date||'').split(' ').slice(1).join(' '); // "May 2026"
   const total = +e.amount||0;
@@ -2033,25 +2063,67 @@ function releaseCreditNote(idx){
   window._cnContext = e;
   document.getElementById('cnOverlay').classList.add('show');
 }
+// converted client-currency value of a line (deposit lines convert INR at live FX)
+function cnLineValue(l){ return l.isDeposit ? (+l.inrAmount||0)/(window._cnFx||1) : (+l.amount||0); }
+// the "₹50,000 → $599.52 @ 83.40 INR/USD · live" caption under a deposit line
+function cnDepConvHtml(l){
+  const fx = window._cnFx||1, ccy = window._cnCcy||'USD', sym = window._cnSym||'$';
+  const conv = (+l.inrAmount||0)/fx;
+  return `Held since <b>${escHtml(l.taken||'—')}</b> · ₹${fmt(l.inrAmount)} → <b>${sym}${fmt2(conv)}</b> @ ${fx} INR/${ccy} <span class="live">live · ${escHtml(cnToday())}</span>`;
+}
 function cnRenderLines(){
   const lines = window._cnLines || [];
+  const sym = window._cnSym || '$';
   const body = document.getElementById('cnLinesBody');
-  body.innerHTML = lines.map((l,i)=>`
+  const emps = (typeof clientEmployees==='function' && currentClient) ? (clientEmployees(currentClient)||[]) : [];
+  body.innerHTML = lines.map((l,i)=>{
+    if(l.isDeposit){
+      const opts = emps.map(e=>`<option value="${escAttr(e.name)}" ${e.name===l.employee?'selected':''}>${escHtml(e.name)}${e.role?` · ${escHtml(e.role)}`:''}</option>`).join('');
+      return `
+      <div class="cn-dep-row" data-i="${i}">
+        <div class="cn-dep-head">
+          <span class="cn-dep-tag"><svg viewBox="0 0 12 12" fill="none"><path d="M6 1L2 3v3c0 2.5 1.7 4.3 4 5 2.3-.7 4-2.5 4-5V3L6 1Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>Security deposit</span>
+          <select class="cn-dep-emp" onchange="cnSetDepEmp(${i}, this.value)">${opts||`<option>${escHtml(l.employee||'—')}</option>`}</select>
+        </div>
+        <div class="cn-li-amt cn-dep-inr"><span class="cur">₹</span><input type="number" value="${l.inrAmount}" oninput="cnSetLine(${i},'inrAmount',this.value);cnRefreshDep(${i})"></div>
+        <button type="button" class="cn-li-del" title="Remove line" onclick="cnRemoveLine(${i})"><svg viewBox="0 0 12 12" fill="none"><path d="M1 1L11 11M11 1L1 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+        <div class="cn-dep-conv">${cnDepConvHtml(l)}</div>
+      </div>`;
+    }
+    return `
     <div class="cn-li-row" data-i="${i}">
       <input class="cn-li-title" value="${escAttr(l.title)}" ${l.locked?'readonly':''} placeholder="Line item title" oninput="cnSetLine(${i},'title',this.value)">
-      <div class="cn-li-amt"><span class="cur">$</span><input type="number" value="${l.amount}" oninput="cnSetLine(${i},'amount',this.value);cnRecalcTotal()"></div>
+      <div class="cn-li-amt"><span class="cur">${sym}</span><input type="number" value="${l.amount}" oninput="cnSetLine(${i},'amount',this.value);cnRecalcTotal()"></div>
       <button type="button" class="cn-li-del" title="Remove line" onclick="cnRemoveLine(${i})"><svg viewBox="0 0 12 12" fill="none"><path d="M1 1L11 11M11 1L1 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
       <input class="cn-li-desc" value="${escAttr(l.desc)}" placeholder="Description" oninput="cnSetLine(${i},'desc',this.value)">
-    </div>`).join('');
+    </div>`;
+  }).join('');
   cnRecalcTotal();
 }
 function cnSetLine(i, field, val){
   const l = (window._cnLines||[])[i]; if(!l) return;
-  l[field] = field==='amount' ? (+val||0) : val;
+  l[field] = (field==='amount'||field==='inrAmount') ? (+val||0) : val;
+}
+// employee changed on a deposit line — relink INR security (≈ one month salary) and "held since" date
+function cnSetDepEmp(i, name){
+  const l = (window._cnLines||[])[i]; if(!l) return;
+  l.employee = name;
+  const emp = ((typeof clientEmployees==='function' && currentClient) ? clientEmployees(currentClient) : []).find(e=>e.name===name);
+  if(emp){ l.inrAmount = Math.round((+emp.salary||0)*(window._cnFx||1)); l.taken = emp.doj||''; }
+  cnRenderLines();
+}
+function cnRefreshDep(i){
+  const l=(window._cnLines||[])[i]; if(!l) return;
+  const row=document.querySelector(`#cnLinesBody .cn-dep-row[data-i="${i}"]`);
+  if(row){ const conv=row.querySelector('.cn-dep-conv'); if(conv) conv.innerHTML = cnDepConvHtml(l); }
+  cnRecalcTotal();
 }
 function cnRecalcTotal(){
-  const total = (window._cnLines||[]).reduce((s,l)=> s + (+l.amount||0), 0);
-  document.getElementById('cnTotal').textContent = '$'+fmt(total);
+  const lines = window._cnLines||[];
+  const total = lines.reduce((s,l)=> s + cnLineValue(l), 0);
+  const sym = window._cnSym || '$';
+  const hasDep = lines.some(l=>l.isDeposit);
+  document.getElementById('cnTotal').textContent = sym + (hasDep ? fmt2(total) : fmt(total));
   document.getElementById('cnAmount').value = total;
 }
 function cnRemoveLine(i){
@@ -2065,20 +2137,32 @@ function cnAddLine(){
   const rows = document.querySelectorAll('#cnLinesBody .cn-li-row');
   const last = rows[rows.length-1]; if(last) last.querySelector('.cn-li-title').focus();
 }
+// add a security-deposit line, linked to the client's first employee by default
+function cnAddDeposit(){
+  const emps = (typeof clientEmployees==='function' && currentClient) ? (clientEmployees(currentClient)||[]) : [];
+  const e = emps[0] || {};
+  (window._cnLines = window._cnLines||[]).push({
+    isDeposit:true, employee:e.name||'', taken:e.doj||'',
+    inrAmount: Math.round((+e.salary||0)*(window._cnFx||1)), locked:false
+  });
+  cnRenderLines();
+}
 function closeCnModal(){ document.getElementById('cnOverlay').classList.remove('show'); }
 function submitCreditNote(){
   const lines = window._cnLines || [];
-  const amt = lines.reduce((s,l)=> s + (+l.amount||0), 0);
+  const amt = lines.reduce((s,l)=> s + cnLineValue(l), 0);
   const reason = document.getElementById('cnReason').value.trim();
   const autoApply = document.getElementById('cnAutoApply').checked;
   const e = window._cnContext;
+  const sym = window._cnSym || '$';
+  const hasDep = lines.some(l=>l.isDeposit);
   if(!lines.length || amt<=0){ const add=document.querySelector('.cn-add-line'); if(add)add.focus(); return; }
   if(!reason){ document.getElementById('cnReason').focus(); return; }
   const cn = 'CN-2026-'+String(20+Math.floor(Math.random()*40)).padStart(4,'0');
   closeCnModal();
   const dest = autoApply ? 'auto-applies to next invoice' : 'held as credit';
-  const lineNote = lines.length>1 ? ` · ${lines.length} line items` : '';
-  showToast(`Credit note ${cn} issued · $${fmt(amt)} against ${e?.ref||'invoice'}${lineNote} · ${dest} · logged to audit trail`);
+  const depNote = hasDep ? ` · deposit converted at live FX (${window._cnFx} INR/${window._cnCcy})` : '';
+  showToast(`Credit note ${cn} issued · ${sym}${hasDep?fmt2(amt):fmt(amt)} against ${e?.ref||'invoice'}${depNote} · ${dest} · logged to audit trail`);
 }
 function refundToBank(idx){
   const items = window._timelineCache || [];
