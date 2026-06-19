@@ -451,13 +451,13 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
 .tl-dot{width:26px;height:26px;border-radius:var(--rfull);display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .tl-dot svg{width:12px;height:12px}
 .tl-dot.invoice{background:var(--p50);color:var(--brand)}
-.tl-dot.paid{background:var(--s50);color:var(--s500)}
+.tl-dot.paid{background:var(--p50);color:var(--brand)}
 .tl-dot.payment{background:var(--n100);color:var(--n600)}
 .tl-dot.deposit{background:var(--purple50);color:var(--purple500)}
 .tl-dot.adjust{background:var(--purple50);color:var(--purple500)}
 .tl-dot.topup{background:var(--w50);color:var(--w500)}
 .tl-dot.refund{background:var(--n100);color:var(--n500)}
-.tl-dot.credit{background:var(--s50);color:var(--s500)}
+.tl-dot.credit{background:var(--p50);color:var(--brand)}
 .tl-name-text{min-width:0;display:flex;flex-direction:column;gap:1px}
 .tl-name-title{font-size:13.5px;font-weight:600;color:var(--n900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tl-name-meta{font-size:11.5px;color:var(--n500);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -967,6 +967,7 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
                 <button type="button" class="ms-opt" data-val="invoice" onclick="toggleKindOpt('invoice')" role="option"><span class="ms-check"></span><span class="ms-txt">Invoices</span></button>
                 <button type="button" class="ms-opt" data-val="payment" onclick="toggleKindOpt('payment')" role="option"><span class="ms-check"></span><span class="ms-txt">Payments</span></button>
                 <button type="button" class="ms-opt" data-val="credit" onclick="toggleKindOpt('credit')" role="option"><span class="ms-check"></span><span class="ms-txt">Credit notes</span></button>
+                <button type="button" class="ms-opt" data-val="security" onclick="toggleKindOpt('security')" role="option"><span class="ms-check"></span><span class="ms-txt">Security</span></button>
               </div>
             </div>
             <div class="ms" id="tlStatusMS">
@@ -1475,7 +1476,7 @@ function defaultTimeline(c){
 
 let currentTab='all', currentClient=null, currentTimeFilter='all';
 const kindSel = new Set(); // empty = all activity
-const KIND_LABELS = {invoice:'Invoices', payment:'Payments', deposit:'Deposits', credit:'Credit notes'};
+const KIND_LABELS = {invoice:'Invoices', payment:'Payments', deposit:'Deposits', credit:'Credit notes', security:'Security'};
 function toggleKindMenu(ev){
   ev.stopPropagation();
   const menu = document.getElementById('tlKindMenu');
@@ -1901,7 +1902,7 @@ function setTlFilter(el, kind){
 function eventIcon(type){
   const icons = {
     'invoice-open':'<svg viewBox="0 0 14 14" fill="none"><rect x="3" y="2" width="8" height="10" rx="0.8" stroke="currentColor" stroke-width="1.3"/><path d="M5 5H9M5 7.5H8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>',
-    'invoice-paid':'<svg viewBox="0 0 14 14" fill="none"><path d="M3 7L6 10L11 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    'invoice-paid':'<svg viewBox="0 0 14 14" fill="none"><rect x="3" y="2" width="8" height="10" rx="0.8" stroke="currentColor" stroke-width="1.3"/><path d="M5 5H9M5 7.5H8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>',
     'payment':'<svg viewBox="0 0 14 14" fill="none"><path d="M7 2V12M3 8L7 12L11 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     'deposit-locked':'<svg viewBox="0 0 14 14" fill="none"><rect x="3" y="6" width="8" height="6" rx="0.8" stroke="currentColor" stroke-width="1.3"/><path d="M5 6V4.5C5 3.4 5.9 2.5 7 2.5C8.1 2.5 9 3.4 9 4.5V6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>',
     'deposit-adjust':'<svg viewBox="0 0 14 14" fill="none"><path d="M2 7H12M8 4L12 7L8 10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
@@ -2086,7 +2087,7 @@ function invoiceHasDeposit(ref){
 function renderTimeline(){
   // deposits live in the Security deposits tab — timeline shows invoices, payments & credit notes only
   const items = (TIMELINES[currentClient.id] || defaultTimeline(currentClient)).filter(e=>eventCategory(e.type)!=='deposit');
-  const kindFiltered = kindSel.size===0 ? items : items.filter(e=>kindSel.has(eventCategory(e.type)));
+  const kindFiltered = kindSel.size===0 ? items : items.filter(e=>kindSel.has(eventCategory(e.type)) || (kindSel.has('security') && invoiceHasDeposit(e.ref)));
   const timeFiltered = kindFiltered.filter(e => isInTimeRange(e.date));
   const statusFiltered = statusSel.size===0 ? timeFiltered : timeFiltered.filter(e => statusSel.has(e.pill||''));
   const searchFiltered = !currentSearch ? statusFiltered : statusFiltered.filter(e =>
