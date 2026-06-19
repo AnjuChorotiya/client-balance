@@ -493,6 +493,9 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
 .tl-kebab svg{width:16px;height:16px}
 .tl-row-menu{position:absolute;top:calc(100% + 4px);right:0;min-width:200px;background:#FFFFFF;border:1px solid #F0F1F1;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.1);padding:6px;z-index:100;display:none;flex-direction:column;gap:2px}
 .tl-row-menu.up{top:auto;bottom:calc(100% + 4px)}
+/* "Security" tag on timeline invoices that include a security deposit */
+.sec-tag{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:var(--purple500);background:var(--purple50);padding:2px 7px;border-radius:999px;text-transform:uppercase;letter-spacing:.03em;vertical-align:middle;margin-left:8px;white-space:nowrap}
+.sec-tag svg{width:10px;height:10px}
 .tl-row-menu.show{display:flex}
 .tl-row-menu button{display:inline-flex;align-items:center;gap:10px;padding:8px 12px;background:transparent;border:none;cursor:pointer;font-family:'Satoshi',sans-serif;font-size:13px;font-weight:500;color:#222224;text-align:left;border-radius:6px;width:100%}
 .tl-row-menu button:hover{background:#F9FAFB}
@@ -963,7 +966,6 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
                 <div class="ms-divider"></div>
                 <button type="button" class="ms-opt" data-val="invoice" onclick="toggleKindOpt('invoice')" role="option"><span class="ms-check"></span><span class="ms-txt">Invoices</span></button>
                 <button type="button" class="ms-opt" data-val="payment" onclick="toggleKindOpt('payment')" role="option"><span class="ms-check"></span><span class="ms-txt">Payments</span></button>
-                <button type="button" class="ms-opt" data-val="deposit" onclick="toggleKindOpt('deposit')" role="option"><span class="ms-check"></span><span class="ms-txt">Deposits</span></button>
                 <button type="button" class="ms-opt" data-val="credit" onclick="toggleKindOpt('credit')" role="option"><span class="ms-check"></span><span class="ms-txt">Credit notes</span></button>
               </div>
             </div>
@@ -2075,8 +2077,15 @@ function eventDetail(e){
   return '';
 }
 
+// an invoice "has a deposit" when any of its line items is a security deposit
+function invoiceHasDeposit(ref){
+  if(!ref) return false;
+  const inv = (typeof INVOICES!=='undefined') ? INVOICES.find(i=>i.id===ref) : null;
+  return !!(inv && inv.items && inv.items.some(it=>it.type==='deposit'));
+}
 function renderTimeline(){
-  const items = TIMELINES[currentClient.id] || defaultTimeline(currentClient);
+  // deposits live in the Security deposits tab — timeline shows invoices, payments & credit notes only
+  const items = (TIMELINES[currentClient.id] || defaultTimeline(currentClient)).filter(e=>eventCategory(e.type)!=='deposit');
   const kindFiltered = kindSel.size===0 ? items : items.filter(e=>kindSel.has(eventCategory(e.type)));
   const timeFiltered = kindFiltered.filter(e => isInTimeRange(e.date));
   const statusFiltered = statusSel.size===0 ? timeFiltered : timeFiltered.filter(e => statusSel.has(e.pill||''));
@@ -2100,6 +2109,7 @@ function renderTimeline(){
   window._timelineCache = filtered;
   document.getElementById('timelineBody').innerHTML = filtered.length ? filtered.map((e,idx)=>{
     const cat = eventCategory(e.type);
+    const secTag = (cat==='invoice' && invoiceHasDeposit(e.ref)) ? `<span class="sec-tag"><svg viewBox="0 0 12 12" fill="none"><path d="M6 1L2 3v3c0 2.5 1.7 4.3 4 5 2.3-.7 4-2.5 4-5V3L6 1Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>Security</span>` : '';
     let menuItems = `<button onclick="event.stopPropagation();openTxnPanel(${idx});closeAllRowMenus()"><svg viewBox="0 0 16 16" fill="none"><path d="M2 4H14M2 8H14M2 12H10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>View details</button>`;
     if(cat==='invoice' || cat==='deposit'){
       menuItems += `<button onclick="event.stopPropagation();releaseCreditNote(${idx});closeAllRowMenus()"><svg viewBox="0 0 16 16" fill="none"><path d="M2.5 6C3 4 5 3 7 3C10 3 12.5 5.5 12.5 8.5C12.5 11.5 10 14 7 14C4.5 14 2.5 12.5 2 10.5M2.5 6V3M2.5 6H5.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Release credit note</button>`;
@@ -2113,7 +2123,7 @@ function renderTimeline(){
         <div class="tl-name">
           <div class="tl-dot ${eventDotClass(e.type)}">${eventIcon(e.type)}</div>
           <div class="tl-name-text">
-            <div class="tl-name-title">${e.title}</div>
+            <div class="tl-name-title">${e.title}${secTag}</div>
             <div class="tl-name-meta">${e.meta}</div>
           </div>
         </div>
