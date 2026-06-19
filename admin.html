@@ -296,6 +296,46 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
 /* timeline */
 .tl-header{display:flex;align-items:center;justify-content:space-between;gap:14px}
 .tl-title{font-size:16px;font-weight:700;color:var(--n900)}
+/* Timeline | Deposits segmented tabs */
+.tl-tabs{display:inline-flex;gap:4px;background:var(--n100);padding:4px;border-radius:10px}
+.tl-tab{border:none;background:none;padding:7px 14px;border-radius:7px;font-family:inherit;font-size:14px;font-weight:600;color:var(--n500);cursor:pointer;white-space:nowrap}
+.tl-tab:hover{color:var(--n700)}
+.tl-tab.active{background:#fff;color:var(--n900);box-shadow:0 1px 2px rgba(16,24,40,.08)}
+/* deposits ledger */
+.dep-view{margin-top:4px}
+.dep-summary{display:flex;flex-wrap:wrap;gap:28px;padding:16px 20px;background:var(--purple50);border:1px solid color-mix(in srgb,var(--purple500) 18%,transparent);border-radius:12px;margin-bottom:14px}
+.dep-sum-item{display:flex;flex-direction:column;gap:3px}
+.dep-sum-lbl{font-size:11.5px;font-weight:600;color:var(--n500);text-transform:uppercase;letter-spacing:.03em}
+.dep-sum-val{font-size:20px;font-weight:700;color:var(--n900)}
+.dep-sum-val .sub{font-size:13px;font-weight:600;color:var(--n500);margin-left:6px}
+.dep-table{background:#fff;border-radius:var(--rlg);overflow:hidden}
+.dep-thead,.dep-row{display:grid;grid-template-columns:minmax(200px,1.6fr) 150px 150px 130px 120px 28px;gap:16px;align-items:center;padding:12px 16px}
+.dep-thead{background:#F9FAFB;border-bottom:1px solid #E5E7EB;font-family:'Open Sans',sans-serif;font-size:12.5px;font-weight:600;color:#404145}
+.dep-thead .right,.dep-row .right{text-align:right;justify-self:end}
+.dep-row{border-bottom:1px solid #F0F1F1;cursor:pointer}
+.dep-row:hover{background:var(--n50)}
+.dep-emp{display:flex;align-items:center;gap:10px;min-width:0}
+.dep-av{width:32px;height:32px;border-radius:50%;flex:0 0 auto;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700}
+.dep-emp-meta{display:flex;flex-direction:column;min-width:0}
+.dep-emp-nm{font-size:14px;font-weight:600;color:var(--n900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dep-emp-role{font-size:12px;color:var(--n500);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dep-inr{font-size:14px;font-weight:700;color:var(--n900);font-variant-numeric:tabular-nums}
+.dep-conv{font-size:13px;color:var(--n600);font-variant-numeric:tabular-nums}
+.dep-date{font-size:13px;color:var(--n700)}
+.dep-chev{transition:transform 150ms;color:var(--n400)}
+.dep-chev svg{width:14px;height:14px;display:block}
+.dep-row.open .dep-chev{transform:rotate(180deg)}
+.dep-detail{display:none;padding:0 16px 14px 58px;background:var(--n50);border-bottom:1px solid #F0F1F1}
+.dep-detail.open{display:block}
+.dep-evt{display:flex;align-items:flex-start;gap:10px;padding:8px 0;font-size:13px}
+.dep-evt:not(:last-child){border-bottom:1px dashed var(--bd)}
+.dep-evt-dot{width:7px;height:7px;border-radius:50%;margin-top:6px;flex:0 0 auto;background:var(--purple500)}
+.dep-evt-dot.released{background:var(--success)}
+.dep-evt-dot.adjusted{background:var(--warning)}
+.dep-evt-main{display:flex;flex-direction:column;gap:1px;flex:1;min-width:0}
+.dep-evt-t{font-weight:600;color:var(--n900)}
+.dep-evt-s{font-size:12px;color:var(--n500)}
+.dep-evt-amt{font-size:13px;font-weight:600;color:var(--n800);font-variant-numeric:tabular-nums;white-space:nowrap}
 .tl-filter{display:flex;gap:6px}
 .tl-controls{display:flex;align-items:center;gap:14px}
 .tl-time{height:42px;padding:0 36px 0 16px;font-family:'Satoshi',sans-serif;font-size:14px;font-weight:500;color:#222224;background:#FFFFFF;border:1px solid #F0F1F1;border-radius:10px;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M3 5L6 8L9 5' stroke='%2385878D' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;background-size:12px;min-width:140px}
@@ -861,7 +901,10 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
 
         <!-- timeline -->
         <div class="tl-header" id="timelineAnchor">
-          <div class="tl-title">Transaction timeline</div>
+          <div class="tl-tabs">
+            <button type="button" class="tl-tab active" id="tlTabTimeline" onclick="setClientView('timeline')">Transaction timeline</button>
+            <button type="button" class="tl-tab" id="tlTabDeposits" onclick="setClientView('deposits')">Security deposits</button>
+          </div>
           <div class="tl-controls">
             <div class="tl-search">
               <svg viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.5"/><path d="M9.5 9.5L12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -914,6 +957,22 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
             <div></div>
           </div>
           <div id="timelineBody"></div>
+        </div>
+
+        <!-- security deposits ledger (one row per employee) -->
+        <div class="dep-view hidden" id="depositsView">
+          <div class="dep-summary" id="depSummary"></div>
+          <div class="dep-table">
+            <div class="dep-thead">
+              <div>Employee</div>
+              <div class="right">INR held</div>
+              <div class="right" id="depCcyHead">≈ Client ccy · live</div>
+              <div>Taken on</div>
+              <div>Status</div>
+              <div></div>
+            </div>
+            <div id="depBody"></div>
+          </div>
         </div>
       </div>
 
@@ -1662,6 +1721,7 @@ function openClient(id){
   document.querySelectorAll('.sort-ind').forEach(el => el.classList.remove('show','desc'));
   const sortDate = document.getElementById('sort-date'); if(sortDate){ sortDate.classList.add('show','desc'); }
   renderTimeline();
+  if(typeof setClientView==='function') setClientView('timeline');
   document.getElementById('listView').classList.add('hidden');
   document.getElementById('clientPage').classList.remove('hidden');
   document.querySelector('.page-body').scrollTop = 0;
@@ -2036,6 +2096,67 @@ function ccySym(ccy){ return ({USD:'$',EUR:'€',GBP:'£',SEK:'kr ',CAD:'C$',AUD
 function getLiveFx(ccy){ return FX_LIVE[ccy] || 83.40; } // INR per 1 unit of client currency
 function fmt2(n){ return (+n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
 function cnToday(){ const d=new Date(); const m=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; return d.getDate()+' '+m[d.getMonth()]+' '+d.getFullYear(); }
+
+// ===== Security deposits ledger (Timeline | Deposits tabs) =====
+function setClientView(view){
+  const isDep = view==='deposits';
+  const tl = document.getElementById('timeline'); if(tl) tl.classList.toggle('hidden', isDep);
+  const dv = document.getElementById('depositsView'); if(dv) dv.classList.toggle('hidden', !isDep);
+  const tt = document.getElementById('tlTabTimeline'); if(tt) tt.classList.toggle('active', !isDep);
+  const td = document.getElementById('tlTabDeposits'); if(td) td.classList.toggle('active', isDep);
+  const ctrls = document.querySelector('#timelineAnchor .tl-controls'); if(ctrls) ctrls.style.display = isDep ? 'none' : '';
+  if(isDep) renderDeposits();
+}
+// Per-employee security-deposit ledger, fetched from the client's roster.
+// INR is the held amount (source of truth); client-currency column is the live-FX equivalent.
+function depLedger(c){
+  const fx = getLiveFx(clientCcy(c));
+  return (clientEmployees(c)||[]).map(e=>{
+    const released = e.status==='exited';
+    const inr = Math.round((+e.salary||0)*fx);     // security ≈ one month salary, held in INR
+    return { e, inr, held: released ? 0 : inr, released };
+  });
+}
+function depDetailHtml(r){
+  const ccy=clientCcy(currentClient), sym=ccySym(ccy), fx=getLiveFx(ccy), e=r.e;
+  const evts = [{cls:'', t:'Security deposit collected', s:`${e.doj||'—'} · onboarding${e.adv?` · ${e.adv}`:''}`, amt:`₹${fmt(r.inr)}`}];
+  if(r.released) evts.push({cls:'released', t:'Deposit released', s:`on exit · refunded at live FX (${fx} INR/${ccy})`, amt:`${sym}${fmt2(r.inr/fx)}`});
+  return evts.map(v=>`<div class="dep-evt"><span class="dep-evt-dot ${v.cls}"></span><div class="dep-evt-main"><span class="dep-evt-t">${escHtml(v.t)}</span><span class="dep-evt-s">${escHtml(v.s)}</span></div><span class="dep-evt-amt">${v.amt}</span></div>`).join('');
+}
+function renderDeposits(){
+  const c = currentClient; if(!c) return;
+  const ccy = clientCcy(c), sym = ccySym(ccy), fx = getLiveFx(ccy);
+  const head = document.getElementById('depCcyHead'); if(head) head.textContent = `≈ ${ccy} · live`;
+  const rows = depLedger(c);
+  const totalHeld = rows.reduce((s,r)=>s+r.held,0);
+  const lockedCount = rows.filter(r=>!r.released).length;
+  document.getElementById('depSummary').innerHTML = `
+    <div class="dep-sum-item"><span class="dep-sum-lbl">Total security held</span><span class="dep-sum-val">₹${fmt(totalHeld)}<span class="sub">≈ ${sym}${fmt2(totalHeld/fx)}</span></span></div>
+    <div class="dep-sum-item"><span class="dep-sum-lbl">Employees locked</span><span class="dep-sum-val">${lockedCount}</span></div>
+    <div class="dep-sum-item"><span class="dep-sum-lbl">Live FX</span><span class="dep-sum-val">${fx}<span class="sub">INR / ${ccy}</span></span></div>`;
+  document.getElementById('depBody').innerHTML = rows.map((r,i)=>{
+    const e=r.e;
+    const initial = e.initial || e.name.split(' ').map(p=>p[0]).join('').slice(0,2);
+    const statusPill = r.released ? `<span class="tl-pill issued">Released</span>` : `<span class="tl-pill locked">Locked</span>`;
+    return `
+    <div class="dep-row" data-i="${i}" onclick="depToggle(${i})">
+      <div class="dep-emp"><span class="dep-av" style="background:${e.bg||'#7C5CFF'}">${escHtml(initial)}</span><span class="dep-emp-meta"><span class="dep-emp-nm">${escHtml(e.name)}</span><span class="dep-emp-role">${escHtml(e.role||'')}</span></span></div>
+      <div class="dep-inr right">₹${fmt(r.held)}</div>
+      <div class="dep-conv right">${r.released?'—':sym+fmt2(r.held/fx)}</div>
+      <div class="dep-date">${escHtml(e.doj||'—')}</div>
+      <div>${statusPill}</div>
+      <div class="dep-chev"><svg viewBox="0 0 12 12" fill="none"><path d="M3 5L6 8L9 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    </div>
+    <div class="dep-detail" data-i="${i}">${depDetailHtml(r)}</div>`;
+  }).join('');
+}
+function depToggle(i){
+  const row=document.querySelector(`.dep-row[data-i="${i}"]`);
+  const det=document.querySelector(`.dep-detail[data-i="${i}"]`);
+  if(!row||!det) return;
+  const open=row.classList.toggle('open');
+  det.classList.toggle('open', open);
+}
 
 function releaseCreditNote(idx){
   const items = window._timelineCache || [];
