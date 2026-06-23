@@ -379,6 +379,12 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
 .inv-doc-trow span:last-child{font-weight:600;color:var(--n900);font-variant-numeric:tabular-nums}
 .inv-doc-trow.grand{border-top:2px solid var(--n900);margin-top:6px;padding-top:12px}
 .inv-doc-trow.grand span{font-size:18px;font-weight:700;color:var(--n900)}
+.inv-doc-card{border:1px solid var(--bd);border-radius:12px;padding:16px;margin-bottom:14px}
+.inv-doc-card .inv-doc-top{padding-bottom:12px;margin-bottom:12px}
+.inv-doc-card .inv-doc-no{font-size:15px}
+.amt-ccy{display:block;font-size:14px;font-weight:600;color:var(--n900);font-variant-numeric:tabular-nums}
+.amt-inr{display:block;font-size:12px;color:var(--n500);font-variant-numeric:tabular-nums;margin-top:1px}
+.dep-ref-more{font-size:10px;font-weight:700;color:var(--brand);background:var(--p50);padding:1px 6px;border-radius:999px;margin-left:4px}
 .tl-filter{display:flex;gap:6px}
 .tl-controls{display:flex;align-items:center;gap:14px}
 .tl-time{height:42px;padding:0 36px 0 16px;font-family:'Satoshi',sans-serif;font-size:14px;font-weight:500;color:#222224;background:#FFFFFF;border:1px solid #F0F1F1;border-radius:10px;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M3 5L6 8L9 5' stroke='%2385878D' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;background-size:12px;min-width:140px}
@@ -2213,7 +2219,7 @@ function renderDeposits(){
       <div class="dep-emp"><span class="dep-av" style="background:var(--brand)">${escHtml(initial)}</span><span class="dep-emp-meta"><span class="dep-emp-nm">${escHtml(e.name)}</span><span class="dep-emp-role">${escHtml(empEmail(e,c))}</span></span></div>
       <div class="dep-inr right">₹${fmt(r.held)}</div>
       <div class="dep-date">${escHtml(e.doj||'—')}</div>
-      <div class="dep-ref">${escHtml(e.adv||'—')}</div>
+      <div class="dep-ref">${escHtml(e.adv||'—')}${(empInvoices(e,c).length>1)?` <span class="dep-ref-more">+${empInvoices(e,c).length-1}</span>`:''}</div>
       <div>${statusPill}</div>
       <div class="tl-row-actions" onclick="event.stopPropagation()">
         <button class="rabtn" title="Actions" onclick="event.stopPropagation();toggleDepMenu(${i})"><svg viewBox="0 0 14 14" fill="none"><circle cx="2.5" cy="7" r="1.2" fill="currentColor"/><circle cx="7" cy="7" r="1.2" fill="currentColor"/><circle cx="11.5" cy="7" r="1.2" fill="currentColor"/></svg></button>
@@ -2247,44 +2253,72 @@ function releaseDepositCN(i){
   window._cnContext = { ref, date:e.doj, title:`Security deposit · ${e.name}` };
   document.getElementById('cnOverlay').classList.add('show');
 }
-// Right panel: the employee's join invoice — advance salary + advance EOR fee (held in INR)
-// and that month's salary + EOR fee (billed in client currency).
+// An employee can have multiple invoices: the join invoice plus a top-up
+// whenever their salary is revised (which increases the held security).
+function empInvoices(e, c){
+  const ccy=clientCcy(c), sym=ccySym(ccy);
+  const my=(e.doj||'').split(' ').slice(1).join(' ');
+  const salary=+e.salary||0, eor=Math.round(salary*0.15);
+  const inv=[{
+    ref:e.adv||'—', date:e.doj||'—', tag:`Join invoice · ${my||''}`, status:'Paid',
+    lines:[
+      {t:'Advance salary', s:'Security · refundable', amt:salary},
+      {t:'Advance EOR fee', s:'Security · refundable', amt:eor},
+      {t:`${my||'Month'} salary`, s:'Monthly payroll', amt:salary},
+      {t:`${my||'Month'} EOR fee`, s:'EOR management', amt:eor}
+    ]
+  }];
+  // even advance numbers → a later salary revision raised the held security
+  const num=parseInt((e.adv||'0').replace(/\D/g,''),10)||0;
+  if(num%2===0){
+    const revised=Math.round(salary*1.15), topup=revised-salary, te=Math.round(topup*0.15);
+    inv.push({
+      ref:(e.adv||'ADV')+'-R1', date:'01 Apr 2026', tag:'Salary revision top-up', status:'Paid',
+      lines:[
+        {t:'Advance salary top-up', s:`Revised to ${sym}${fmt(revised)}`, amt:topup},
+        {t:'Advance EOR fee top-up', s:'Security · refundable', amt:te}
+      ]
+    });
+  }
+  return inv;
+}
+// Right panel: all of the employee's deposit invoices, each line shown in
+// client currency with the INR equivalent (held) at the live FX rate.
 function openDepPanel(i){
   const r = (window._depRows||[])[i]; if(!r) return;
   const e = r.e;
-  const ccy = clientCcy(currentClient), sym = ccySym(ccy);
-  const my = (e.doj||'').split(' ').slice(1).join(' ');         // "Jan 2026"
-  const salaryCcy = +e.salary||0;
-  const eorCcy = Math.round(salaryCcy*0.15);
-  const total = salaryCcy*2 + eorCcy*2;
+  const ccy = clientCcy(currentClient), sym = ccySym(ccy), fx = getLiveFx(ccy);
   const initial = e.initial || e.name.split(' ').map(p=>p[0]).join('').slice(0,2);
   const cName = (currentClient&&currentClient.name)||'Client';
   const cSub = (currentClient&&currentClient.sub)||'';
-  document.getElementById('depPanelTitle').textContent = `Join invoice · ${e.adv||''}`;
+  const invoices = empInvoices(e, currentClient);
+  const amtCell = (a)=>`<td class="right"><span class="amt-ccy">${sym}${fmt(a)}</span><span class="amt-inr">₹${fmt(Math.round(a*fx))}</span></td>`;
+  const grand = invoices.reduce((s,inv)=>s+inv.lines.reduce((x,l)=>x+l.amt,0),0);
+  document.getElementById('depPanelTitle').textContent = `Deposit invoices · ${e.name}`;
   document.getElementById('depPanelBody').innerHTML = `
     <div class="inv-doc">
-      <div class="inv-doc-top">
-        <div><div class="inv-doc-no">${escHtml(e.adv||'—')}</div><div class="inv-doc-subt">Join invoice · ${escHtml(my||'')}</div></div>
-        <span class="inv-doc-status">Paid</span>
-      </div>
       <div class="inv-doc-parties">
         <div class="inv-doc-party"><span class="lbl">Billed to</span><span class="val">${escHtml(cName)}</span><span class="sub">${escHtml(cSub)}</span></div>
         <div class="inv-doc-party"><span class="lbl">Employee</span><span class="val">${escHtml(e.name)}</span><span class="sub">${escHtml(empEmail(e,currentClient))}</span></div>
-        <div class="inv-doc-party"><span class="lbl">Issue date</span><span class="val">${escHtml(e.doj||'—')}</span></div>
+        <div class="inv-doc-party"><span class="lbl">Live FX</span><span class="val">${fx} INR/${ccy}</span></div>
       </div>
-      <table class="inv-doc-table">
-        <thead><tr><th>Description</th><th class="right">Amount</th></tr></thead>
-        <tbody>
-          <tr><td><span class="td-nm">Advance salary</span><span class="td-sub">Security · refundable</span></td><td class="right">${sym}${fmt(salaryCcy)}</td></tr>
-          <tr><td><span class="td-nm">Advance EOR fee</span><span class="td-sub">Security · refundable</span></td><td class="right">${sym}${fmt(eorCcy)}</td></tr>
-          <tr><td><span class="td-nm">${escHtml(my||'Month')} salary</span><span class="td-sub">Monthly payroll</span></td><td class="right">${sym}${fmt(salaryCcy)}</td></tr>
-          <tr><td><span class="td-nm">${escHtml(my||'Month')} EOR fee</span><span class="td-sub">EOR management</span></td><td class="right">${sym}${fmt(eorCcy)}</td></tr>
-        </tbody>
-      </table>
-      <div class="inv-doc-totals">
-        <div class="inv-doc-trow"><span>Subtotal</span><span>${sym}${fmt(total)}</span></div>
-        <div class="inv-doc-trow grand"><span>Invoice total</span><span>${sym}${fmt(total)}</span></div>
-      </div>
+      ${invoices.map(inv=>{
+        const sub = inv.lines.reduce((x,l)=>x+l.amt,0);
+        return `<div class="inv-doc-card">
+          <div class="inv-doc-top">
+            <div><div class="inv-doc-no">${escHtml(inv.ref)}</div><div class="inv-doc-subt">${escHtml(inv.tag)} · ${escHtml(inv.date)}</div></div>
+            <span class="inv-doc-status">${escHtml(inv.status)}</span>
+          </div>
+          <table class="inv-doc-table">
+            <thead><tr><th>Description</th><th class="right">Amount</th></tr></thead>
+            <tbody>
+              ${inv.lines.map(l=>`<tr><td><span class="td-nm">${escHtml(l.t)}</span><span class="td-sub">${escHtml(l.s)}</span></td>${amtCell(l.amt)}</tr>`).join('')}
+            </tbody>
+          </table>
+          <div class="inv-doc-totals"><div class="inv-doc-trow"><span>Invoice total</span><span>${sym}${fmt(sub)} · ₹${fmt(Math.round(sub*fx))}</span></div></div>
+        </div>`;
+      }).join('')}
+      <div class="inv-doc-totals"><div class="inv-doc-trow grand"><span>Total (${invoices.length} invoice${invoices.length>1?'s':''})</span><span>${sym}${fmt(grand)} · ₹${fmt(Math.round(grand*fx))}</span></div></div>
     </div>`;
   document.getElementById('depPanel').classList.add('show');
 }
