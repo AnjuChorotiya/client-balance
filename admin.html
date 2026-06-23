@@ -1213,10 +1213,10 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
         </div>
       </div>
       <div class="fg">
-        <div class="flabel">Line items to credit <span class="req">*</span></div>
+        <div class="flabel">Line items to credit</div>
         <div class="cn-lines" id="cnLinesBody"></div>
         <button type="button" class="cn-add-line" id="cnAddLineBtn" onclick="cnAddLine()"><svg viewBox="0 0 12 12" fill="none"><path d="M6 1.5V10.5M1.5 6H10.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Add line item</button>
-        <div class="cn-total-row">
+        <div class="cn-total-row" id="cnTotalRow">
           <span class="lbl">Amount to credit</span>
           <span class="val" id="cnTotal">$0</span>
         </div>
@@ -2315,6 +2315,7 @@ function releaseDepositCN(i){
   window._cnLines = [{ isDeposit:true, employee:e.name, empRole:e.role||'', taken:e.doj||'', inrAmount:inr, locked:false, empLocked:true }];
   cnRenderLines();
   const addBtn=document.getElementById('cnAddLineBtn'); if(addBtn) addBtn.style.display='none';
+  const totRow=document.getElementById('cnTotalRow'); if(totRow) totRow.style.display='none';
   document.getElementById('cnReason').value='';
   document.getElementById('cnAutoApply').checked=true;
   window._cnContext = { ref, date:e.doj, title:`Security deposit · ${e.name}` };
@@ -2445,6 +2446,7 @@ function releaseCreditNote(idx){
       ];
   cnRenderLines();
   const addBtn=document.getElementById('cnAddLineBtn'); if(addBtn) addBtn.style.display='';
+  const totRow=document.getElementById('cnTotalRow'); if(totRow) totRow.style.display='';
   document.getElementById('cnReason').value = '';
   document.getElementById('cnAutoApply').checked = true;
   window._cnContext = e;
@@ -2470,7 +2472,7 @@ function cnRenderLines(){
       return `
       <div class="cn-dep2">
         <div class="cn-dep2-row"><span class="lbl">INR held · ${escHtml(l.employee||'—')}${l.empRole?` <span class="r">· ${escHtml(l.empRole)}</span>`:''}</span><span class="val">₹${fmt(l.inrAmount)}</span></div>
-        <div class="cn-dep2-row"><span class="lbl">Conversion at live FX</span><span class="val">${fx} INR/${ccy} <span class="live">live · ${escHtml(cnToday())}</span></span></div>
+        <div class="cn-dep2-row"><span class="lbl">Conversion at live FX</span><span class="val">${fx} INR/${ccy}</span></div>
         <div class="cn-dep2-row total"><span class="lbl">Credit amount</span><span class="val">${dsym}${fmt2(conv)}</span></div>
       </div>`;
     }
