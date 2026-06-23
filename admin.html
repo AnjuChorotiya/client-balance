@@ -230,6 +230,8 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
 .cn-dep-tag svg{width:12px;height:12px}
 .cn-dep-emp{font-size:13px;font-weight:600;color:var(--n900);border:1px solid var(--bd);border-radius:8px;padding:6px 10px;background:#fff;font-family:inherit;width:100%;cursor:pointer}
 .cn-dep-emp:focus{outline:none;border-color:var(--purple500)}
+.cn-dep-empname{font-size:14px;font-weight:600;color:var(--n900);padding:6px 0}
+.cn-dep-empname .role{font-weight:500;color:var(--n500)}
 .cn-dep-inr{grid-column:2;grid-row:1;align-self:center}
 .cn-dep-inr input{background:#fff}
 .cn-dep-row .cn-li-del{grid-column:3;grid-row:1;align-self:center}
@@ -1202,7 +1204,7 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
       <div class="fg">
         <div class="flabel">Line items to credit <span class="req">*</span></div>
         <div class="cn-lines" id="cnLinesBody"></div>
-        <button type="button" class="cn-add-line" onclick="cnAddLine()"><svg viewBox="0 0 12 12" fill="none"><path d="M6 1.5V10.5M1.5 6H10.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Add line item</button>
+        <button type="button" class="cn-add-line" id="cnAddLineBtn" onclick="cnAddLine()"><svg viewBox="0 0 12 12" fill="none"><path d="M6 1.5V10.5M1.5 6H10.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Add line item</button>
         <div class="cn-total-row">
           <span class="lbl">Amount to credit</span>
           <span class="val" id="cnTotal">$0</span>
@@ -2290,10 +2292,11 @@ function releaseDepositCN(i){
   const inr = Math.round((+e.salary||0)*window._cnFx);
   const ref = e.adv || 'ADV';
   document.getElementById('cnCtxTitle').textContent = `Security deposit · ${e.name}`;
-  document.getElementById('cnCtxMeta').textContent = `${e.doj||''} · ${ref}`;
-  document.getElementById('cnCtxAmt').textContent = window._cnSym+fmt2(inr/window._cnFx);
-  window._cnLines = [{ isDeposit:true, employee:e.name, taken:e.doj||'', inrAmount:inr, locked:false }];
+  document.getElementById('cnCtxMeta').textContent = `${e.doj||''}`;
+  document.getElementById('cnCtxAmt').textContent = '₹'+fmt(inr);
+  window._cnLines = [{ isDeposit:true, employee:e.name, empRole:e.role||'', taken:e.doj||'', inrAmount:inr, locked:false, empLocked:true }];
   cnRenderLines();
+  const addBtn=document.getElementById('cnAddLineBtn'); if(addBtn) addBtn.style.display='none';
   document.getElementById('cnReason').value='';
   document.getElementById('cnAutoApply').checked=true;
   window._cnContext = { ref, date:e.doj, title:`Security deposit · ${e.name}` };
@@ -2422,6 +2425,7 @@ function releaseCreditNote(idx){
         {title: 'EOR management fee', desc: `Monthly EOR service charge${my?` · ${my}`:''}`, amount: eorFee, locked:true}
       ];
   cnRenderLines();
+  const addBtn=document.getElementById('cnAddLineBtn'); if(addBtn) addBtn.style.display='';
   document.getElementById('cnReason').value = '';
   document.getElementById('cnAutoApply').checked = true;
   window._cnContext = e;
@@ -2442,12 +2446,14 @@ function cnRenderLines(){
   const emps = (typeof clientEmployees==='function' && currentClient) ? (clientEmployees(currentClient)||[]) : [];
   body.innerHTML = lines.map((l,i)=>{
     if(l.isDeposit){
-      const opts = emps.map(e=>`<option value="${escAttr(e.name)}" ${e.name===l.employee?'selected':''}>${escHtml(e.name)}${e.role?` · ${escHtml(e.role)}`:''}</option>`).join('');
+      const empField = l.empLocked
+        ? `<div class="cn-dep-empname">${escHtml(l.employee||'—')}${l.empRole?` <span class="role">· ${escHtml(l.empRole)}</span>`:''}</div>`
+        : `<select class="cn-dep-emp" onchange="cnSetDepEmp(${i}, this.value)">${emps.map(e=>`<option value="${escAttr(e.name)}" ${e.name===l.employee?'selected':''}>${escHtml(e.name)}${e.role?` · ${escHtml(e.role)}`:''}</option>`).join('')||`<option>${escHtml(l.employee||'—')}</option>`}</select>`;
       return `
       <div class="cn-dep-row" data-i="${i}">
         <div class="cn-dep-head">
           <span class="cn-dep-tag"><svg viewBox="0 0 12 12" fill="none"><path d="M6 1L2 3v3c0 2.5 1.7 4.3 4 5 2.3-.7 4-2.5 4-5V3L6 1Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>Security deposit</span>
-          <select class="cn-dep-emp" onchange="cnSetDepEmp(${i}, this.value)">${opts||`<option>${escHtml(l.employee||'—')}</option>`}</select>
+          ${empField}
         </div>
         <div class="cn-li-amt cn-dep-inr"><span class="cur">₹</span><input type="number" value="${l.inrAmount}" oninput="cnSetLine(${i},'inrAmount',this.value);cnRefreshDep(${i})"></div>
         <button type="button" class="cn-li-del" title="Remove line" onclick="cnRemoveLine(${i})"><svg viewBox="0 0 12 12" fill="none"><path d="M1 1L11 11M11 1L1 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
