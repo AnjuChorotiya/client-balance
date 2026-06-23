@@ -321,7 +321,7 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
 .dep-sum-val{font-size:20px;font-weight:700;color:var(--n900)}
 .dep-sum-val .sub{font-size:13px;font-weight:600;color:var(--n500);margin-left:6px}
 .dep-table{background:#fff;border-radius:var(--rlg);overflow:hidden}
-.dep-thead,.dep-row{display:grid;grid-template-columns:minmax(180px,1.5fr) 140px 120px 150px 110px 28px;gap:16px;align-items:center;padding:12px 16px}
+.dep-thead,.dep-row{display:grid;grid-template-columns:minmax(170px,1.4fr) 130px 110px 140px 110px 110px 28px;gap:16px;align-items:center;padding:12px 16px}
 .dep-thead{background:#F9FAFB;border-bottom:1px solid #E5E7EB;font-family:'Open Sans',sans-serif;font-size:12.5px;font-weight:600;color:#404145}
 .dep-thead .right,.dep-row .right{text-align:right;justify-self:end}
 .dep-row{border-bottom:1px solid #F0F1F1;cursor:pointer}
@@ -1058,6 +1058,7 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
               <div class="right">INR held</div>
               <div>Date</div>
               <div>Invoice ref</div>
+              <div>Deposit</div>
               <div>Status</div>
               <div></div>
             </div>
@@ -2263,6 +2264,11 @@ function empEmail(e, c){
   const handle = (e.name||'').toLowerCase().replace(/[^a-z\s]/g,'').trim().split(/\s+/).filter(Boolean).join('.');
   return handle ? `${handle}@${domain}` : '';
 }
+// employee status pill (active / exited)
+function empStatusPill(s){
+  const m = s==='exited' ? {c:'due',t:'Exited'} : {c:'paid',t:'Active'};
+  return `<span class="tl-pill ${m.c}">${m.t}</span>`;
+}
 function renderDeposits(){
   const c = currentClient; if(!c) return;
   const rows = depLedger(c);
@@ -2278,6 +2284,7 @@ function renderDeposits(){
       <div class="dep-date">${escHtml(e.doj||'—')}</div>
       <div class="dep-ref">${escHtml(e.adv||'—')}${(empInvoices(e,c).length>1)?` <span class="dep-ref-more">+${empInvoices(e,c).length-1}</span>`:''}</div>
       <div>${statusPill}</div>
+      <div>${empStatusPill(e.status)}</div>
       <div class="tl-row-actions" onclick="event.stopPropagation()">
         <button class="rabtn" title="Actions" onclick="event.stopPropagation();toggleDepMenu(${i})"><svg viewBox="0 0 14 14" fill="none"><circle cx="2.5" cy="7" r="1.2" fill="currentColor"/><circle cx="7" cy="7" r="1.2" fill="currentColor"/><circle cx="11.5" cy="7" r="1.2" fill="currentColor"/></svg></button>
         <div class="tl-row-menu" id="depmenu-${i}">
