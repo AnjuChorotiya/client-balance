@@ -397,6 +397,9 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
 .amt-ccy{display:block;font-size:14px;font-weight:600;color:var(--n900);font-variant-numeric:tabular-nums}
 .amt-inr{display:block;font-size:12px;color:var(--n500);font-variant-numeric:tabular-nums;margin-top:1px}
 .dep-ref-more{font-size:10px;font-weight:700;color:var(--brand);background:var(--p50);padding:1px 6px;border-radius:999px;margin-left:4px}
+.emp-pill{display:inline-flex;align-items:center;font-size:11px;font-weight:600;padding:3px 11px;border-radius:999px;white-space:nowrap}
+.emp-pill.active{background:#ECFDF3;color:#027A48}
+.emp-pill.exited{background:var(--n100);color:var(--n600)}
 .inv-doc-no-link{border:none;background:none;padding:0;font-family:inherit;cursor:pointer;color:var(--brand);text-decoration:underline;text-underline-offset:2px}
 .inv-doc-no-link:hover{color:var(--p700)}
 /* invoice PDF document */
@@ -2264,10 +2267,9 @@ function empEmail(e, c){
   const handle = (e.name||'').toLowerCase().replace(/[^a-z\s]/g,'').trim().split(/\s+/).filter(Boolean).join('.');
   return handle ? `${handle}@${domain}` : '';
 }
-// employee status pill (active / exited)
+// employee status pill (active / exited) — filled pill, no dot
 function empStatusPill(s){
-  const m = s==='exited' ? {c:'due',t:'Exited'} : {c:'paid',t:'Active'};
-  return `<span class="tl-pill ${m.c}">${m.t}</span>`;
+  return s==='exited' ? `<span class="emp-pill exited">Exited</span>` : `<span class="emp-pill active">Active</span>`;
 }
 function renderDeposits(){
   const c = currentClient; if(!c) return;
