@@ -232,6 +232,16 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
 .cn-dep-emp:focus{outline:none;border-color:var(--purple500)}
 .cn-dep-empname{font-size:14px;font-weight:600;color:var(--n900);padding:6px 0}
 .cn-dep-empname .role{font-weight:500;color:var(--n500)}
+/* security-deposit credit summary (INR held → live FX → credit amount) */
+.cn-dep2{border:1px solid var(--bd);border-radius:10px;padding:4px 14px}
+.cn-dep2-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;font-size:13.5px;color:var(--n600);border-bottom:1px solid var(--n100)}
+.cn-dep2-row:last-child{border-bottom:none}
+.cn-dep2-row .lbl{color:var(--n700)}
+.cn-dep2-row .lbl .r{color:var(--n500);font-weight:500}
+.cn-dep2-row .val{font-weight:600;color:var(--n900);font-variant-numeric:tabular-nums}
+.cn-dep2-row.total .lbl{font-weight:700;color:var(--n900)}
+.cn-dep2-row.total .val{font-size:16px;font-weight:700}
+.cn-dep2-row .live{font-size:10px;font-weight:700;color:var(--success);background:#ECFDF3;padding:1px 6px;border-radius:999px;text-transform:uppercase;letter-spacing:.03em;margin-left:4px}
 .cn-dep-inr{grid-column:2;grid-row:1;align-self:center}
 .cn-dep-inr input{background:#fff}
 .cn-dep-row .cn-li-del{grid-column:3;grid-row:1;align-self:center}
@@ -2448,18 +2458,13 @@ function cnRenderLines(){
   const emps = (typeof clientEmployees==='function' && currentClient) ? (clientEmployees(currentClient)||[]) : [];
   body.innerHTML = lines.map((l,i)=>{
     if(l.isDeposit){
-      const empField = l.empLocked
-        ? `<div class="cn-dep-empname">${escHtml(l.employee||'—')}${l.empRole?` <span class="role">· ${escHtml(l.empRole)}</span>`:''}</div>`
-        : `<select class="cn-dep-emp" onchange="cnSetDepEmp(${i}, this.value)">${emps.map(e=>`<option value="${escAttr(e.name)}" ${e.name===l.employee?'selected':''}>${escHtml(e.name)}${e.role?` · ${escHtml(e.role)}`:''}</option>`).join('')||`<option>${escHtml(l.employee||'—')}</option>`}</select>`;
+      const fx=window._cnFx||1, ccy=window._cnCcy||'USD', dsym=window._cnSym||'$';
+      const conv=(+l.inrAmount||0)/fx;
       return `
-      <div class="cn-dep-row" data-i="${i}">
-        <div class="cn-dep-head">
-          <span class="cn-dep-tag"><svg viewBox="0 0 12 12" fill="none"><path d="M6 1L2 3v3c0 2.5 1.7 4.3 4 5 2.3-.7 4-2.5 4-5V3L6 1Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>Security deposit</span>
-          ${empField}
-        </div>
-        <div class="cn-li-amt cn-dep-inr"><span class="cur">₹</span><input type="number" value="${l.inrAmount}" oninput="cnSetLine(${i},'inrAmount',this.value);cnRefreshDep(${i})"></div>
-        <button type="button" class="cn-li-del" title="Remove line" onclick="cnRemoveLine(${i})"><svg viewBox="0 0 12 12" fill="none"><path d="M1 1L11 11M11 1L1 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
-        <div class="cn-dep-conv">${cnDepConvHtml(l)}</div>
+      <div class="cn-dep2">
+        <div class="cn-dep2-row"><span class="lbl">INR held · ${escHtml(l.employee||'—')}${l.empRole?` <span class="r">· ${escHtml(l.empRole)}</span>`:''}</span><span class="val">₹${fmt(l.inrAmount)}</span></div>
+        <div class="cn-dep2-row"><span class="lbl">Conversion at live FX</span><span class="val">${fx} INR/${ccy} <span class="live">live · ${escHtml(cnToday())}</span></span></div>
+        <div class="cn-dep2-row total"><span class="lbl">Credit amount</span><span class="val">${dsym}${fmt2(conv)}</span></div>
       </div>`;
     }
     return `
