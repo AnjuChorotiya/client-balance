@@ -385,6 +385,32 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
 .amt-ccy{display:block;font-size:14px;font-weight:600;color:var(--n900);font-variant-numeric:tabular-nums}
 .amt-inr{display:block;font-size:12px;color:var(--n500);font-variant-numeric:tabular-nums;margin-top:1px}
 .dep-ref-more{font-size:10px;font-weight:700;color:var(--brand);background:var(--p50);padding:1px 6px;border-radius:999px;margin-left:4px}
+.inv-doc-no-link{border:none;background:none;padding:0;font-family:inherit;cursor:pointer;color:var(--brand);text-decoration:underline;text-underline-offset:2px}
+.inv-doc-no-link:hover{color:var(--p700)}
+/* invoice PDF document */
+.pdf-page{background:#fff;border:1px solid var(--bd);border-radius:10px;padding:32px;box-shadow:0 1px 3px rgba(16,24,40,.06)}
+.pdf-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:26px}
+.pdf-brand{font-size:19px;font-weight:800;color:var(--n900)}
+.pdf-brand-sub{font-size:11px;color:var(--n500);margin-top:2px}
+.pdf-doc-label{text-align:right}
+.pdf-doc-label .t{font-size:20px;font-weight:800;letter-spacing:.06em;color:var(--n900)}
+.pdf-doc-label .n{font-size:12px;color:var(--n500);margin-top:2px}
+.pdf-meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px 24px;margin-bottom:24px}
+.pdf-meta .l{font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:var(--n400);font-weight:600}
+.pdf-meta .v{font-size:13.5px;font-weight:600;color:var(--n900);margin-top:2px}
+.pdf-meta .n{font-size:12px;color:var(--n500)}
+.pdf-table{width:100%;border-collapse:collapse;margin-bottom:18px}
+.pdf-table th{background:var(--n50);text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--n500);font-weight:600;padding:10px 12px}
+.pdf-table th.right,.pdf-table td.right{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.pdf-table td{padding:12px;border-bottom:1px solid var(--n100);font-size:13px;color:var(--n800);vertical-align:top}
+.pdf-nm{font-weight:600;color:var(--n900)}
+.pdf-sub{font-size:11.5px;color:var(--n500);margin-top:2px}
+.pdf-totals{margin-left:auto;width:280px;margin-bottom:22px}
+.pdf-trow{display:flex;justify-content:space-between;padding:8px 12px;font-size:13px;color:var(--n600)}
+.pdf-trow span:last-child{font-weight:600;color:var(--n900);font-variant-numeric:tabular-nums}
+.pdf-trow.grand{border-top:2px solid var(--n900);margin-top:4px;font-size:15px}
+.pdf-trow.grand span{font-weight:700;color:var(--n900)}
+.pdf-foot{font-size:11px;color:var(--n400);border-top:1px solid var(--bd);padding-top:14px;line-height:1.6}
 .tl-filter{display:flex;gap:6px}
 .tl-controls{display:flex;align-items:center;gap:14px}
 .tl-time{height:42px;padding:0 36px 0 16px;font-family:'Satoshi',sans-serif;font-size:14px;font-weight:500;color:#222224;background:#FFFFFF;border:1px solid #F0F1F1;border-radius:10px;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M3 5L6 8L9 5' stroke='%2385878D' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;background-size:12px;min-width:140px}
@@ -1127,6 +1153,17 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
     </header>
     <div class="txn-panel-body" id="depPanelBody"></div>
   </aside>
+</div>
+
+<!-- INVOICE PDF VIEWER modal -->
+<div class="modal-overlay" id="invPdfOverlay" onclick="if(event.target===this)closeInvoicePdf()">
+  <div class="modal" style="width:720px;max-width:94vw">
+    <div class="m-header">
+      <div class="m-title">Invoice <span id="invPdfNo"></span></div>
+      <button class="m-close" onclick="closeInvoicePdf()" aria-label="Close"><svg viewBox="0 0 12 12" fill="none"><path d="M1 1L11 11M11 1L1 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+    </div>
+    <div class="m-body" id="invPdfBody"></div>
+  </div>
 </div>
 
 <!-- INTERNAL NOTES right-side drawer -->
@@ -2298,7 +2335,8 @@ function openDepPanel(i){
   const ccy = clientCcy(currentClient), sym = ccySym(ccy);
   const cName = (currentClient&&currentClient.name)||'Client';
   const cSub = (currentClient&&currentClient.sub)||'';
-  const invoices = empInvoices(e, currentClient);
+  const invoices = empInvoices(e, currentClient).sort((a,b)=> new Date(b.date) - new Date(a.date)); // newest first
+  window._depInvoices = invoices; window._depEmp = e;
   const amtCell = (a, fxr)=>`<td class="right"><span class="amt-ccy">${sym}${fmt(a)}</span><span class="amt-inr">₹${fmt(Math.round(a*fxr))}</span></td>`;
   document.getElementById('depPanelTitle').textContent = `Deposit invoices · ${e.name}`;
   document.getElementById('depPanelBody').innerHTML = `
@@ -2307,11 +2345,11 @@ function openDepPanel(i){
         <div class="inv-doc-party"><span class="lbl">Billed to</span><span class="val">${escHtml(cName)}</span><span class="sub">${escHtml(cSub)}</span></div>
         <div class="inv-doc-party"><span class="lbl">Employee</span><span class="val">${escHtml(e.name)}</span><span class="sub">${escHtml(empEmail(e,currentClient))}</span></div>
       </div>
-      ${invoices.map(inv=>{
+      ${invoices.map((inv,ii)=>{
         const sub = inv.lines.reduce((x,l)=>x+l.amt,0);
         return `<div class="inv-doc-card">
           <div class="inv-doc-top">
-            <div><div class="inv-doc-no">${escHtml(inv.ref)}</div><div class="inv-doc-subt">${escHtml(inv.tag)} · ${escHtml(inv.date)} · FX ${inv.fx} INR/${ccy}</div></div>
+            <div><button type="button" class="inv-doc-no inv-doc-no-link" onclick="openInvoicePdf(${ii})" title="View invoice PDF">${escHtml(inv.ref)}</button><div class="inv-doc-subt">${escHtml(inv.tag)} · ${escHtml(inv.date)} · FX ${inv.fx} INR/${ccy}</div></div>
             <span class="inv-doc-status">${escHtml(inv.status)}</span>
           </div>
           <table class="inv-doc-table">
@@ -2327,6 +2365,40 @@ function openDepPanel(i){
   document.getElementById('depPanel').classList.add('show');
 }
 function closeDepPanel(){ document.getElementById('depPanel').classList.remove('show'); }
+// View the original invoice as a PDF-style document
+function openInvoicePdf(idx){
+  const inv = (window._depInvoices||[])[idx], e = window._depEmp; if(!inv||!e) return;
+  const ccy = clientCcy(currentClient), sym = ccySym(ccy);
+  const cName = (currentClient&&currentClient.name)||'Client', cSub = (currentClient&&currentClient.sub)||'';
+  const sub = inv.lines.reduce((x,l)=>x+l.amt,0);
+  document.getElementById('invPdfNo').textContent = inv.ref;
+  document.getElementById('invPdfBody').innerHTML = `
+    <div class="pdf-page">
+      <div class="pdf-head">
+        <div><div class="pdf-brand">Wisemonk</div><div class="pdf-brand-sub">EOR &amp; payroll · invoice</div></div>
+        <div class="pdf-doc-label"><div class="t">INVOICE</div><div class="n">${escHtml(inv.ref)}</div></div>
+      </div>
+      <div class="pdf-meta-grid">
+        <div class="pdf-meta"><div class="l">Billed to</div><div class="v">${escHtml(cName)}</div><div class="n">${escHtml(cSub)}</div></div>
+        <div class="pdf-meta"><div class="l">Employee</div><div class="v">${escHtml(e.name)}</div><div class="n">${escHtml(empEmail(e,currentClient))}</div></div>
+        <div class="pdf-meta"><div class="l">Issue date</div><div class="v">${escHtml(inv.date)}</div></div>
+        <div class="pdf-meta"><div class="l">FX rate</div><div class="v">${inv.fx} INR/${ccy}</div></div>
+      </div>
+      <table class="pdf-table">
+        <thead><tr><th>Description</th><th class="right">Amount (${ccy})</th><th class="right">INR equivalent</th></tr></thead>
+        <tbody>
+          ${inv.lines.map(l=>`<tr><td><div class="pdf-nm">${escHtml(l.t)}</div><div class="pdf-sub">${escHtml(l.s)}</div></td><td class="right">${sym}${fmt(l.amt)}</td><td class="right">₹${fmt(Math.round(l.amt*inv.fx))}</td></tr>`).join('')}
+        </tbody>
+      </table>
+      <div class="pdf-totals">
+        <div class="pdf-trow"><span>Subtotal</span><span>${sym}${fmt(sub)}</span></div>
+        <div class="pdf-trow grand"><span>Total due</span><span>${sym}${fmt(sub)}</span></div>
+      </div>
+      <div class="pdf-foot">Security-deposit components are refundable and held in INR (₹${fmt(Math.round(sub*inv.fx))} at ${inv.fx} INR/${ccy}). This is a system-generated invoice and does not require a signature.</div>
+    </div>`;
+  document.getElementById('invPdfOverlay').classList.add('show');
+}
+function closeInvoicePdf(){ document.getElementById('invPdfOverlay').classList.remove('show'); }
 
 function releaseCreditNote(idx){
   const items = window._timelineCache || [];
