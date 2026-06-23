@@ -1749,7 +1749,7 @@ function openClient(id){
   const wal = c.outstanding || 0;
   document.getElementById('drSumm').innerHTML = `
     <div class="summ-cell"><div class="summ-label">Outstanding</div><div class="summ-val ${wal?'warn':'muted'}">${wal?`<span class="cur">$</span>${fmt(wal)}`:'$0'}</div></div>
-    <div class="summ-cell"><div class="summ-label">Deposit held</div><div class="summ-val">${c.deposit?`<span class="cur">$</span>${fmt(c.deposit)}`:'<span class="muted">$0</span>'}</div></div>
+    <div class="summ-cell"><div class="summ-label">Deposit held</div><div class="summ-val">${c.deposit?`<span class="cur">₹</span>${fmt(Math.round(c.deposit*getLiveFx(clientCcy(c))))}`:'<span class="muted">₹0</span>'}</div></div>
     <div class="summ-cell"><div class="summ-label">Employees</div><div class="summ-val">${c.employees}</div></div>
   `;
 
