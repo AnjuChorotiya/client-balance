@@ -2473,8 +2473,7 @@ function cnRenderLines(){
       const conv=(+l.inrAmount||0)/fx;
       return `
       <div class="cn-dep2">
-        <div class="cn-dep2-row"><span class="lbl">INR held · ${escHtml(l.employee||'—')}${l.empRole?` <span class="r">· ${escHtml(l.empRole)}</span>`:''}</span><span class="val">₹${fmt(l.inrAmount)}</span></div>
-        <div class="cn-dep2-row"><span class="lbl">Conversion at live FX</span><span class="val">${fx} INR/${ccy}</span></div>
+        <div class="cn-dep2-row"><span class="lbl">₹${fmt(l.inrAmount)} at live FX</span><span class="val">${fx} INR/${ccy}</span></div>
         <div class="cn-dep2-row total"><span class="lbl">Credit amount</span><span class="val">${dsym}${fmt2(conv)}</span></div>
       </div>`;
     }
