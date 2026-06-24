@@ -2477,6 +2477,7 @@ function cnRenderLines(){
       const conv=(+l.inrAmount||0)/fx;
       return `
       <div class="cn-dep2">
+        <div class="cn-dep2-row"><span class="lbl">Employee</span><span class="val">${escHtml(l.employee||'—')}${l.empRole?` <span class="r">· ${escHtml(l.empRole)}</span>`:''}</span></div>
         <div class="cn-dep2-row"><span class="lbl">Security deposit held</span><span class="val">₹${fmt(l.inrAmount)}</span></div>
         <div class="cn-dep2-row"><span class="lbl">Live FX conversion</span><span class="val">${fx} INR/${ccy}</span></div>
         <div class="cn-dep2-row total"><span class="lbl">Credit amount</span><span class="val">${dsym}${fmt2(conv)}</span></div>
