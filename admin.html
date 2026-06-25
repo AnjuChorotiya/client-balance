@@ -400,6 +400,22 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
 .emp-pill{display:inline-flex;align-items:center;font-size:11px;font-weight:600;padding:3px 11px;border-radius:999px;white-space:nowrap}
 .emp-pill.active{background:var(--p50);color:var(--brand)}
 .emp-pill.exited{background:var(--n100);color:var(--n600)}
+/* deposit edit panel */
+.dpe-emp{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:18px;border-bottom:1px solid var(--bd)}
+.dpe-emp .dep-av{width:44px;height:44px;font-size:15px}
+.dpe-nm{font-size:16px;font-weight:700;color:var(--n900)}
+.dpe-sub{font-size:13px;color:var(--n500)}
+.dpe-row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:14px;border:1px solid var(--bd);border-radius:12px}
+.dpe-row-txt{min-width:0}
+.dpe-row-title{font-size:14px;font-weight:600;color:var(--n900)}
+.dpe-row-sub{font-size:12.5px;color:var(--n500);line-height:1.5;margin-top:3px}
+.dpe-foot{display:flex;justify-content:flex-end;gap:10px;padding:16px 24px;border-top:1px solid var(--bd)}
+.wm-switch{position:relative;display:inline-block;width:42px;height:24px;flex:0 0 auto}
+.wm-switch input{opacity:0;width:0;height:0}
+.wm-switch .slider{position:absolute;inset:0;background:var(--n300);border-radius:999px;transition:.18s;cursor:pointer}
+.wm-switch .slider:before{content:'';position:absolute;width:18px;height:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.18s;box-shadow:0 1px 2px rgba(16,24,40,.2)}
+.wm-switch input:checked + .slider{background:var(--brand)}
+.wm-switch input:checked + .slider:before{transform:translateX(18px)}
 .inv-doc-no-link{border:none;background:none;padding:0;font-family:inherit;cursor:pointer;color:var(--brand);text-decoration:underline;text-underline-offset:2px}
 .inv-doc-no-link:hover{color:var(--p700)}
 /* invoice PDF document */
@@ -1168,6 +1184,21 @@ body{font-family:var(--font);background:var(--bg);color:#222224;-webkit-font-smo
       <button class="m-close" onclick="closeDepPanel()" aria-label="Close"><svg viewBox="0 0 12 12" fill="none"><path d="M1 1L11 11M11 1L1 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
     </header>
     <div class="txn-panel-body" id="depPanelBody"></div>
+  </aside>
+</div>
+
+<!-- DEPOSIT / EMPLOYEE EDIT right-side panel -->
+<div class="txn-overlay" id="depEditOverlay" onclick="if(event.target===this)closeDepEdit()">
+  <aside class="txn-panel">
+    <header class="txn-panel-head">
+      <div class="txn-panel-title" id="depEditTitle">Edit</div>
+      <button class="m-close" onclick="closeDepEdit()" aria-label="Close"><svg viewBox="0 0 12 12" fill="none"><path d="M1 1L11 11M11 1L1 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+    </header>
+    <div class="txn-panel-body" id="depEditBody"></div>
+    <footer class="dpe-foot">
+      <button class="btn-cancel" onclick="closeDepEdit()">Cancel</button>
+      <button class="btn-confirm" onclick="saveDepEdit()">Save changes</button>
+    </footer>
   </aside>
 </div>
 
@@ -2292,6 +2323,7 @@ function renderDeposits(){
         <div class="tl-row-menu" id="depmenu-${i}">
           <button onclick="event.stopPropagation();openDepPanel(${i});closeAllRowMenus()"><svg viewBox="0 0 16 16" fill="none"><path d="M2 4H14M2 8H14M2 12H10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>View join invoice</button>
           <button onclick="event.stopPropagation();releaseDepositCN(${i});closeAllRowMenus()"><svg viewBox="0 0 16 16" fill="none"><path d="M2.5 6C3 4 5 3 7 3C10 3 12.5 5.5 12.5 8.5C12.5 11.5 10 14 7 14C4.5 14 2.5 12.5 2 10.5M2.5 6V3M2.5 6H5.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Release credit note</button>
+          <button onclick="event.stopPropagation();openDepEdit(${i});closeAllRowMenus()"><svg viewBox="0 0 16 16" fill="none"><path d="M9 3L13 7L6 14H2V10L9 3Z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Edit</button>
         </div>
       </div>
     </div>`;
@@ -2392,6 +2424,29 @@ function openDepPanel(i){
   document.getElementById('depPanel').classList.add('show');
 }
 function closeDepPanel(){ document.getElementById('depPanel').classList.remove('show'); }
+// Edit panel — per-employee settings (e.g. whether to show the billing screen to this client)
+function openDepEdit(i){
+  const r=(window._depRows||[])[i]; if(!r) return; const e=r.e;
+  window._depEditEmp=e;
+  const initial=e.initial||e.name.split(' ').map(p=>p[0]).join('').slice(0,2);
+  const access=(window._billingAccess&&window._billingAccess[e.id]!==undefined)?window._billingAccess[e.id]:true;
+  document.getElementById('depEditTitle').textContent=`Edit · ${e.name}`;
+  document.getElementById('depEditBody').innerHTML=`
+    <div class="dpe-emp"><span class="dep-av" style="background:var(--brand)">${escHtml(initial)}</span><div><div class="dpe-nm">${escHtml(e.name)}</div><div class="dpe-sub">${escHtml(empEmail(e,currentClient))}</div></div></div>
+    <div class="dpe-row">
+      <div class="dpe-row-txt"><div class="dpe-row-title">Show billing screen to this client</div><div class="dpe-row-sub">When on, this contractor can view the billing &amp; invoices screen in their portal.</div></div>
+      <label class="wm-switch"><input type="checkbox" id="dpeBilling" ${access?'checked':''}><span class="slider"></span></label>
+    </div>`;
+  document.getElementById('depEditOverlay').classList.add('show');
+}
+function closeDepEdit(){ document.getElementById('depEditOverlay').classList.remove('show'); }
+function saveDepEdit(){
+  const e=window._depEditEmp; if(!e) return;
+  const on=document.getElementById('dpeBilling').checked;
+  window._billingAccess=window._billingAccess||{}; window._billingAccess[e.id]=on;
+  closeDepEdit();
+  if(typeof showToast==='function') showToast(`Billing screen ${on?'enabled':'hidden'} for ${e.name}`);
+}
 // View the original invoice as a PDF-style document
 function openInvoicePdf(idx){
   const inv = (window._depInvoices||[])[idx], e = window._depEmp; if(!inv||!e) return;
